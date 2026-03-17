@@ -54,10 +54,13 @@ export default function Dashboard() {
       setRecentAnalyses(analyses.slice(0, 3));
     } catch (err) {
       console.error("[Dashboard] Failed to fetch data from Firebase:", err);
-      // Provide a functional fallback if Firebase rules block or DB is uninitialized
-      setUserStatus({
-        plan: 'free', documentsUsed: 0, limit: 'unlimited', remaining: 'unlimited', isLimitReached: false
-      } as unknown as UserStatus);
+      setUserStatus({ 
+        plan: 'free', 
+        usageCount: 0, 
+        usageLimit: 1, 
+        remaining: 1, 
+        isLimitReached: false 
+      } as any);
     }
   }, []);
 
@@ -97,13 +100,45 @@ export default function Dashboard() {
     }
   };
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = (reader.result as string).split(',')[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const processFile = async () => {
+    if (!file) {
+      setError("Please select a PDF file first.");
+      return;
+    }
+
+    const user = auth.currentUser;
+    if (!user) {
+      setError("You must be signed in to analyze documents.");
+      return;
+    }
+
+    // Enforce limits
+    if (userStatus?.isLimitReached) {
+      setIsUpgradeModalOpen(true);
+      return;
+    }
+
     try {
       setIsProcessing(true);
       setError(null);
+      setResult(""); // Clear previous result
+
+      const base64Data = await fileToBase64(file);
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
         {
           method: "POST",
           headers: {
@@ -114,7 +149,13 @@ export default function Dashboard() {
               {
                 parts: [
                   {
-                    text: "Analyze this legal document and extract key risks, obligations, and important clauses."
+                    inline_data: {
+                      mime_type: "application/pdf",
+                      data: base64Data
+                    }
+                  },
+                  {
+                    text: "Analyze this legal document and extract key risks, obligations, and important clauses. Provide a clear summary."
                   }
                 ]
               }
@@ -124,17 +165,34 @@ export default function Dashboard() {
       );
 
       const data = await response.json();
+      console.log("FULL GEMINI RESPONSE:", JSON.stringify(data, null, 2));
 
-      console.log("Gemini response:", data);
+      let resultText = "No result";
 
-      const resultText =
-        data?.candidates?.[0]?.content?.parts?.[0]?.text || "No result";
+      if (data && data.candidates && data.candidates.length > 0) {
+        const parts = data.candidates[0]?.content?.parts;
+        if (parts && parts.length > 0) {
+          resultText = parts.map((p: any) => p.text).join("\n");
+        }
+      }
+
+      if (resultText === "No result" && data.error) {
+        throw new Error(data.error.message || "Gemini API error");
+      }
 
       setResult(resultText);
 
-    } catch (error) {
+      // Track usage in Firebase
+      await firebaseService.incrementUsage(user.uid);
+      
+      // Save a dummy analysis record so it shows in history (optional but good for UX)
+      // await firebaseService.saveAnalysis({ ... }, user.uid, []); 
+      
+      fetchData(); // Refresh usage limits
+
+    } catch (error: any) {
       console.error(error);
-      setError("Analysis failed. Please try again.");
+      setError(error.message || "Analysis failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -354,19 +412,19 @@ return (
                   <div className="space-y-5">
                     <div className="flex justify-between items-end">
                       <span className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Analysis Limit</span>
-                      <span className="text-2xl font-display font-bold text-slate-800 tracking-tight">
-                        {userStatus.documentsUsed} <span className="text-slate-300 font-medium">/</span> {userStatus.limit === 'unlimited' ? '∞' : userStatus.limit}
-                      </span>
-                    </div>
-                    <div className="h-2.5 w-full bg-slate-200/60 rounded-full overflow-hidden shadow-inner">
-                      <div
-                        className="h-full bg-brand-500 transition-all duration-1000 ease-out rounded-full"
-                        style={{
-                          width: userStatus.limit === 'unlimited'
-                            ? '100%'
-                            : `${Math.min(100, (userStatus.documentsUsed / (userStatus.limit as number || 1)) * 100)}%`
-                        }}
-                      />
+                        <span className="text-2xl font-display font-bold text-slate-800 tracking-tight">
+                          {userStatus.usageCount} <span className="text-slate-300 font-medium">/</span> {userStatus.usageLimit === 'unlimited' ? '∞' : userStatus.usageLimit}
+                        </span>
+                      </div>
+                      <div className="h-2.5 w-full bg-slate-200/60 rounded-full overflow-hidden shadow-inner">
+                        <div 
+                          className="h-full bg-brand-500 transition-all duration-1000 ease-out rounded-full" 
+                          style={{ 
+                            width: userStatus.usageLimit === 'unlimited' 
+                              ? '100%' 
+                              : `${Math.min(100, (userStatus.usageCount / (userStatus.usageLimit as number || 1)) * 100)}%` 
+                          }} 
+                        />
                     </div>
                   </div>
 

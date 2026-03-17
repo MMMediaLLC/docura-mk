@@ -137,10 +137,7 @@ export default function LandingPage() {
                 Analyze a document
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/pricing" className="w-full sm:w-auto px-12 py-5 text-lg font-bold text-slate-600 hover:text-brand-600 flex items-center justify-center gap-2 group transition-colors">
-                View Pricing
-                <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </Link>
+
             </div>
 
             {/* Trust badges */}
@@ -395,7 +392,7 @@ export default function LandingPage() {
           </div>
           <div className="border-t border-slate-100 pt-10 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">© 2026 DOCURA AI. All rights reserved.</p>
-            <p className="text-xs text-slate-300 font-medium">Powered by Gemini AI · Secured by Firebase</p>
+
           </div>
         </div>
       </footer>

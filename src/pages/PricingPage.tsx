@@ -1,18 +1,30 @@
-import { Zap, Check, ArrowRight, Sparkles, Building2, Star } from 'lucide-react';
+import { 
+  Check, 
+  ArrowRight, 
+  Sparkles, 
+  Zap, 
+  ShieldCheck, 
+  Crown, 
+  Star,
+  Flame,
+  Gem,
+  Cpu
+} from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
 import { auth } from '../firebase';
 import { firebaseService } from '../services/firebaseService';
+import { PLANS, getCheckoutUrl } from '../config/plans';
 
 export default function PricingPage() {
   const plans = [
     {
-      id: "true_docura",
-      name: "True Docura",
-      price: "$0",
-      desc: "Try DOCURA for free — no card required.",
+      id: "free",
+      name: PLANS.free.name,
+      price: PLANS.free.price,
+      desc: "Perfect for testing the waters of AI analysis.",
       icon: Sparkles,
-      iconGradient: "from-slate-400 to-slate-600",
+      iconGradient: "from-blue-400 to-indigo-500",
       features: [
         "1 document analysis",
         "Basic AI summary",
@@ -23,15 +35,15 @@ export default function PricingPage() {
     },
     {
       id: "pro",
-      name: "Pro",
-      price: "$6",
-      period: "/month",
-      desc: "For professionals who review regularly.",
-      icon: Zap,
-      iconGradient: "from-brand-500 to-indigo-600",
+      name: PLANS.pro.name,
+      price: PLANS.pro.price,
+      period: PLANS.pro.period,
+      desc: "For legal warriors and high-volume professionals.",
+      icon: Flame, // Changed from Zap to Flame for more premium feel
+      iconGradient: "from-orange-400 to-rose-600",
       features: [
         "3 document analyses / month",
-        "Full AI analysis & scoring",
+        "Gemini 1.5 Pro engine",
         "Risk & liability detection",
         "Obligations extraction",
         "Deadlines & dates detection",
@@ -39,39 +51,35 @@ export default function PricingPage() {
       ],
       cta: "Upgrade to Pro",
       highlight: true,
-      lemonSqueezyUrl: "https://docura.lemonsqueezy.com/checkout/buy/pro-plan"
+      lemonSqueezyUrl: getCheckoutUrl("pro")
     },
     {
       id: "business",
-      name: "Business",
-      price: "$19",
-      period: "/month",
-      desc: "For agencies and legal departments.",
-      icon: Building2,
-      iconGradient: "from-violet-500 to-purple-700",
+      name: PLANS.business.name,
+      price: PLANS.business.price,
+      period: PLANS.business.period,
+      desc: "The ultimate power for agencies and legal teams.",
+      icon: Gem, // Changed from Building2 to Gem
+      iconGradient: "from-fuchsia-500 to-purple-700",
       features: [
         "Unlimited document analysis",
-        "Full AI analysis & scoring",
-        "Document Q&A",
-        "Export reports",
-        "Priority processing",
+        "Everything in Pro",
+        "Priority AI access",
+        "Export professional reports",
+        "Advanced data extraction",
         "Dedicated support",
       ],
       cta: "Start Business",
-      lemonSqueezyUrl: "https://docura.lemonsqueezy.com/checkout/buy/business-plan"
+      lemonSqueezyUrl: getCheckoutUrl("business")
     }
   ];
 
-  const handlePlanAction = async (plan: any) => {
-    if (plan.id === 'true_docura') return;
-    const user = auth.currentUser;
-    if (!user) return;
+  const handlePlanAction = (plan: any) => {
+    if (plan.id === 'free' || plan.current) return;
     
-    try {
-      await firebaseService.updatePlan(user.uid, plan.id as any);
-      window.location.href = '/dashboard';
-    } catch (err) {
-      console.error("Failed to update plan", err);
+    // Redirect to Lemon Squeezy checkout
+    if (plan.lemonSqueezyUrl) {
+      window.open(plan.lemonSqueezyUrl, '_blank');
     }
   };
 
@@ -127,8 +135,7 @@ export default function PricingPage() {
               )}
 
               {plan.highlight && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-linear-to-r from-amber-400 to-orange-400 text-white text-[10px] font-bold uppercase tracking-[0.2em] px-5 py-2 rounded-full shadow-xl shadow-amber-200">
-                  <Star className="w-3 h-3 fill-current" />
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-linear-to-r from-orange-400 via-rose-500 to-brand-600 text-white text-[9px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg shadow-rose-500/20 border border-white/10 whitespace-nowrap">
                   Most Popular
                 </div>
               )}
@@ -136,13 +143,7 @@ export default function PricingPage() {
               <div className="p-9 relative z-10 flex flex-col h-full">
                 {/* Plan header */}
                 <div className="mb-8">
-                  <div className={cn(
-                    "w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-linear-to-br shadow-lg",
-                    plan.iconGradient,
-                    plan.highlight ? "shadow-brand-900/30" : "shadow-slate-200"
-                  )}>
-                    <plan.icon className="w-7 h-7 text-white" />
-                  </div>
+
                   <h3 className={cn("font-display text-2xl font-bold mb-2 tracking-tight", plan.highlight ? "text-white" : "text-slate-900")}>{plan.name}</h3>
                   <div className="flex items-baseline gap-1 mb-4">
                     <span className={cn("text-5xl font-black tracking-tighter", plan.highlight ? "text-white" : "text-slate-900")}>{plan.price}</span>
