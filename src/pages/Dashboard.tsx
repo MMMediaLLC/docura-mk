@@ -118,27 +118,21 @@ export default function Dashboard() {
       return;
     }
 
-    const user = auth.currentUser;
-    if (!user) {
-      setError("You must be signed in to analyze documents.");
-      return;
-    }
-
-    // Enforce limits
-    if (userStatus?.isLimitReached) {
-      setIsUpgradeModalOpen(true);
-      return;
-    }
-
     try {
       setIsProcessing(true);
       setError(null);
-      setResult(""); // Clear previous result
+
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+      if (!apiKey) {
+        setError("API key is missing");
+        return;
+      }
 
       const base64Data = await fileToBase64(file);
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: {
@@ -155,7 +149,7 @@ export default function Dashboard() {
                     }
                   },
                   {
-                    text: "Analyze this legal document and extract key risks, obligations, and important clauses. Provide a clear summary."
+                    text: "Analyze this legal document and return:\n- Key risks\n- Legal obligations\n- Important clauses\n- Short summary\nFormat clearly with bullet points."
                   }
                 ]
               }
@@ -165,34 +159,24 @@ export default function Dashboard() {
       );
 
       const data = await response.json();
+
       console.log("FULL GEMINI RESPONSE:", JSON.stringify(data, null, 2));
 
       let resultText = "No result";
 
       if (data && data.candidates && data.candidates.length > 0) {
         const parts = data.candidates[0]?.content?.parts;
+
         if (parts && parts.length > 0) {
           resultText = parts.map((p: any) => p.text).join("\n");
         }
       }
 
-      if (resultText === "No result" && data.error) {
-        throw new Error(data.error.message || "Gemini API error");
-      }
-
       setResult(resultText);
 
-      // Track usage in Firebase
-      await firebaseService.incrementUsage(user.uid);
-      
-      // Save a dummy analysis record so it shows in history (optional but good for UX)
-      // await firebaseService.saveAnalysis({ ... }, user.uid, []); 
-      
-      fetchData(); // Refresh usage limits
-
-    } catch (error: any) {
+    } catch (error) {
       console.error(error);
-      setError(error.message || "Analysis failed. Please try again.");
+      setError("Analysis failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -322,7 +306,7 @@ return (
                     </button>
 
                     {result && (
-                      <div className="mt-6 p-4 bg-slate-100 rounded-xl text-left text-sm text-slate-700 whitespace-pre-wrap border border-slate-200">
+                      <div className="mt-6 p-4 bg-slate-100 rounded-xl whitespace-pre-wrap">
                         {result}
                       </div>
                     )}
