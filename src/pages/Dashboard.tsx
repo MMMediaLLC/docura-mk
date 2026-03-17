@@ -29,6 +29,11 @@ import { UserStatus } from '../types/user';
 import { auth } from '../firebase';
 import { firebaseService } from '../services/firebaseService';
 import { AnalysisService } from '../services/analysisService';
+import * as pdfjsLib from 'pdfjs-dist';
+import mammoth from 'mammoth';
+
+// Configure PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
 export default function Dashboard() {
   const [isDragging, setIsDragging] = useState(false);
@@ -82,22 +87,51 @@ export default function Dashboard() {
     e.preventDefault();
     setIsDragging(false);
     const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile && droppedFile.type === 'application/pdf') {
+    const allowedTypes = [
+      'application/pdf', 
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    if (droppedFile && allowedTypes.includes(droppedFile.type)) {
       setFile(droppedFile);
       setError(null);
     } else {
-      setError('Please upload a PDF file.');
+      setError('Please upload a PDF or DOCX file.');
     }
   }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile && selectedFile.type === 'application/pdf') {
+    const allowedTypes = [
+      'application/pdf', 
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    if (selectedFile && allowedTypes.includes(selectedFile.type)) {
       setFile(selectedFile);
       setError(null);
     } else {
-      setError('Please upload a PDF file.');
+      setError('Please upload a PDF or DOCX file.');
     }
+  };
+
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer();
+    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+    const pdf = await loadingTask.promise;
+    let fullText = '';
+    
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item: any) => item.str).join(' ');
+      fullText += pageText + '\n';
+    }
+    return fullText;
+  };
+
+  const extractTextFromDOCX = async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    return result.value;
   };
 
   const fileToBase64 = (file: File): Promise<string> => {
@@ -114,22 +148,49 @@ export default function Dashboard() {
 
   const processFile = async () => {
     if (!file) {
-      setError("Please select a PDF file first.");
+      setError("Please select a file first.");
       return;
     }
 
     try {
       setIsProcessing(true);
       setError(null);
+      setResult("");
 
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
       if (!apiKey) {
         setError("API key is missing");
         return;
       }
 
-      const base64Data = await fileToBase64(file);
+      let documentText = "";
+      
+      try {
+        if (file.type === 'application/pdf') {
+          documentText = await extractTextFromPDF(file);
+        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+          documentText = await extractTextFromDOCX(file);
+        } else {
+          setError("Unsupported file type. Please upload a PDF or DOCX.");
+          setIsProcessing(false);
+          return;
+        }
+      } catch (extError) {
+        console.error("Extraction error:", extError);
+        setError("Failed to extract text from document. Please ensure it's not password protected.");
+        setIsProcessing(false);
+        return;
+      }
+
+      documentText = documentText.trim();
+      if (!documentText) {
+        setError("The document seems to be empty or contains no readable text.");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Limit to ~12000 chars for safety/speed
+      const truncatedText = documentText.slice(0, 12000);
 
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
@@ -143,13 +204,19 @@ export default function Dashboard() {
               {
                 parts: [
                   {
-                    inline_data: {
-                      mime_type: "application/pdf",
-                      data: base64Data
-                    }
-                  },
-                  {
-                    text: "Analyze this legal document and return:\n- Key risks\n- Legal obligations\n- Important clauses\n- Short summary\nFormat clearly with bullet points."
+                    text: `You are a professional document analysis assistant.
+
+Analyze the following document and return:
+- Short summary
+- Key risks
+- Main obligations
+- Important clauses
+- Recommended next steps
+
+Format clearly with section headings and bullet points.
+
+Document content:
+${truncatedText}`
                   }
                 ]
               }
@@ -159,17 +226,19 @@ export default function Dashboard() {
       );
 
       const data = await response.json();
-
       console.log("FULL GEMINI RESPONSE:", JSON.stringify(data, null, 2));
 
-      let resultText = "No result";
+      let resultText = "No analysis result returned.";
 
       if (data && data.candidates && data.candidates.length > 0) {
         const parts = data.candidates[0]?.content?.parts;
-
         if (parts && parts.length > 0) {
           resultText = parts.map((p: any) => p.text).join("\n");
         }
+      } else if (data.error) {
+        setError(`Gemini Error: ${data.error.message}`);
+        setIsProcessing(false);
+        return;
       }
 
       setResult(resultText);
@@ -230,7 +299,7 @@ return (
               <input
                 type="file"
                 onChange={handleFileChange}
-                accept=".pdf"
+                accept=".pdf,.docx"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 disabled={isProcessing}
               />
