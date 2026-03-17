@@ -163,6 +163,18 @@ export default function Dashboard() {
         return;
       }
 
+      const user = auth.currentUser;
+      if (!user) {
+        setError("You must be signed in to analyze documents.");
+        return;
+      }
+
+      // Enforce limits
+      if (userStatus?.isLimitReached) {
+        setIsUpgradeModalOpen(true);
+        return;
+      }
+
       let documentText = "";
       
       try {
@@ -242,6 +254,12 @@ ${truncatedText}`
       }
 
       setResult(resultText);
+
+      // Track usage in Firebase
+      await firebaseService.incrementUsage(user.uid);
+      
+      // Refresh usage limits
+      fetchData();
 
     } catch (error) {
       console.error(error);
