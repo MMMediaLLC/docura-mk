@@ -1,0 +1,7 @@
+This is a sample contract text for testing DOCURA analysis pipeline.
+It contains terms and conditions for a software license agreement.
+The licensee agrees to pay $1000 per month.
+The agreement terminates on December 31, 2026.
+Confidentiality must be maintained for 5 years.
+Liability is limited to the total fees paid in the last 12 months.
+Disputes will be resolved in the courts of London.

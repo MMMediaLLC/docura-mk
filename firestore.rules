@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global function to determine if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // User Profiles Security
+    // Users can only read and write their own profile document
+    match /users/{userId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      // Allow creation when user first signs up
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      // Allow generic updates to their own profile (like usage increment)
+      allow update: if isAuthenticated() && request.auth.uid == userId;
+      allow delete: if false; // Users shouldn't delete their core profile here
+    }
+
+    // Analyses Security
+    match /analyses/{analysisId} {
+      // READ: You can only read an analysis if your UID matches the document's userId (and the document exists)
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      
+      // CREATE: You can only create a record for yourself
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      
+      // DELETE/UPDATE: Only the owner can delete or modify the record
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+
+      // Nested Collection Security: Chunks 
+      match /chunks/{chunkId} {
+        // For subcollections, we need to verify the owner of the parent document
+        function isParentOwner() {
+          let parentDoc = get(/databases/$(database)/documents/analyses/$(analysisId));
+          return parentDoc.data.userId == request.auth.uid;
+        }
+
+        // Apply parent ownership rules to chunk reading
+        allow read: if isAuthenticated() && isParentOwner();
+        
+        // When creating chunks, ensure the user owns the parent analysis
+        allow create: if isAuthenticated() && isParentOwner();
+        
+        allow update, delete: if isAuthenticated() && isParentOwner();
+      }
+    }
+  }
+}

@@ -1,0 +1,216 @@
+import { Zap, Check, ArrowRight, Sparkles, Building2, Star } from 'lucide-react';
+import { motion } from 'motion/react';
+import { cn } from '../lib/utils';
+import { auth } from '../firebase';
+import { firebaseService } from '../services/firebaseService';
+
+export default function PricingPage() {
+  const plans = [
+    {
+      id: "true_docura",
+      name: "True Docura",
+      price: "$0",
+      desc: "Try DOCURA for free — no card required.",
+      icon: Sparkles,
+      iconGradient: "from-slate-400 to-slate-600",
+      features: [
+        "1 document analysis",
+        "Basic AI summary",
+        "Standard processing",
+      ],
+      cta: "Current Plan",
+      current: true
+    },
+    {
+      id: "pro",
+      name: "Pro",
+      price: "$6",
+      period: "/month",
+      desc: "For professionals who review regularly.",
+      icon: Zap,
+      iconGradient: "from-brand-500 to-indigo-600",
+      features: [
+        "3 document analyses / month",
+        "Full AI analysis & scoring",
+        "Risk & liability detection",
+        "Obligations extraction",
+        "Deadlines & dates detection",
+        "Document Q&A",
+      ],
+      cta: "Upgrade to Pro",
+      highlight: true,
+      lemonSqueezyUrl: "https://docura.lemonsqueezy.com/checkout/buy/pro-plan"
+    },
+    {
+      id: "business",
+      name: "Business",
+      price: "$19",
+      period: "/month",
+      desc: "For agencies and legal departments.",
+      icon: Building2,
+      iconGradient: "from-violet-500 to-purple-700",
+      features: [
+        "Unlimited document analysis",
+        "Full AI analysis & scoring",
+        "Document Q&A",
+        "Export reports",
+        "Priority processing",
+        "Dedicated support",
+      ],
+      cta: "Start Business",
+      lemonSqueezyUrl: "https://docura.lemonsqueezy.com/checkout/buy/business-plan"
+    }
+  ];
+
+  const handlePlanAction = async (plan: any) => {
+    if (plan.id === 'true_docura') return;
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    try {
+      await firebaseService.updatePlan(user.uid, plan.id as any);
+      window.location.href = '/dashboard';
+    } catch (err) {
+      console.error("Failed to update plan", err);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-transparent py-4 px-4 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="fixed inset-0 pointer-events-none -z-10">
+        <div className="absolute top-40 left-1/4 w-[500px] h-[500px] bg-brand-400/6 rounded-full blur-[180px]" />
+        <div className="absolute bottom-40 right-1/4 w-[500px] h-[500px] bg-indigo-400/6 rounded-full blur-[180px]" />
+      </div>
+
+      <div className="max-w-6xl mx-auto space-y-16 relative z-10">
+        
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-2xl mx-auto pt-8"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-50 border border-brand-100 text-brand-700 text-[10px] font-bold rounded-full mb-6 uppercase tracking-[0.25em] shadow-sm">
+            <Sparkles className="w-3.5 h-3.5" />
+            Pricing Plans
+          </div>
+          <h1 className="font-display text-5xl md:text-6xl font-bold text-slate-900 tracking-tight mb-6 leading-tight">
+            Simple, transparent <span className="text-gradient">pricing</span>
+          </h1>
+          <p className="text-slate-500 text-xl font-medium leading-relaxed">Choose the plan that fits your document review needs. No hidden fees, cancel anytime.</p>
+        </motion.div>
+
+        {/* Plans Grid */}
+        <div className="grid md:grid-cols-3 gap-6 items-stretch">
+          {plans.map((plan, i) => (
+            <motion.div
+              key={plan.name}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className={cn(
+                "relative rounded-[2.5rem] border flex flex-col h-full transition-all duration-500 group overflow-hidden",
+                plan.highlight 
+                  ? "bg-linear-to-b from-brand-700 via-brand-800 to-slate-900 text-white border-brand-600/50 shadow-2xl shadow-brand-900/40 md:scale-105 md:z-10" 
+                  : "bg-white text-slate-900 border-slate-200/60 hover:border-brand-200 hover:shadow-2xl hover:shadow-brand-100/30 shadow-sm"
+              )}
+            >
+              {/* Top glow for highlighted plan */}
+              {plan.highlight && (
+                <>
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-brand-500/20 blur-[80px] rounded-full" />
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/20 blur-[80px] rounded-full" />
+                  <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+                </>
+              )}
+
+              {plan.highlight && (
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-linear-to-r from-amber-400 to-orange-400 text-white text-[10px] font-bold uppercase tracking-[0.2em] px-5 py-2 rounded-full shadow-xl shadow-amber-200">
+                  <Star className="w-3 h-3 fill-current" />
+                  Most Popular
+                </div>
+              )}
+
+              <div className="p-9 relative z-10 flex flex-col h-full">
+                {/* Plan header */}
+                <div className="mb-8">
+                  <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-linear-to-br shadow-lg",
+                    plan.iconGradient,
+                    plan.highlight ? "shadow-brand-900/30" : "shadow-slate-200"
+                  )}>
+                    <plan.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className={cn("font-display text-2xl font-bold mb-2 tracking-tight", plan.highlight ? "text-white" : "text-slate-900")}>{plan.name}</h3>
+                  <div className="flex items-baseline gap-1 mb-4">
+                    <span className={cn("text-5xl font-black tracking-tighter", plan.highlight ? "text-white" : "text-slate-900")}>{plan.price}</span>
+                    {plan.period && <span className={cn("text-sm font-bold uppercase tracking-widest ml-1", plan.highlight ? "text-brand-300" : "text-slate-400")}>{plan.period}</span>}
+                  </div>
+                  <p className={cn("text-sm font-medium leading-relaxed", plan.highlight ? "text-brand-200" : "text-slate-500")}>{plan.desc}</p>
+                </div>
+
+                {/* Divider */}
+                <div className={cn("h-px w-full mb-8", plan.highlight ? "bg-white/10" : "bg-slate-100")} />
+
+                {/* Features */}
+                <div className="space-y-4 mb-10 flex-1">
+                  {plan.features.map((feature, j) => (
+                    <div key={j} className="flex items-center gap-3 text-sm font-medium">
+                      <div className={cn(
+                        "w-5 h-5 rounded-full flex items-center justify-center shrink-0",
+                        plan.highlight ? "bg-brand-500 text-white shadow-md shadow-brand-900/30" : "bg-emerald-100 text-emerald-600"
+                      )}>
+                        <Check className="w-3 h-3" strokeWidth={3} />
+                      </div>
+                      <span className={cn(plan.highlight ? "text-brand-100" : "text-slate-600")}>{feature}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA Button */}
+                <button
+                  onClick={() => handlePlanAction(plan)}
+                  className={cn(
+                    "w-full py-4 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 active:scale-[0.98]",
+                    plan.current
+                      ? "bg-slate-100 text-slate-400 cursor-default"
+                      : plan.highlight
+                        ? "bg-white text-brand-800 hover:bg-brand-50 shadow-xl shadow-brand-900/20 hover:shadow-brand-900/30"
+                        : "bg-linear-to-br from-brand-600 to-brand-700 text-white hover:from-brand-500 hover:to-brand-600 shadow-lg shadow-brand-200"
+                  )}
+                >
+                  {plan.cta}
+                  {!plan.current && <ArrowRight className="w-4 h-4" />}
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Enterprise CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="rounded-[2.5rem] p-12 text-center border border-slate-200/60 bg-white shadow-sm relative overflow-hidden group"
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-400/15 blur-[100px] rounded-full -mr-32 -mt-32 transition-transform duration-700 group-hover:scale-110" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/15 blur-[100px] rounded-full -ml-32 -mb-32 transition-transform duration-700 group-hover:scale-110" />
+          <div className="relative z-10">
+            <div className="w-16 h-16 bg-linear-to-br from-brand-500 to-indigo-600 rounded-[1.5rem] shadow-lg shadow-brand-200 flex items-center justify-center mx-auto mb-6">
+              <Zap className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="font-display text-3xl font-bold text-slate-900 mb-3 tracking-tight">Need a custom solution?</h3>
+            <p className="text-slate-500 text-lg font-medium mb-8 max-w-xl mx-auto leading-relaxed">Enterprise-grade security, custom integrations, and dedicated support for high-volume users.</p>
+            <button className="inline-flex items-center gap-2 bg-slate-900 text-white font-bold px-8 py-4 rounded-2xl text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 hover:-translate-y-0.5 group/btn">
+              Talk to our team
+              <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
