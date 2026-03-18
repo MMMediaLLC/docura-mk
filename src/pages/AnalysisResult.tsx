@@ -13,7 +13,6 @@ import {
   ArrowLeft,
   ChevronRight,
   Info,
-  Lock,
   Zap,
   Send,
   Loader2,

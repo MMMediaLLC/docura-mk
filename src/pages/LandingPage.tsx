@@ -9,7 +9,6 @@ import {
   Bot,
   ChevronDown,
   Sparkles,
-  FileText,
   Check
 } from 'lucide-react';
 import { motion } from 'motion/react';

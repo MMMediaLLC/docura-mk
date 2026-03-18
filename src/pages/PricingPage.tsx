@@ -2,18 +2,12 @@ import {
   Check, 
   ArrowRight, 
   Sparkles, 
-  Zap, 
-  ShieldCheck, 
-  Crown, 
-  Star,
+  Zap,
   Flame,
-  Gem,
-  Cpu
+  Gem
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
-import { auth } from '../firebase';
-import { firebaseService } from '../services/firebaseService';
 import { PLANS, getCheckoutUrl } from '../config/plans';
 
 export default function PricingPage() {

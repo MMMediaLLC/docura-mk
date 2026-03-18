@@ -5,9 +5,7 @@ import { fileURLToPath } from "url";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import multer from "multer";
-import { analyzeDocument } from "./src/lib/analysis-engine";
-import { documentStore } from "./src/lib/document-store";
-import { askDocument } from "./src/lib/qa-engine";
+
 import { userStore } from "./src/lib/user-store";
 
 dotenv.config();
@@ -92,70 +90,7 @@ async function startServer() {
     }
   });
 
-  app.post("/api/analyze", upload.single('file'), async (req, res) => {
-    try {
-      const status = userStore.getUserStatus();
-      if (status.isLimitReached) {
-        return res.status(403).json({ 
-          error: "You have reached your document limit. Upgrade your plan to continue.",
-          limitReached: true
-        });
-      }
-
-      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-
-      const result = await analyzeDocument(
-        req.file.buffer,
-        req.file.originalname,
-        req.file.size,
-        req.file.mimetype,
-        ai
-      );
-
-      userStore.incrementUsage();
-      res.json(result);
-    } catch (error: any) {
-      console.error("[Server] Analysis error:", error);
-      res.status(500).json({ error: "Analysis failed: " + (error.message || "Unknown error") });
-    }
-  });
-
-  app.get("/api/documents", (req, res) => {
-    const docs = documentStore.list().map(d => ({
-      id: d.id,
-      fileName: d.fileName,
-      fileSize: d.fileSize,
-      uploadDate: d.uploadDate,
-      documentType: d.analysis.documentType
-    }));
-    res.json(docs);
-  });
-
-  app.get("/api/documents/:id", (req, res) => {
-    const doc = documentStore.get(req.params.id);
-    if (!doc) return res.status(404).json({ error: "Document not found" });
-    res.json(doc.analysis);
-  });
-
-  app.post("/api/chat", async (req, res) => {
-    try {
-      const { question, documentId } = req.body;
-      const doc = documentStore.get(documentId);
-      if (!doc) return res.status(404).json({ error: "Document not found" });
-
-      const answer = await askDocument(
-        question,
-        doc.chunks,
-        doc.analysis.summary,
-        ai
-      );
-      
-      res.json({ answer });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
+  // Legacy Analysis API endpoints removed in favor of client-side architecture
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

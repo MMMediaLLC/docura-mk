@@ -1,7 +1,6 @@
 import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { 
-  FileText, 
   FileSearch,
   LayoutGrid, 
   Clock, 
@@ -9,10 +8,7 @@ import {
   LogOut, 
   Menu, 
   X,
-  ShieldCheck,
   CreditCard,
-  HelpCircle,
-  ChevronRight,
   Zap,
   Sparkles
 } from 'lucide-react';

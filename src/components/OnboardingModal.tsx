@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, ArrowRight, Check, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { auth } from '../firebase';
 
 const ONBOARDING_KEY = 'docura_onboarding_shown';

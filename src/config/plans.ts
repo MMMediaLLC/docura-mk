@@ -3,7 +3,7 @@
 // Central source of truth for plan IDs, names, and limits.
 // =============================================================
 
-export type UserPlan = 'free' | 'pro' | 'business';
+export type UserPlan = 'free' | 'true_docura' | 'pro' | 'business';
 
 export interface PlanConfig {
   name: string;
@@ -16,6 +16,11 @@ export interface PlanConfig {
 export const PLANS: Record<UserPlan, PlanConfig> = {
   free: {
     name: 'Free',
+    price: '$0',
+    limit: 1,
+  },
+  true_docura: {
+    name: 'True Docura',
     price: '$0',
     limit: 1,
   },

@@ -3,8 +3,6 @@ import {
   Search, 
   Filter, 
   FileText, 
-  MoreVertical, 
-  Download, 
   Trash2, 
   ExternalLink,
   ChevronLeft,
@@ -13,7 +11,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { cn } from '../lib/utils';
 import { auth } from '../firebase';
 import { firebaseService } from '../services/firebaseService';
 

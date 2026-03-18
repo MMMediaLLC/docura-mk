@@ -5,17 +5,9 @@ import {
   FileText,
   X,
   AlertCircle,
-  Loader2,
-  Clock,
   ChevronRight,
   ShieldCheck,
-  ShieldAlert,
-  Calendar,
   Search,
-  Plus,
-  LayoutGrid,
-  Sliders,
-  LogOut,
   Zap,
   Sparkles,
   ArrowRight,
@@ -29,11 +21,6 @@ import { UserStatus } from '../types/user';
 import { auth } from '../firebase';
 import { firebaseService } from '../services/firebaseService';
 import { AnalysisService } from '../services/analysisService';
-import * as pdfjsLib from 'pdfjs-dist';
-import mammoth from 'mammoth';
-
-// Configure PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
 export default function Dashboard() {
   const [isDragging, setIsDragging] = useState(false);
@@ -113,39 +100,6 @@ export default function Dashboard() {
     }
   };
 
-  const extractTextFromPDF = async (file: File): Promise<string> => {
-    const arrayBuffer = await file.arrayBuffer();
-    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-    const pdf = await loadingTask.promise;
-    let fullText = '';
-    
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item: any) => item.str).join(' ');
-      fullText += pageText + '\n';
-    }
-    return fullText;
-  };
-
-  const extractTextFromDOCX = async (file: File): Promise<string> => {
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    return result.value;
-  };
-
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64String = (reader.result as string).split(',')[1];
-        resolve(base64String);
-      };
-      reader.onerror = (error) => reject(error);
-    });
-  };
-
   const processFile = async () => {
     if (!file) {
       setError("Please select a file first.");
@@ -175,91 +129,18 @@ export default function Dashboard() {
         return;
       }
 
-      let documentText = "";
-      
       try {
-        if (file.type === 'application/pdf') {
-          documentText = await extractTextFromPDF(file);
-        } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-          documentText = await extractTextFromDOCX(file);
-        } else {
-          setError("Unsupported file type. Please upload a PDF or DOCX.");
-          setIsProcessing(false);
-          return;
-        }
-      } catch (extError) {
-        console.error("Extraction error:", extError);
-        setError("Failed to extract text from document. Please ensure it's not password protected.");
-        setIsProcessing(false);
-        return;
+        const analysisService = new AnalysisService(apiKey);
+        const { analysis, chunks } = await analysisService.analyze(file);
+        
+        await firebaseService.saveAnalysis(analysis, user.uid, chunks);
+        await firebaseService.incrementUsage(user.uid);
+        
+        navigate(`/analysis/${analysis.id}`);
+      } catch (err: any) {
+        console.error("Pipeline Error:", err);
+        setError(err.message || "Analysis failed. Please try again.");
       }
-
-      documentText = documentText.trim();
-      if (!documentText) {
-        setError("The document seems to be empty or contains no readable text.");
-        setIsProcessing(false);
-        return;
-      }
-
-      // Limit to ~12000 chars for safety/speed
-      const truncatedText = documentText.slice(0, 12000);
-
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: `You are a professional document analysis assistant.
-
-Analyze the following document and return:
-- Short summary
-- Key risks
-- Main obligations
-- Important clauses
-- Recommended next steps
-
-Format clearly with section headings and bullet points.
-
-Document content:
-${truncatedText}`
-                  }
-                ]
-              }
-            ]
-          })
-        }
-      );
-
-      const data = await response.json();
-      console.log("FULL GEMINI RESPONSE:", JSON.stringify(data, null, 2));
-
-      let resultText = "No analysis result returned.";
-
-      if (data && data.candidates && data.candidates.length > 0) {
-        const parts = data.candidates[0]?.content?.parts;
-        if (parts && parts.length > 0) {
-          resultText = parts.map((p: any) => p.text).join("\n");
-        }
-      } else if (data.error) {
-        setError(`Gemini Error: ${data.error.message}`);
-        setIsProcessing(false);
-        return;
-      }
-
-      setResult(resultText);
-
-      // Track usage in Firebase
-      await firebaseService.incrementUsage(user.uid);
-      
-      // Refresh usage limits
-      fetchData();
 
     } catch (error) {
       console.error(error);
@@ -391,12 +272,6 @@ return (
                       </>
                     )}
                     </button>
-
-                    {result && (
-                      <div className="mt-6 p-4 bg-slate-100 rounded-xl whitespace-pre-wrap">
-                        {result}
-                      </div>
-                    )}
                   </motion.div>
               )}
             </AnimatePresence>

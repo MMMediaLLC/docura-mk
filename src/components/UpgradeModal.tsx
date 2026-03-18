@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Zap, Rocket, Shield, ArrowRight } from 'lucide-react';
-import { PLANS, getCheckoutUrl } from '../config/plans';
+import { getCheckoutUrl } from '../config/plans';
 import type { UserPlan } from '../types/user';
 
 interface UpgradeModalProps {

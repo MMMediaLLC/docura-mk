@@ -7,6 +7,7 @@ class UserStore {
     plan: 'true_docura',
     usageCount: 0,
     usageLimit: 1,
+    usageResetDate: null,
     subscriptionStatus: 'active',
     currentPeriodStart: null,
     currentPeriodEnd: null,
@@ -46,7 +47,8 @@ class UserStore {
       usageCount: user.usageCount,
       usageLimit: limit,
       remaining,
-      isLimitReached
+      isLimitReached,
+      usageResetDate: user.usageResetDate || null
     };
   }
 

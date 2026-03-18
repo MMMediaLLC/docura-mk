@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { User, Shield, Bell, CreditCard, Trash2, ChevronRight, Loader2, Zap, ArrowRight, X, CheckCircle2, LogOut } from 'lucide-react';
+import { User, Shield, Bell, CreditCard, Trash2, Loader2, Zap, ArrowRight, X, CheckCircle2, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../lib/utils';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { firebaseService } from '../services/firebaseService';

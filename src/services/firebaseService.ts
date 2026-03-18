@@ -14,7 +14,6 @@ import {
   increment,
   updateDoc,
   deleteDoc,
-  Timestamp,
   getDocFromServer
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';

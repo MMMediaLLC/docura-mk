@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText, Sparkles, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, FileText, ShieldCheck } from 'lucide-react';
 
 export default function PrivacyPage() {
   return (

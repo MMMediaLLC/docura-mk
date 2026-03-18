@@ -15,7 +15,9 @@ service cloud.firestore {
       // Allow creation when user first signs up
       allow create: if isAuthenticated() && request.auth.uid == userId;
       // Allow generic updates to their own profile (like usage increment)
-      allow update: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && 
+              request.resource.data.email == resource.data.email &&
+              request.resource.data.id == resource.data.id;
       allow delete: if false; // Users shouldn't delete their core profile here
     }
 

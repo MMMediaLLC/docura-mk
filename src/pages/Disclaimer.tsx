@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText, AlertTriangle, ShieldAlert, Scale, Sparkles } from 'lucide-react';
+import { ArrowLeft, FileText, AlertTriangle, ShieldAlert, Scale } from 'lucide-react';
 
 export default function DisclaimerPage() {
   return (

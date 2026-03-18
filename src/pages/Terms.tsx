@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, FileText, Sparkles, Scale, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, FileText, Sparkles, Scale } from 'lucide-react';
 
 export default function TermsPage() {
   return (
