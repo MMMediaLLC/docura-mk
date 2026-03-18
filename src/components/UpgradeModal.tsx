@@ -31,7 +31,7 @@ export default function UpgradeModal({
 
   // Build usage context message
   const usageMessage = currentPlan && usageCount != null && usageLimit != null && currentPlan !== 'business'
-    ? `You have used ${usageCount} of ${usageLimit} ${usageLimit === 1 ? 'analysis' : 'analyses'} this month.`
+    ? `You have reached your limit of ${usageLimit} active ${usageLimit === 1 ? 'document' : 'documents'}.`
     : null;
 
   return (
@@ -75,7 +75,7 @@ export default function UpgradeModal({
                 <p className="text-sm font-bold text-rose-500 mb-1">{usageMessage}</p>
               )}
               <p className="text-slate-500 mb-8 font-medium leading-relaxed">
-                {message || "Upgrade your plan to continue analyzing documents with DOCURA's powerful AI engine."}
+                {message || "Upgrade your plan or delete existing documents to continue using DOCURA."}
               </p>
 
               {/* Plan options */}
@@ -91,7 +91,7 @@ export default function UpgradeModal({
                     </div>
                     <div>
                       <p className="font-bold text-slate-900 text-base">Upgrade to Pro</p>
-                      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-0.5">$6 / month • 3 analyses/mo</p>
+                      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-0.5">$6 / month • 3 active docs</p>
                     </div>
                   </div>
                   <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-brand-500 transition-colors" />

@@ -51,3 +51,12 @@ export function getPlanConfig(plan: UserPlan): PlanConfig {
 export function getCheckoutUrl(plan: 'pro' | 'business'): string {
   return PLANS[plan].lemonSqueezyUrl!;
 }
+
+// Reusable checker based on new "Active Documents" paradigm
+export function canCreateDocument(plan: UserPlan, activeDocsCount: number): boolean {
+  return activeDocsCount < getPlanLimit(plan);
+}
+
+export function getRemainingDocs(plan: UserPlan, activeDocsCount: number): number {
+  return Math.max(0, getPlanLimit(plan) - activeDocsCount);
+}

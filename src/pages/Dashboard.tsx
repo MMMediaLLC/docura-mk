@@ -357,16 +357,18 @@ return (
                 <>
                   <div className="space-y-5">
                     <div className="flex justify-between items-end">
-                      <span className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Analysis Limit</span>
+                      <span className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Active Documents</span>
                         <span className="text-2xl font-display font-bold text-slate-800 tracking-tight">
-                          {userStatus.usageCount} <span className="text-slate-300 font-medium">/</span> {userStatus.usageLimit === 'unlimited' ? '∞' : userStatus.usageLimit}
+                          {userStatus.plan === 'business' ? userStatus.usageCount : (
+                            <>{userStatus.usageCount} <span className="text-slate-300 font-medium">/</span> {userStatus.usageLimit}</>
+                          )}
                         </span>
                       </div>
                       <div className="h-2.5 w-full bg-slate-200/60 rounded-full overflow-hidden shadow-inner">
                         <div 
                           className="h-full bg-brand-500 transition-all duration-1000 ease-out rounded-full" 
                           style={{ 
-                            width: userStatus.usageLimit === 'unlimited' 
+                            width: userStatus.plan === 'business' 
                               ? '100%' 
                               : `${Math.min(100, (userStatus.usageCount / (userStatus.usageLimit as number || 1)) * 100)}%` 
                           }} 
@@ -377,10 +379,10 @@ return (
                   <div className="p-6 bg-white/50 rounded-3xl border border-white">
                     <p className="text-sm font-medium text-slate-600 leading-relaxed">
                       {userStatus.isLimitReached
-                        ? "You've reached your limit. Upgrade to continue analyzing documents."
+                        ? "You've reached your document limit. Upgrade to store more active documents."
                         : userStatus.plan === 'free'
-                          ? "You're on the free plan. Upgrade for unlimited analyses and features."
-                          : `You have ${userStatus.remaining} analyses remaining this month.`}
+                          ? "You're on the free plan. Upgrade for more storage and features."
+                          : `You can store ${userStatus.remaining} more active documents.`}
                     </p>
                   </div>
 
@@ -445,6 +447,9 @@ return (
     <UpgradeModal
       isOpen={isUpgradeModalOpen}
       onClose={() => setIsUpgradeModalOpen(false)}
+      currentPlan={userStatus?.plan}
+      usageCount={userStatus?.usageCount}
+      usageLimit={userStatus?.usageLimit}
     />
   </div>
 );

@@ -194,7 +194,7 @@ export default function App() {
                           {userStatus.plan === 'free' ? 'Free Plan' : userStatus.plan === 'pro' ? 'Pro Plan' : 'Business Plan'}
                         </span>
                         <span className="text-sm font-black text-slate-900">
-                           {userStatus.plan === 'business' ? 'Unlimited' : `${userStatus.usageCount} / ${userStatus.usageLimit} Docs`}
+                           {userStatus.plan === 'business' ? `${userStatus.usageCount} Docs` : `${userStatus.usageCount} / ${userStatus.usageLimit} Docs`}
                         </span>
                       </div>
                       <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100">

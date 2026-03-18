@@ -14,7 +14,8 @@ import {
   increment,
   updateDoc,
   deleteDoc,
-  getDocFromServer
+  getDocFromServer,
+  getCountFromServer
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { AnalysisResult } from '../types/analysis';
@@ -140,27 +141,26 @@ export const firebaseService = {
         data = { ...data, plan: 'free' };
       }
 
-      // Auto-reset usage if billing period ended
+      // We no longer strictly care about monthly usageCount resets for "active documents",
+      // but keeping billing period resets keeps the User record clean.
       const resetUpdates = buildResetIfNeeded(data);
       if (resetUpdates) {
         await updateDoc(doc(db, path), resetUpdates);
         data = { ...data, ...resetUpdates };
       }
 
-      // Guard against corrupted usageCount
-      if (typeof data.usageCount !== 'number' || isNaN(data.usageCount)) {
-        await updateDoc(doc(db, path), { usageCount: 0 });
-        data.usageCount = 0;
-      }
+      // Compute Active Documents via live DB count
+      const q = query(collection(db, 'analyses'), where('userId', '==', userId));
+      const countSnap = await getCountFromServer(q);
+      const activeDocsCount = countSnap.data().count;
 
       const limit = getPlanLimit(data.plan);
-      const safeUsage = data.usageCount;
-      const remaining = Math.max(0, limit - safeUsage);
-      const isLimitReached = safeUsage >= limit;
+      const remaining = Math.max(0, limit - activeDocsCount);
+      const isLimitReached = activeDocsCount >= limit;
 
       return {
         plan: data.plan,
-        usageCount: safeUsage,
+        usageCount: activeDocsCount, // Replaces naive increment with factual live active docs
         usageLimit: limit,
         remaining,
         isLimitReached,
