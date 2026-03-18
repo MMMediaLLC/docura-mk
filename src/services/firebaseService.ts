@@ -241,12 +241,22 @@ export const firebaseService = {
   // ── Analyses ─────────────────────────────────────────────
 
   async saveAnalysis(analysis: AnalysisResult, userId: string, chunks: any[]): Promise<void> {
+    if (!userId) {
+      throw new Error("[Security] Missing authenticated userId for FireStore write.");
+    }
+    
+    // HARDENING: Strictly limit to 1 chunk maximum, and trim safely to 50k chars
+    const safeChunks = chunks.slice(0, 1).map(c => ({
+      ...c,
+      content: typeof c.content === 'string' ? c.content.substring(0, 50000) : ''
+    }));
+
     const path = `analyses/${analysis.id}`;
     try {
       await setDoc(doc(db, path), {
         ...analysis,
-        userId,
-        chunks,
+        userId, // Strictly enforce owner identity
+        chunks: safeChunks,
         uploadDate: new Date().toISOString()
       });
       await this.incrementUsage(userId);

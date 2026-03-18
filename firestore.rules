@@ -8,45 +8,63 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Check if the current user owns the target userId profile
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // MVP validation: check basic required fields and structural integrity.
+    // We intentionally leave plan/usageCount writable for MVP compatibility.
+    function isValidUser(data) {
+      return data.keys().hasAll(['id', 'email', 'plan', 'usageCount']) &&
+             data.plan in ['free', 'pro', 'business', 'true_docura'];
+    }
+
     // User Profiles Security
-    // Users can only read and write their own profile document
     match /users/{userId} {
-      allow read: if isAuthenticated() && request.auth.uid == userId;
-      // Allow creation when user first signs up
-      allow create: if isAuthenticated() && request.auth.uid == userId;
-      // Allow generic updates to their own profile (like usage increment)
-      allow update: if isOwner(userId) && isValidUser(request.resource.data) && 
-              request.resource.data.email == resource.data.email &&
-              request.resource.data.id == resource.data.id;
+      allow read: if isOwner(userId);
+      
+      // Allow creation when user first signs up (Frontend creates this right now)
+      allow create: if isOwner(userId) 
+                    && isValidUser(request.resource.data) 
+                    && request.resource.data.id == userId;
+                    
+      // Allow generic updates (plan upgrades, usage increments)
+      // BUT strictly lock down identity fields
+      allow update: if isOwner(userId) 
+                    && isValidUser(request.resource.data) 
+                    && request.resource.data.email == resource.data.email
+                    && request.resource.data.id == resource.data.id;
+                    
       allow delete: if false; // Users shouldn't delete their core profile here
     }
 
     // Analyses Security
     match /analyses/{analysisId} {
-      // READ: You can only read an analysis if your UID matches the document's userId (and the document exists)
+      // READ: Only read your own analysis
       allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
       
-      // CREATE: You can only create a record for yourself
-      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // CREATE: Must assign yourself as the owner
+      allow create: if isAuthenticated() 
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.keys().hasAll(['userId', 'documentType', 'title']);
       
-      // DELETE/UPDATE: Only the owner can delete or modify the record
-      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // UPDATE: Prevent transferring ownership to someone else
+      allow update: if isAuthenticated() 
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.userId == resource.data.userId;
+                    
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
 
       // Nested Collection Security: Chunks 
       match /chunks/{chunkId} {
-        // For subcollections, we need to verify the owner of the parent document
         function isParentOwner() {
           let parentDoc = get(/databases/$(database)/documents/analyses/$(analysisId));
-          return parentDoc.data.userId == request.auth.uid;
+          // Provide safety check if document doesn't exist
+          return parentDoc != null && parentDoc.data.userId == request.auth.uid;
         }
 
-        // Apply parent ownership rules to chunk reading
-        allow read: if isAuthenticated() && isParentOwner();
-        
-        // When creating chunks, ensure the user owns the parent analysis
-        allow create: if isAuthenticated() && isParentOwner();
-        
-        allow update, delete: if isAuthenticated() && isParentOwner();
+        allow read, create, update, delete: if isAuthenticated() && isParentOwner();
       }
     }
   }
