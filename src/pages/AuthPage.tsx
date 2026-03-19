@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FileText, Mail, Lock, ArrowRight, Github } from 'lucide-react';
+import { FileText, Mail, Lock, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { auth } from '../firebase';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
@@ -55,7 +55,7 @@ export default function AuthPage() {
             {isLogin ? 'Welcome back' : 'Create your account'}
           </h1>
           <p className="text-slate-500 mt-3 font-medium text-sm leading-relaxed max-w-[280px]">
-            {isLogin ? 'Enter your details to access your secure documents.' : 'Start analyzing complex documents with True Docura today.'}
+            {isLogin ? 'Enter your details to access your secure documents.' : 'Start analyzing documents with DOCURA today.'}
           </p>
         </div>
 
@@ -81,10 +81,6 @@ export default function AuthPage() {
               </svg>
             )}
             Continue with Google
-          </button>
-          <button className="w-full flex items-center justify-center gap-3 py-3.5 bg-white border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all group hover:-translate-y-0.5">
-            <Github className="w-5 h-5 text-slate-900 group-hover:scale-110 transition-transform" />
-            Continue with GitHub
           </button>
         </div>
 

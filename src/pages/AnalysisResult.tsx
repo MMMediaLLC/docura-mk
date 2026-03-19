@@ -156,23 +156,23 @@ export default function AnalysisResult() {
       <div className="grid lg:grid-cols-3 gap-8 relative z-10">
         <div className="lg:col-span-2 space-y-8">
           {/* Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
+          <div className="flex items-center gap-1.5 flex-wrap pb-2">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "flex items-center gap-2.5 px-6 py-3 text-sm font-bold rounded-2xl transition-all duration-300 whitespace-nowrap border",
+                  "flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-2xl transition-all duration-300 whitespace-nowrap border",
                   activeTab === tab.id 
                     ? "bg-brand-600 text-white shadow-lg shadow-brand-500/25 border-brand-500" 
                     : "bg-white/60 text-slate-600 border-white/40 hover:bg-white hover:shadow-md hover:text-brand-700 backdrop-blur-md"
                 )}
               >
-                <tab.icon className={cn("w-4 h-4", activeTab === tab.id ? "text-brand-100" : "text-slate-400")} />
+                <tab.icon className={cn("w-3.5 h-3.5", activeTab === tab.id ? "text-brand-100" : "text-slate-400")} />
                 {tab.label}
                 {tab.count !== undefined && (
                   <span className={cn(
-                    "ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold border",
+                    "ml-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold border",
                     activeTab === tab.id 
                       ? "bg-brand-500 text-white border-brand-400" 
                       : "bg-slate-100 text-slate-500 border-slate-200"
