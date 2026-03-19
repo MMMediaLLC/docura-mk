@@ -111,12 +111,6 @@ export default function Dashboard() {
       setError(null);
       setResult("");
 
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey) {
-        setError("API key is missing");
-        return;
-      }
-
       const user = auth.currentUser;
       if (!user) {
         setError("You must be signed in to analyze documents.");
@@ -130,7 +124,7 @@ export default function Dashboard() {
       }
 
       try {
-        const analysisService = new AnalysisService(apiKey);
+        const analysisService = new AnalysisService("");
         const { analysis, chunks } = await analysisService.analyze(file);
         
         await firebaseService.saveAnalysis(analysis, user.uid, chunks);

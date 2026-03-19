@@ -68,7 +68,7 @@ export default function AnalysisResult() {
     setIsAsking(true);
 
     try {
-      const analysisService = new AnalysisService(import.meta.env.VITE_GEMINI_API_KEY || "");
+      const analysisService = new AnalysisService("");
       const answer = await analysisService.chat(chunks, currentInput, analysis.title);
       
       const assistantMsg: ChatMessage = { 
