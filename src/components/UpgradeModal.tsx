@@ -67,7 +67,7 @@ export default function UpgradeModal({
               
               {/* Headline */}
               <h2 className="font-display text-3xl font-bold text-slate-900 mb-3 tracking-tight">
-                {title || 'Your monthly limit is reached.'}
+                {title || "You've reached your plan limit."}
               </h2>
 
               {/* Usage context */}
@@ -75,7 +75,7 @@ export default function UpgradeModal({
                 <p className="text-sm font-bold text-rose-500 mb-1">{usageMessage}</p>
               )}
               <p className="text-slate-500 mb-8 font-medium leading-relaxed">
-                {message || "Upgrade your plan or delete existing documents to continue using DOCURA."}
+                {message || "Upgrade your plan to analyze more documents. Business users get unlimited analyses."}
               </p>
 
               {/* Plan options */}

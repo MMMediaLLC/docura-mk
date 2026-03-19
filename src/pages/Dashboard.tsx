@@ -117,8 +117,20 @@ export default function Dashboard() {
         return;
       }
 
-      // Enforce limits
+      // Fast pre-check using cached state (avoids unnecessary server call on obvious over-limit)
       if (userStatus?.isLimitReached) {
+        setIsUpgradeModalOpen(true);
+        return;
+      }
+
+      // HARDENED: Fresh server-side check right before consuming AI API resources.
+      // This prevents stale-state bypasses (e.g. user opens two tabs, or refreshes after
+      // reaching the limit on another device). We check canRunAnalysis before calling the AI.
+      const canRun = await firebaseService.canRunAnalysis(user.uid);
+      if (!canRun) {
+        // Refresh local state so the UI reflects the real limit
+        const freshStatus = await firebaseService.getUserStatus(user.uid);
+        setUserStatus(freshStatus);
         setIsUpgradeModalOpen(true);
         return;
       }
@@ -126,10 +138,11 @@ export default function Dashboard() {
       try {
         const analysisService = new AnalysisService("");
         const { analysis, chunks } = await analysisService.analyze(file);
-        
+
+        // NOTE: saveAnalysis already calls incrementUsage internally.
+        // Do NOT call incrementUsage again here — that was a double-count bug.
         await firebaseService.saveAnalysis(analysis, user.uid, chunks);
-        await firebaseService.incrementUsage(user.uid);
-        
+
         navigate(`/analysis/${analysis.id}`);
       } catch (err: any) {
         console.error("Pipeline Error:", err);
