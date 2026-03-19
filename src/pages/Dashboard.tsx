@@ -358,22 +358,24 @@ return (
         <div className="space-y-8">
           <div className="glass-panel rounded-[2.5rem] p-10 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-40 h-40 bg-brand-400/10 blur-[50px] rounded-full -mr-16 -mt-16 pointer-events-none" />
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-10">Usage Overview</h3>
+            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-10">Plan Usage</h3>
             <div className="space-y-10 relative z-10">
               {userStatus ? (
                 <>
                   <div className="space-y-5">
                     <div className="flex justify-between items-end">
-                      <span className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Active Documents</span>
+                      <span className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Analyses Used</span>
                         <span className="text-2xl font-display font-bold text-slate-800 tracking-tight">
-                          {userStatus.plan === 'business' ? userStatus.usageCount : (
+                          {userStatus.plan === 'business' ? (
+                            <span className="text-emerald-600">{userStatus.usageCount} <span className="text-lg font-medium text-slate-400">used</span></span>
+                          ) : (
                             <>{userStatus.usageCount} <span className="text-slate-300 font-medium">/</span> {userStatus.usageLimit}</>
                           )}
                         </span>
                       </div>
                       <div className="h-2.5 w-full bg-slate-200/60 rounded-full overflow-hidden shadow-inner">
                         <div 
-                          className="h-full bg-brand-500 transition-all duration-1000 ease-out rounded-full" 
+                          className={cn("h-full transition-all duration-1000 ease-out rounded-full", userStatus.isLimitReached ? "bg-rose-500" : "bg-brand-500")}
                           style={{ 
                             width: userStatus.plan === 'business' 
                               ? '100%' 
@@ -386,10 +388,14 @@ return (
                   <div className="p-6 bg-white/50 rounded-3xl border border-white">
                     <p className="text-sm font-medium text-slate-600 leading-relaxed">
                       {userStatus.isLimitReached
-                        ? "You've reached your document limit. Upgrade to store more active documents."
+                        ? userStatus.plan === 'free'
+                          ? "Free plan includes 1 analysis. Upgrade to Pro for 3, or Business for unlimited."
+                          : "You've used all 3 analyses on your Pro plan. Upgrade to Business for unlimited."
                         : userStatus.plan === 'free'
-                          ? "You're on the free plan. Upgrade for more storage and features."
-                          : `You can store ${userStatus.remaining} more active documents.`}
+                          ? "Free plan includes 1 analysis. Upgrade to Pro ($6/mo) for 3, or Business ($19/mo) for unlimited."
+                          : userStatus.plan === 'business'
+                            ? "Business plan — unlimited document analyses."
+                            : `${userStatus.remaining} of ${userStatus.usageLimit} analyses remaining on this plan.`}
                     </p>
                   </div>
 
@@ -421,12 +427,12 @@ return (
               <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-8 border border-white/10">
                 <Sparkles className="w-6 h-6 text-brand-200" />
               </div>
-              <h4 className="font-display text-2xl font-bold mb-4 tracking-tight">Pro Intelligence</h4>
+              <h4 className="font-display text-2xl font-bold mb-4 tracking-tight">Ask the Document</h4>
               <p className="text-brand-100 text-base leading-relaxed font-medium mb-8 opacity-90">
-                Use the "Ask Document" feature to find specific clauses or verify obligations instantly.
+                After analysis, use the chat button to ask specific questions about any clause, obligation, or risk found in the document.
               </p>
               <button className="text-xs font-bold uppercase tracking-[0.2em] bg-white text-brand-600 hover:bg-brand-50 px-6 py-3 rounded-xl transition-all shadow-lg active:scale-95">
-                Learn More
+                Try it on a document
               </button>
             </div>
           </div>
