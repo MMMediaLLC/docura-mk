@@ -172,9 +172,17 @@ export const firebaseService = {
     }
   },
 
-  async canRunAnalysis(userId: string): Promise<boolean> {
+  /**
+   * Checks whether the user can run another analysis.
+   * Returns a structured result — never throws for a limit case.
+   * Real Firestore/network errors still propagate so callers can handle them separately.
+   */
+  async canRunAnalysis(userId: string): Promise<{ allowed: boolean; reason?: 'plan_limit' }> {
     const status = await this.getUserStatus(userId);
-    return !status.isLimitReached;
+    if (status.isLimitReached) {
+      return { allowed: false, reason: 'plan_limit' };
+    }
+    return { allowed: true };
   },
 
   async incrementUsage(userId: string): Promise<void> {

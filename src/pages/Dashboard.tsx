@@ -30,6 +30,7 @@ export default function Dashboard() {
   const [userStatus, setUserStatus] = useState<UserStatus | null>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<any[]>([]);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [isPlanLimitReached, setIsPlanLimitReached] = useState(false);
   const [result, setResult] = useState("");
   const navigate = useNavigate();
 
@@ -41,6 +42,10 @@ export default function Dashboard() {
     try {
       const status = await firebaseService.getUserStatus(user.uid);
       setUserStatus(status);
+      // If limit is already reached on page load, show the upgrade panel immediately
+      if (status.isLimitReached) {
+        setIsPlanLimitReached(true);
+      }
 
       const analyses = await firebaseService.listAnalyses(user.uid);
       setRecentAnalyses(analyses.slice(0, 3));
@@ -106,52 +111,73 @@ export default function Dashboard() {
       return;
     }
 
+    const user = auth.currentUser;
+    if (!user) {
+      setError("You must be signed in to analyze documents.");
+      return;
+    }
+
+    // ── Stage 1: Fast pre-check using cached state ────────────────────
+    // This is purely a UX shortcut — the hard check below is authoritative.
+    if (userStatus?.isLimitReached) {
+      setIsPlanLimitReached(true);
+      return;
+    }
+
+    // ── Stage 2: Fresh server-side limit check ────────────────────────
+    // This is the authoritative gate. Runs BEFORE any AI work.
+    // Returns a structured result — limit is a product state, not an error.
+    setIsProcessing(true);
+    setError(null);
+    setResult("");
+
     try {
-      setIsProcessing(true);
-      setError(null);
-      setResult("");
-
-      const user = auth.currentUser;
-      if (!user) {
-        setError("You must be signed in to analyze documents.");
-        return;
-      }
-
-      // Fast pre-check using cached state (avoids unnecessary server call on obvious over-limit)
-      if (userStatus?.isLimitReached) {
-        setIsUpgradeModalOpen(true);
-        return;
-      }
-
-      // HARDENED: Fresh server-side check right before consuming AI API resources.
-      // This prevents stale-state bypasses (e.g. user opens two tabs, or refreshes after
-      // reaching the limit on another device). We check canRunAnalysis before calling the AI.
-      const canRun = await firebaseService.canRunAnalysis(user.uid);
-      if (!canRun) {
-        // Refresh local state so the UI reflects the real limit
-        const freshStatus = await firebaseService.getUserStatus(user.uid);
-        setUserStatus(freshStatus);
-        setIsUpgradeModalOpen(true);
-        return;
-      }
+      let checkResult: { allowed: boolean; reason?: string } = { allowed: true };
 
       try {
-        const analysisService = new AnalysisService("");
-        const { analysis, chunks } = await analysisService.analyze(file);
-
-        // NOTE: saveAnalysis already calls incrementUsage internally.
-        // Do NOT call incrementUsage again here — that was a double-count bug.
-        await firebaseService.saveAnalysis(analysis, user.uid, chunks);
-
-        navigate(`/analysis/${analysis.id}`);
-      } catch (err: any) {
-        console.error("Pipeline Error:", err);
-        setError(err.message || "Analysis failed. Please try again.");
+        checkResult = await firebaseService.canRunAnalysis(user.uid);
+      } catch (checkErr) {
+        // Firestore/network error on the check — safe fallback: re-fetch status
+        console.warn("[Dashboard] canRunAnalysis check failed — re-fetching status.", checkErr);
+        try {
+          const freshStatus = await firebaseService.getUserStatus(user.uid);
+          setUserStatus(freshStatus);
+          if (freshStatus.isLimitReached) {
+            setIsPlanLimitReached(true);
+            return;
+          }
+          // Status re-fetched and we're within limit — allow proceeding
+          checkResult = { allowed: true };
+        } catch {
+          setError("Unable to verify your plan status. Please refresh and try again.");
+          return;
+        }
       }
 
-    } catch (error) {
-      console.error(error);
-      setError("Analysis failed. Please try again.");
+      // ── Stage 3: Handle limit result as a product state ───────────────
+      if (!checkResult.allowed) {
+        // Refresh local status so sidebar/counter updates, then show upgrade panel.
+        try {
+          const freshStatus = await firebaseService.getUserStatus(user.uid);
+          setUserStatus(freshStatus);
+        } catch { /* non-critical — UI still shows upgrade panel */ }
+        setIsPlanLimitReached(true);
+        return;
+      }
+
+      // ── Stage 4: Analysis pipeline (limit confirmed clear) ────────────
+      const analysisService = new AnalysisService("");
+      const { analysis, chunks } = await analysisService.analyze(file);
+
+      // saveAnalysis also calls incrementUsage internally — do NOT call it again.
+      await firebaseService.saveAnalysis(analysis, user.uid, chunks);
+
+      navigate(`/analysis/${analysis.id}`);
+
+    } catch (err: any) {
+      // Real system/pipeline failure — show inline error, not upgrade panel.
+      console.error("[Dashboard] Analysis pipeline error:", err);
+      setError(err.message || "Analysis failed. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -185,6 +211,58 @@ return (
       <div className="grid lg:grid-cols-3 gap-10">
         {/* Upload Area */}
         <div className="lg:col-span-2 space-y-10">
+          {isPlanLimitReached ? (
+            /* ── Plan Limit Reached — controlled product state, NOT a crash ────── */
+            <div className="relative border-2 border-dashed border-brand-200 rounded-[2.5rem] p-16 flex flex-col items-center justify-center text-center bg-white/60 backdrop-blur-xl overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-brand-400/10 blur-[60px] rounded-full -mr-24 -mt-24 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/10 blur-[60px] rounded-full -ml-24 -mb-24 pointer-events-none" />
+              <div className="relative z-10 space-y-6 max-w-sm mx-auto">
+                <div className="w-20 h-20 bg-brand-50 border border-brand-100 rounded-3xl flex items-center justify-center mx-auto shadow-sm">
+                  <Zap className="w-9 h-9 text-brand-600" />
+                </div>
+                <div>
+                  <h2 className="font-display text-2xl font-bold text-slate-900 tracking-tight mb-3">
+                    Free plan limit reached
+                  </h2>
+                  <p className="text-slate-500 font-medium leading-relaxed">
+                    You've used your 1 included document analysis.
+                    Upgrade to <strong className="text-slate-700">Pro</strong> to analyze up to 3 documents,
+                    or choose <strong className="text-slate-700">Business</strong> for higher usage.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                  <button
+                    onClick={() => setIsUpgradeModalOpen(true)}
+                    className="btn-primary flex items-center justify-center gap-2 py-3 px-6 shadow-brand-500/20"
+                  >
+                    <Zap className="w-4 h-4 fill-brand-200 text-brand-100" />
+                    Upgrade to Pro
+                  </button>
+                  <button
+                    onClick={() => navigate('/pricing')}
+                    className="px-6 py-3 bg-white border border-slate-200/60 rounded-2xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
+                  >
+                    View Pricing
+                  </button>
+                  <button
+                    onClick={() => navigate('/history')}
+                    className="px-6 py-3 bg-white border border-slate-200/60 rounded-2xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-all shadow-sm"
+                  >
+                    View History
+                  </button>
+                </div>
+                <p className="text-xs text-slate-400 font-medium">
+                  Already upgraded?{' '}
+                  <button
+                    onClick={() => { setIsPlanLimitReached(false); fetchData(); }}
+                    className="text-brand-600 hover:underline font-bold"
+                  >
+                    Refresh status
+                  </button>
+                </p>
+              </div>
+            </div>
+          ) : (
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -283,6 +361,7 @@ return (
               )}
             </AnimatePresence>
           </div>
+          )} {/* end of isPlanLimitReached ternary */}
 
           {error && (
             <div className="flex items-center gap-3 text-rose-600 bg-rose-50 p-5 rounded-2xl border border-rose-100 text-sm font-bold animate-shake">

@@ -6,8 +6,6 @@ import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import multer from "multer";
 
-import { userStore } from "./src/lib/user-store";
-
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,25 +20,6 @@ async function startServer() {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
   const upload = multer({
     limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
-  });
-
-  // API Routes
-  app.get("/api/user/status", (req, res) => {
-    res.json(userStore.getUserStatus());
-  });
-
-  app.post("/api/user/plan", (req, res) => {
-    const { plan } = req.body;
-    if (!['free', 'pro', 'business'].includes(plan)) {
-      return res.status(400).json({ error: "Invalid plan" });
-    }
-    userStore.updateUser({ 
-      plan, 
-      usageCount: 0,
-      currentPeriodStart: new Date().toISOString(),
-      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-    });
-    res.json(userStore.getUserStatus());
   });
 
   // ==============================================================
