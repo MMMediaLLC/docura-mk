@@ -70,14 +70,16 @@ export class AnalysisService {
     
     let text = '';
     
-    if (file.type === 'application/pdf') {
+    const fileName = file.name.toLowerCase();
+    
+    if (file.type === 'application/pdf' || fileName.endsWith('.pdf')) {
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
         text += content.items.map((item: any) => item.str).join(' ') + '\n';
       }
-    } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+    } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || fileName.endsWith('.docx')) {
       const result = await mammoth.extractRawText({ arrayBuffer });
       text = result.value;
     } else {
