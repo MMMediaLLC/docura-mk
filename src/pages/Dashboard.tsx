@@ -54,6 +54,8 @@ export default function Dashboard() {
       setUserStatus({ 
         plan: 'free', 
         usageCount: 0, 
+        usedAnalysesInPeriod: 0,
+        lifetimeFreeAnalysesUsed: 0,
         usageLimit: 1, 
         remaining: 1, 
         isLimitReached: false 

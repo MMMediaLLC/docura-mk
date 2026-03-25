@@ -57,6 +57,7 @@ function buildResetIfNeeded(user: User): Partial<User> | null {
     const newEnd = new Date(now);
     newEnd.setDate(newEnd.getDate() + 30);
     return {
+      usageCount: 0,
       usedAnalysesInPeriod: 0,
       currentPeriodStart: now.toISOString(),
       currentPeriodEnd: newEnd.toISOString(),
@@ -78,6 +79,7 @@ function buildResetIfNeeded(user: User): Partial<User> | null {
         newEnd.setMonth(newEnd.getMonth() + 1);
       }
       return {
+        usageCount: 0,
         usedAnalysesInPeriod: 0,
         currentPeriodStart: newStart.toISOString(),
         currentPeriodEnd: newEnd.toISOString(),
@@ -88,6 +90,7 @@ function buildResetIfNeeded(user: User): Partial<User> | null {
       const newEnd = new Date(now);
       newEnd.setDate(newEnd.getDate() + 30);
       return {
+        usageCount: 0,
         usedAnalysesInPeriod: 0,
         currentPeriodStart: now.toISOString(),
         currentPeriodEnd: newEnd.toISOString(),
@@ -214,7 +217,8 @@ export const firebaseService = {
       const data = snap.data() as User;
       const updates: Partial<User> = {};
       
-      // Always increment lifetime
+      // Legacy compliance + always increment lifetime
+      updates.usageCount = increment(1) as unknown as number;
       updates.lifetimeFreeAnalysesUsed = increment(1) as unknown as number;
       
       // If paid plan, increment the monthly counter too
@@ -238,6 +242,7 @@ export const firebaseService = {
 
       await updateDoc(doc(db, path), {
         plan,
+        usageCount: 0,
         usedAnalysesInPeriod: 0,
         subscriptionStatus: 'active',
         currentPeriodStart: now.toISOString(),
@@ -262,6 +267,7 @@ export const firebaseService = {
 
       await updateDoc(doc(db, path), {
         plan,
+        usageCount: 0,
         usedAnalysesInPeriod: 0,
         billingEmail,
         subscriptionStatus: 'active',

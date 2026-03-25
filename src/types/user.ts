@@ -6,6 +6,7 @@ export interface User {
   id: string;
   email: string;
   plan: UserPlan;
+  usageCount: number; // Restored for backwards compatibility with harsh Firestore rules
   usedAnalysesInPeriod: number; // For paid active monthly cycle
   lifetimeFreeAnalysesUsed: number; // Permanent cap for Free plan
   usageLimit: number;
@@ -37,6 +38,7 @@ export function createDefaultUser(userId: string, email: string): User {
     id: userId,
     email,
     plan: 'free',
+    usageCount: 0, // Restored for schema compatibility
     usedAnalysesInPeriod: 0,
     lifetimeFreeAnalysesUsed: 0,
     usageLimit: 1, // 1 lifetime review for Free plan
