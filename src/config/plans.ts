@@ -17,7 +17,7 @@ export const PLANS: Record<UserPlan, PlanConfig> = {
   free: {
     name: 'Free',
     price: '$0',
-    limit: 1,
+    limit: 1, // Lifetime total
   },
   true_docura: {
     name: 'True Docura',
@@ -28,14 +28,14 @@ export const PLANS: Record<UserPlan, PlanConfig> = {
     name: 'Pro',
     price: '$6',
     period: '/month',
-    limit: 3,
+    limit: 2, // Per billing period
     lemonSqueezyUrl: 'https://docura.lemonsqueezy.com/checkout/buy/dbdbb86d-e540-4a99-bceb-125f19334d23',
   },
   business: {
     name: 'Business',
     price: '$19',
     period: '/month',
-    limit: 30, // HIDDEN — never shown in UI. Business plan shows "Unlimited" to users.
+    limit: 15, // Per billing period
     lemonSqueezyUrl: 'https://docura.lemonsqueezy.com/checkout/buy/95ac39a4-6bcc-45c2-ba87-9739781f2f15',
   },
 };

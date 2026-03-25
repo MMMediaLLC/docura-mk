@@ -442,23 +442,17 @@ return (
               {userStatus ? (
                 <>
                   <div className="space-y-5">
-                    <div className="flex justify-between items-end">
-                      <span className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Analyses Used</span>
+                      <div className="flex justify-between items-end">
+                        <span className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Analyses Used</span>
                         <span className="text-2xl font-display font-bold text-slate-800 tracking-tight">
-                          {userStatus.plan === 'business' ? (
-                            <span className="text-emerald-600">{userStatus.usageCount} <span className="text-lg font-medium text-slate-400">used</span></span>
-                          ) : (
-                            <>{userStatus.usageCount} <span className="text-slate-300 font-medium">/</span> {userStatus.usageLimit}</>
-                          )}
+                            <>{userStatus.plan === 'free' ? userStatus.lifetimeFreeAnalysesUsed : userStatus.usedAnalysesInPeriod} <span className="text-slate-300 font-medium">/</span> {userStatus.usageLimit}</>
                         </span>
                       </div>
                       <div className="h-2.5 w-full bg-slate-200/60 rounded-full overflow-hidden shadow-inner">
                         <div 
                           className={cn("h-full transition-all duration-1000 ease-out rounded-full", userStatus.isLimitReached ? "bg-rose-500" : "bg-brand-500")}
                           style={{ 
-                            width: userStatus.plan === 'business' 
-                              ? '100%' 
-                              : `${Math.min(100, (userStatus.usageCount / (userStatus.usageLimit as number || 1)) * 100)}%` 
+                            width: `${Math.min(100, ((userStatus.plan === 'free' ? userStatus.lifetimeFreeAnalysesUsed : userStatus.usedAnalysesInPeriod) / (userStatus.usageLimit as number || 1)) * 100)}%` 
                           }} 
                         />
                     </div>
@@ -468,13 +462,11 @@ return (
                     <p className="text-sm font-medium text-slate-600 leading-relaxed">
                       {userStatus.isLimitReached
                         ? userStatus.plan === 'free'
-                          ? "Free plan includes 1 analysis. Upgrade to Pro for 3, or Business for unlimited."
-                          : "You've used all 3 analyses on your Pro plan. Upgrade to Business for unlimited."
+                          ? "Free plan includes 1 lifetime analysis. Upgrade to Pro for 2/mo, or Business for 15/mo."
+                          : `You've used all ${userStatus.usageLimit} analyses on your ${userStatus.plan} plan this month.`
                         : userStatus.plan === 'free'
-                          ? "Free plan includes 1 analysis. Upgrade to Pro ($6/mo) for 3, or Business ($19/mo) for unlimited."
-                          : userStatus.plan === 'business'
-                            ? "Business plan — unlimited document analyses."
-                            : `${userStatus.remaining} of ${userStatus.usageLimit} analyses remaining on this plan.`}
+                          ? "Free plan includes 1 lifetime analysis. Upgrade to Pro ($6/mo) for 2/mo, or Business ($19/mo) for 15/mo."
+                          : `${userStatus.remaining} of ${userStatus.usageLimit} analyses remaining this month.`}
                     </p>
                   </div>
 
@@ -540,7 +532,7 @@ return (
       isOpen={isUpgradeModalOpen}
       onClose={() => setIsUpgradeModalOpen(false)}
       currentPlan={userStatus?.plan}
-      usageCount={userStatus?.usageCount}
+      usageCount={userStatus?.plan === 'free' ? userStatus?.lifetimeFreeAnalysesUsed : userStatus?.usedAnalysesInPeriod}
       usageLimit={userStatus?.usageLimit}
     />
   </div>

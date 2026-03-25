@@ -6,7 +6,8 @@ export interface User {
   id: string;
   email: string;
   plan: UserPlan;
-  usageCount: number;
+  usedAnalysesInPeriod: number; // For paid active monthly cycle
+  lifetimeFreeAnalysesUsed: number; // Permanent cap for Free plan
   usageLimit: number;
   usageResetDate: string | null; // ISO string — monthly reset date
   billingEmail?: string;         // Email used on Lemon Squeezy checkout
@@ -19,8 +20,9 @@ export interface User {
 
 export interface UserStatus {
   plan: UserPlan;
-  usageCount: number;
-  usageLimit: number;
+  usedAnalysesInPeriod: number;
+  lifetimeFreeAnalysesUsed: number;
+  usageLimit: number; // Represents either lifetime free limit, or active monthly limit
   remaining: number;
   isLimitReached: boolean;
   usageResetDate: string | null;
@@ -35,8 +37,9 @@ export function createDefaultUser(userId: string, email: string): User {
     id: userId,
     email,
     plan: 'free',
-    usageCount: 0,
-    usageLimit: 1,
+    usedAnalysesInPeriod: 0,
+    lifetimeFreeAnalysesUsed: 0,
+    usageLimit: 1, // 1 lifetime review for Free plan
     usageResetDate: resetDate.toISOString(),
     subscriptionStatus: 'active',
     currentPeriodStart: now.toISOString(),

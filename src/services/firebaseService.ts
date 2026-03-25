@@ -48,52 +48,66 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 // Subscription helpers — self-contained, reusable
 // ============================================================
 
-/**
- * Called before any analysis. Checks if the usage reset
- * period has passed and automatically resets if needed.
- * Returns the (possibly updated) reset updates to apply.
- */
 function buildResetIfNeeded(user: User): Partial<User> | null {
-  if (!user.usageResetDate) {
-    // No reset date → initialize it to now + 30 days
-    const newReset = new Date();
-    newReset.setDate(newReset.getDate() + 30);
+  const isPaid = user.plan !== 'free';
+  const now = new Date();
+
+  // If there's no period end yet, initialize it
+  if (!user.currentPeriodEnd) {
+    const newEnd = new Date(now);
+    newEnd.setDate(newEnd.getDate() + 30);
     return {
-      usageCount: 0,
-      usageResetDate: newReset.toISOString(),
-      currentPeriodStart: new Date().toISOString(),
-      currentPeriodEnd: newReset.toISOString(),
+      usedAnalysesInPeriod: 0,
+      currentPeriodStart: now.toISOString(),
+      currentPeriodEnd: newEnd.toISOString(),
     };
   }
 
-  const now = new Date();
-  const resetDate = new Date(user.usageResetDate);
+  const periodEnd = new Date(user.currentPeriodEnd);
 
-  if (now > resetDate) {
-    // Period has ended → reset usage and roll next period
-    const newReset = new Date();
-    newReset.setDate(newReset.getDate() + 30);
-    return {
-      usageCount: 0,
-      usageResetDate: newReset.toISOString(),
-      currentPeriodStart: now.toISOString(),
-      currentPeriodEnd: newReset.toISOString(),
-    };
+  // If the period has elapsed
+  if (now >= periodEnd) {
+    if (isPaid && user.subscriptionStatus === 'active') {
+      // Roll forward by exactly 1 month and reset monthly usage
+      const newStart = new Date(periodEnd);
+      const newEnd = new Date(periodEnd);
+      newEnd.setMonth(newEnd.getMonth() + 1);
+      // Failsafe: if they haven't logged in for 3 months, jump to now
+      if (now > newEnd) {
+        newEnd.setTime(now.getTime());
+        newEnd.setMonth(newEnd.getMonth() + 1);
+      }
+      return {
+        usedAnalysesInPeriod: 0,
+        currentPeriodStart: newStart.toISOString(),
+        currentPeriodEnd: newEnd.toISOString(),
+      };
+    } else {
+      // Inactive subscription or Free -> Downgrade to free, do NOT reset lifetime free usage
+      const newEnd = new Date(now);
+      newEnd.setDate(newEnd.getDate() + 30);
+      return {
+        plan: 'free',
+        subscriptionStatus: 'inactive',
+        usedAnalysesInPeriod: 0,
+        currentPeriodStart: now.toISOString(),
+        currentPeriodEnd: newEnd.toISOString(),
+      };
+    }
   }
 
   return null;
 }
 
 /**
- * Pure check — can this user run another analysis?
+ * Pure check — can this user run another analysis based strictly on their current tracking numbers?
  */
 function canAnalyze(user: User): boolean {
   const limit = getPlanLimit(user.plan);
-  // Guard against corrupted usageCount
-  const safeUsage = typeof user.usageCount === 'number' && !isNaN(user.usageCount) 
-    ? user.usageCount 
-    : 0;
-  return safeUsage < limit;
+  if (user.plan === 'free') {
+    return (user.lifetimeFreeAnalysesUsed || 0) < limit;
+  }
+  return (user.usedAnalysesInPeriod || 0) < limit;
 }
 
 // ============================================================
@@ -124,46 +138,48 @@ export const firebaseService = {
         await setDoc(doc(db, path), newUser);
         return {
           plan: 'free',
-          usageCount: 0,
+          usedAnalysesInPeriod: 0,
+          lifetimeFreeAnalysesUsed: 0,
           usageLimit: 1,
           remaining: 1,
           isLimitReached: false,
-          usageResetDate: newUser.usageResetDate,
+          usageResetDate: newUser.currentPeriodEnd,
         };
       }
 
       let data = snap.data() as User;
 
+      // Ensure default fields exist
+      if (typeof data.lifetimeFreeAnalysesUsed === 'undefined') data.lifetimeFreeAnalysesUsed = 0;
+      if (typeof data.usedAnalysesInPeriod === 'undefined') data.usedAnalysesInPeriod = 0;
+
       // Migrate legacy `true_docura` plan to `free`
       if ((data.plan as string) === 'true_docura') {
-        await updateDoc(doc(db, path), { plan: 'free' });
-        data = { ...data, plan: 'free' };
+        const update = { plan: 'free' as UserPlan };
+        await updateDoc(doc(db, path), update);
+        data = { ...data, ...update };
       }
 
-      // We no longer strictly care about monthly usageCount resets for "active documents",
-      // but keeping billing period resets keeps the User record clean.
+      // Check and apply period rollovers
       const resetUpdates = buildResetIfNeeded(data);
       if (resetUpdates) {
-        await updateDoc(doc(db, path), resetUpdates);
+        await updateDoc(doc(db, path), { ...resetUpdates });
         data = { ...data, ...resetUpdates };
       }
 
-      // Compute Active Documents via live DB count
-      const q = query(collection(db, 'analyses'), where('userId', '==', userId));
-      const countSnap = await getCountFromServer(q);
-      const activeDocsCount = countSnap.data().count;
-
       const limit = getPlanLimit(data.plan);
-      const remaining = Math.max(0, limit - activeDocsCount);
-      const isLimitReached = activeDocsCount >= limit;
+      const currentUsage = data.plan === 'free' ? data.lifetimeFreeAnalysesUsed : data.usedAnalysesInPeriod;
+      const remaining = Math.max(0, limit - currentUsage);
+      const isLimitReached = currentUsage >= limit;
 
       return {
         plan: data.plan,
-        usageCount: activeDocsCount, // Replaces naive increment with factual live active docs
+        usedAnalysesInPeriod: data.usedAnalysesInPeriod,
+        lifetimeFreeAnalysesUsed: data.lifetimeFreeAnalysesUsed,
         usageLimit: limit,
         remaining,
         isLimitReached,
-        usageResetDate: data.usageResetDate ?? null,
+        usageResetDate: data.currentPeriodEnd ?? null,
       };
     } catch (error) {
       handleFirestoreError(error, OperationType.GET, path);
@@ -187,7 +203,21 @@ export const firebaseService = {
   async incrementUsage(userId: string): Promise<void> {
     const path = `users/${userId}`;
     try {
-      await updateDoc(doc(db, path), { usageCount: increment(1) });
+      const snap = await getDoc(doc(db, path));
+      if (!snap.exists()) return;
+      
+      const data = snap.data() as User;
+      const updates: Partial<User> = {};
+      
+      // Always increment lifetime
+      updates.lifetimeFreeAnalysesUsed = increment(1) as unknown as number;
+      
+      // If paid plan, increment the monthly counter too
+      if (data.plan !== 'free') {
+        updates.usedAnalysesInPeriod = increment(1) as unknown as number;
+      }
+      
+      await updateDoc(doc(db, path), updates);
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, path);
     }
@@ -197,19 +227,16 @@ export const firebaseService = {
   async updatePlan(userId: string, plan: UserPlan): Promise<void> {
     const path = `users/${userId}`;
     try {
-      const limit = getPlanLimit(plan);
       const now = new Date();
       const end = new Date(now);
-      end.setDate(end.getDate() + 30);
+      end.setMonth(end.getMonth() + 1);
 
       await updateDoc(doc(db, path), {
         plan,
-        usageLimit: limit,
-        usageCount: 0,
+        usedAnalysesInPeriod: 0,
         subscriptionStatus: 'active',
         currentPeriodStart: now.toISOString(),
-        currentPeriodEnd: end.toISOString(),
-        usageResetDate: end.toISOString(),
+        currentPeriodEnd: end.toISOString()
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, path);
@@ -224,20 +251,17 @@ export const firebaseService = {
   async activateUnverifiedPlan(userId: string, plan: 'pro' | 'business', billingEmail: string): Promise<void> {
     const path = `users/${userId}`;
     try {
-      const limit = getPlanLimit(plan);
       const now = new Date();
       const end = new Date(now);
-      end.setDate(end.getDate() + 30);
+      end.setMonth(end.getMonth() + 1);
 
       await updateDoc(doc(db, path), {
         plan,
-        usageLimit: limit,
-        usageCount: 0,
+        usedAnalysesInPeriod: 0,
         billingEmail,
         subscriptionStatus: 'active',
         currentPeriodStart: now.toISOString(),
-        currentPeriodEnd: end.toISOString(),
-        usageResetDate: end.toISOString(),
+        currentPeriodEnd: end.toISOString()
       });
     } catch (error) {
       handleFirestoreError(error, OperationType.UPDATE, path);
