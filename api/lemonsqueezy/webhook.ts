@@ -89,115 +89,140 @@ async function downgradeUserToFree(db: admin.firestore.Firestore, userId: string
 // ── Main handler ────────────────────────────────────────────
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
-  // 1. Read raw body by buffering the stream.
-  //    bodyParser is DISABLED — req.body is not available.
-  //    We must accumulate chunks to get the exact bytes Lemon signed.
-  const rawBody = await new Promise<Buffer>((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
-    req.on('end', () => resolve(Buffer.concat(chunks)));
-    req.on('error', reject);
-  });
-
-  // 2. Verify HMAC-SHA256 using the correct header: X-Signature
-  //    (Lemon Squeezy sends X-Signature; Node.js lowercases all headers)
-  const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET || '';
-  const signature = req.headers['x-signature'];
-
-  if (!verifySignature(rawBody, signature, secret)) {
-    console.warn('[LS Webhook] Signature mismatch. Header present:', !!signature, '| Secret set:', !!secret);
-    return res.status(401).json({ error: 'Invalid signature' });
-  }
-
-  // 3. Parse payload
-  let payload: any;
   try {
-    payload = JSON.parse(rawBody.toString('utf8'));
-  } catch {
-    return res.status(400).json({ error: 'Invalid JSON payload' });
-  }
+    // 1. Validate Method — return 200 for PING/OPTIONS/GET health checks
+    if (req.method !== 'POST') {
+      return res.status(200).json({ received: true, message: 'Non-POST requests safely ignored' });
+    }
 
-  const eventName: string = payload?.meta?.event_name || '';
-  const attrs = payload?.data?.attributes || {};
+    // 2. Safely read raw body regardless of Vercel runtime config
+    let rawBody: Buffer;
+    if (req.body instanceof Buffer) {
+      rawBody = req.body;
+    } else if (typeof req.body === 'string') {
+      rawBody = Buffer.from(req.body, 'utf8');
+    } else if (req.body && typeof req.body === 'object' && Object.keys(req.body).length > 0) {
+      // Vercel body parser triggered early — stringification fallback
+      rawBody = Buffer.from(JSON.stringify(req.body), 'utf8');
+    } else {
+      // Consume incoming message stream safely with timeout
+      rawBody = await new Promise<Buffer>((resolve, reject) => {
+        const chunks: Buffer[] = [];
+        let timeout = setTimeout(() => reject(new Error('req stream timeout')), 5000);
+        req.on('data', (chunk: Buffer) => chunks.push(chunk));
+        req.on('end', () => {
+          clearTimeout(timeout);
+          resolve(Buffer.concat(chunks));
+        });
+        req.on('error', (err) => {
+          clearTimeout(timeout);
+          reject(err);
+        });
+      });
+    }
 
-  // Extract the billing/user email
-  const userEmail: string | undefined =
-    attrs.user_email ||
-    attrs.billing_address?.email ||
-    payload?.data?.relationships?.customer?.data?.email;
+    // 3. Verify HMAC-SHA256 signature using the correct header: X-Signature
+    const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET || '';
+    const signature = req.headers['x-signature'];
 
-  // Extract Lemon Squeezy variant ID (used to map to pro/business)
-  const variantId: string | number | undefined =
-    attrs.variant_id ||
-    payload?.data?.relationships?.variant?.data?.id;
+    if (!verifySignature(rawBody, signature, secret)) {
+      console.warn('[LS Webhook] Signature mismatch. Header present:', !!signature, '| Secret set:', !!secret);
+      return res.status(401).json({ error: 'Invalid signature' });
+    }
 
-  console.log(`[LS Webhook] Event: ${eventName} | Email: ${userEmail} | Variant: ${variantId}`);
+    // 4. Safely parse JSON payload
+    let payload: any;
+    try {
+      payload = JSON.parse(rawBody.toString('utf8'));
+    } catch {
+      return res.status(400).json({ error: 'Invalid JSON payload format' });
+    }
 
-  // 4. Initialize Firebase Admin
-  const app = getAdminApp();
-  const db = admin.firestore(app);
+    // 5. Extract strictly guarded properties
+    const eventName: string = payload?.meta?.event_name || 'unknown';
+    const attrs = payload?.data?.attributes || {};
+    const rels = payload?.data?.relationships || {};
 
-  // 5. Process events
-  try {
+    const userEmail: string | undefined =
+      attrs.user_email ||
+      attrs.billing_address?.email ||
+      rels.customer?.data?.email;
+
+    const variantId: string | number | undefined =
+      attrs.variant_id ||
+      rels.variant?.data?.id;
+
+    console.log(`[LS Webhook] Event: ${eventName} | Email: ${userEmail} | Variant: ${variantId}`);
+
+    // If no email or event name, log and ignore (return 200 safely)
+    if (!eventName || eventName === 'unknown') {
+      return res.status(200).json({ received: true, ignored: 'Unknown event name' });
+    }
+
+    // 6. Initialize Firebase Admin lazily
+    const app = getAdminApp();
+    const db = admin.firestore(app);
+
+    // 7. Process recognized events
     switch (eventName) {
       case 'order_created':
       case 'subscription_created':
       case 'subscription_payment_success':
       case 'subscription_updated': {
         if (!userEmail) {
-          console.warn(`[LS Webhook] No email found for event ${eventName}`);
+          console.warn(`[LS Webhook] Ignored ${eventName} - missing userEmail`);
           break;
         }
         const plan = resolvePlan(variantId);
         if (!plan) {
-          console.warn(`[LS Webhook] Unknown variant ${variantId} — cannot map to plan`);
+          console.warn(`[LS Webhook] Ignored ${eventName} - unmapped variant ${variantId}`);
           break;
         }
-        const userId = await getUserDocIdByEmail(db, userEmail);
+        const userId = await getUserDocIdByEmail(db, String(userEmail));
         if (!userId) {
-          console.warn(`[LS Webhook] No user found with email ${userEmail}`);
+          console.warn(`[LS Webhook] Ignored ${eventName} - user not found in DB: ${userEmail}`);
           break;
         }
         await activateUserPlan(db, userId, plan);
-        console.log(`[LS Webhook] ✅ Activated ${plan} for user ${userId} (${userEmail})`);
+        console.log(`[LS Webhook] ✅ Success: Activated ${plan} for ${userEmail}`);
         break;
       }
 
       case 'subscription_payment_failed': {
-        // Payment failed — do not immediately downgrade, just log
-        console.warn(`[LS Webhook] Payment failed for ${userEmail} — monitoring`);
+        console.warn(`[LS Webhook] Alert: Payment failed for ${userEmail || 'unknown'}`);
         break;
       }
 
       case 'subscription_cancelled':
       case 'subscription_expired': {
-        if (!userEmail) break;
-        const userId = await getUserDocIdByEmail(db, userEmail);
+        if (!userEmail) {
+          console.warn(`[LS Webhook] Ignored ${eventName} - missing userEmail`);
+          break;
+        }
+        const userId = await getUserDocIdByEmail(db, String(userEmail));
         if (!userId) {
-          console.warn(`[LS Webhook] No user found with email ${userEmail}`);
+          console.warn(`[LS Webhook] Ignored ${eventName} - user not found in DB: ${userEmail}`);
           break;
         }
         await downgradeUserToFree(db, userId);
-        console.log(`[LS Webhook] ℹ️ Downgraded ${userId} to free (${eventName})`);
+        console.log(`[LS Webhook] ℹ️ Success: Downgraded ${userEmail} to free (${eventName})`);
         break;
       }
 
       default:
-        console.log(`[LS Webhook] Unhandled event: ${eventName}`);
+        console.log(`[LS Webhook] Safely ignored unhandled event: ${eventName}`);
+        break;
     }
-  } catch (err: any) {
-    console.error('[LS Webhook] Firestore error:', err.message);
-    // Still return 200 so Lemon Squeezy does not retry indefinitely
-    return res.status(200).json({ received: true, warning: 'Firestore update failed' });
+
+    return res.status(200).json({ received: true, event: eventName });
+
+  } catch (globalError: any) {
+    // 8. Trap ALL fatal exceptions so we NEVER throw HTTP 500 randomly.
+    // If we throw 5xx, Lemon Squeezy retries for 3 days and generates noise.
+    console.error('[LS Webhook] Global Fatal Crash:', globalError?.message || String(globalError));
+    return res.status(200).json({ received: true, error_suppressed: true, message: globalError?.message });
   }
-
-  return res.status(200).json({ received: true, event: eventName });
 }
-
 // Required for Vercel to pass raw body correctly
 export const config = {
   api: {
