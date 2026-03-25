@@ -53,7 +53,7 @@ export default function HistoryPage() {
   };
 
   const filteredDocs = documents.filter(doc => 
-    doc.fileName.toLowerCase().includes(searchQuery.toLowerCase())
+    (doc.documentName || doc.fileName || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -109,61 +109,63 @@ export default function HistoryPage() {
             <p className="text-slate-400 text-sm font-medium">Upload a document from the dashboard to see it here.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100">
-                  <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Document Name</th>
-                  <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Type</th>
-                  <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Date</th>
-                  <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Size</th>
-                  <th className="px-8 py-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100/50">
-                {filteredDocs.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-white/50 transition-all group">
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center group-hover:bg-brand-50 group-hover:text-brand-600 transition-all duration-300 border border-slate-100 group-hover:border-brand-200 shadow-sm">
-                          <FileText className="w-5 h-5 text-slate-400 group-hover:text-brand-600" />
-                        </div>
-                        <span className="font-bold text-slate-900 group-hover:text-brand-700 transition-colors text-base">{doc.fileName}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <span className="px-3.5 py-1.5 bg-slate-100/80 text-slate-600 text-[10px] font-bold uppercase tracking-widest rounded-full border border-slate-200/50 mix-blend-multiply">
-                        {doc.documentType || 'Document'}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6 text-slate-500 font-bold text-xs uppercase tracking-wider">
-                      {new Date(doc.uploadDate).toLocaleDateString()}
-                    </td>
-                    <td className="px-8 py-6 text-slate-500 font-bold text-xs uppercase tracking-wider">
-                      {(doc.fileSize / 1024 / 1024).toFixed(2)} MB
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <div className="flex items-center justify-end gap-3 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <Link 
-                          to={`/analysis/${doc.id}`}
-                          className="p-2.5 bg-white hover:bg-brand-50 rounded-xl text-slate-500 hover:text-brand-600 transition-all border border-slate-200 hover:border-brand-200 shadow-sm"
-                          title="View Analysis"
-                        >
-                          <ExternalLink className="w-4.5 h-4.5" />
-                        </Link>
-                        <button 
-                          onClick={() => handleDelete(doc.id)}
-                          className="p-2.5 bg-white hover:bg-rose-50 rounded-xl text-slate-500 hover:text-rose-600 transition-all border border-slate-200 hover:border-rose-200 shadow-sm" 
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4.5 h-4.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-4 p-4 lg:p-8">
+            {filteredDocs.map((doc) => (
+              <div key={doc.id} className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row gap-6 md:items-center justify-between hover:border-brand-300 hover:shadow-lg hover:shadow-brand-500/5 transition-all group">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors border border-slate-100 shrink-0">
+                      <FileText className="w-5 h-5 text-slate-400 group-hover:text-brand-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-slate-900 group-hover:text-brand-700 transition-colors text-lg truncate">
+                        {doc.documentName || doc.fileName || 'Untitled Document'}
+                      </h3>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-0.5">
+                        {new Date(doc.createdAt || doc.uploadDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {doc.summary && (
+                    <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed mt-3 md:ml-13">
+                      {doc.summary}
+                    </p>
+                  )}
+                  
+                  <div className="flex flex-wrap items-center gap-3 mt-4 md:ml-13">
+                    <div className="px-3 py-1.5 bg-rose-50 border border-rose-100/50 text-rose-700 rounded-lg text-xs font-bold leading-none flex items-center gap-2">
+                       <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                       {doc.risks?.length || 0} Risks
+                    </div>
+                    <div className="px-3 py-1.5 bg-amber-50 border border-amber-100/50 text-amber-700 rounded-lg text-xs font-bold leading-none flex items-center gap-2">
+                       <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                       {doc.obligations?.length || 0} Obligations
+                    </div>
+                    <div className="px-3 py-1.5 bg-indigo-50 border border-indigo-100/50 text-indigo-700 rounded-lg text-xs font-bold leading-none flex items-center gap-2">
+                       <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                       {doc.deadlines?.length || 0} Deadlines
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 md:pl-6 md:border-l border-slate-100 shrink-0 mt-2 md:mt-0">
+                  <Link 
+                    to={`/analysis/${doc.id}`}
+                    className="flex-1 md:flex-none btn-primary py-2.5 px-6 rounded-xl text-sm justify-center shadow-sm"
+                  >
+                    Open Report
+                  </Link>
+                  <button 
+                    onClick={() => handleDelete(doc.id)}
+                    className="p-2.5 bg-white hover:bg-rose-50 rounded-xl text-slate-400 hover:text-rose-600 transition-all border border-slate-200 hover:border-rose-200 shadow-sm shrink-0" 
+                    title="Delete"
+                  >
+                    <Trash2 className="w-4.5 h-4.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 

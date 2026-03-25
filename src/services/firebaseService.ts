@@ -253,20 +253,24 @@ export const firebaseService = {
       throw new Error("[Security] Missing authenticated userId for FireStore write.");
     }
     
-    // HARDENING: Strictly limit to 1 chunk maximum, and trim safely to 50k chars
-    const safeChunks = chunks.slice(0, 1).map(c => ({
-      ...c,
-      content: typeof c.content === 'string' ? c.content.substring(0, 50000) : ''
-    }));
+    // Minimal history record as requested
+    const minimalRecord = {
+      id: analysis.id,
+      userId,
+      documentName: analysis.fileName || 'Untitled Document',
+      createdAt: new Date().toISOString(),
+      status: 'completed',
+      summary: typeof analysis.summary === 'string' ? analysis.summary.substring(0, 500) : '',
+      keyPoints: Array.isArray(analysis.keyPoints) ? analysis.keyPoints.map(String).slice(0, 10) : [],
+      risks: Array.isArray(analysis.risks) ? analysis.risks.map(r => String(r.title || r.explanation || '')).filter(Boolean).slice(0, 10) : [],
+      obligations: Array.isArray(analysis.obligations) ? analysis.obligations.map(o => String(o.obligation || '')).filter(Boolean).slice(0, 10) : [],
+      deadlines: Array.isArray(analysis.deadlines) ? analysis.deadlines.map(d => String(`${d.dateOrPeriod || ''} - ${d.description || ''}`)).filter(Boolean).slice(0, 10) : [],
+      questions: Array.isArray(analysis.suggestedQuestions) ? analysis.suggestedQuestions.map(String).slice(0, 10) : []
+    };
 
     const path = `analyses/${analysis.id}`;
     try {
-      await setDoc(doc(db, path), {
-        ...analysis,
-        userId, // Strictly enforce owner identity
-        chunks: safeChunks,
-        uploadDate: new Date().toISOString()
-      });
+      await setDoc(doc(db, path), minimalRecord);
       await this.incrementUsage(userId);
     } catch (error) {
       handleFirestoreError(error, OperationType.WRITE, path);
@@ -279,7 +283,26 @@ export const firebaseService = {
       const snap = await getDoc(doc(db, path));
       if (!snap.exists()) return null;
       const data = snap.data();
-      const { chunks, userId, ...analysis } = data;
+      const { chunks, userId, ...rawAnalysis } = data;
+      
+      // Map the minimal string arrays back to objects that satisfy AnalysisResult
+      const analysis: Partial<AnalysisResult> = {
+        ...rawAnalysis,
+        id: rawAnalysis.id || id,
+        fileName: rawAnalysis.documentName || rawAnalysis.fileName || 'Untitled Document',
+        uploadDate: rawAnalysis.createdAt || rawAnalysis.uploadDate || new Date().toISOString(),
+        risks: Array.isArray(rawAnalysis.risks) ? rawAnalysis.risks.map((r: any) => 
+          typeof r === 'string' ? { title: r, severity: 'medium', explanation: r } : r
+        ) : [],
+        obligations: Array.isArray(rawAnalysis.obligations) ? rawAnalysis.obligations.map((o: any) => 
+          typeof o === 'string' ? { party: 'unspecified', obligation: o, timing: 'See document' } : o
+        ) : [],
+        deadlines: Array.isArray(rawAnalysis.deadlines) ? rawAnalysis.deadlines.map((d: any) => 
+          typeof d === 'string' ? { dateOrPeriod: 'Review', description: d, severity: 'info' } : d
+        ) : [],
+        suggestedQuestions: Array.isArray(rawAnalysis.questions) ? rawAnalysis.questions : (rawAnalysis.suggestedQuestions || [])
+      };
+
       return { analysis: analysis as AnalysisResult, chunks: chunks || [] };
     } catch (error) {
       handleFirestoreError(error, OperationType.GET, path);
@@ -303,10 +326,10 @@ export const firebaseService = {
       const q = query(
         collection(db, path),
         where('userId', '==', userId),
-        orderBy('uploadDate', 'desc')
+        orderBy('createdAt', 'desc')
       );
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(d => d.data());
+      return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
     } catch (error) {
       handleFirestoreError(error, OperationType.LIST, path);
       throw error;
