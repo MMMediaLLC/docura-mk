@@ -79,29 +79,33 @@ export default function Dashboard() {
     e.preventDefault();
     setIsDragging(false);
     const droppedFile = e.dataTransfer.files[0];
-    const allowedTypes = [
-      'application/pdf', 
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ];
-    if (droppedFile && allowedTypes.includes(droppedFile.type)) {
+    const isAllowed = (f: File) => {
+      const allowedMimes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'];
+      const allowedExts = ['.pdf', '.docx'];
+      const ext = '.' + f.name.split('.').pop()?.toLowerCase();
+      return allowedMimes.includes(f.type) || allowedExts.includes(ext);
+    };
+    if (droppedFile && isAllowed(droppedFile)) {
       setFile(droppedFile);
       setError(null);
     } else {
-      setError('Please upload a PDF or DOCX file.');
+      setError('Please upload a PDF or Word document (.docx).');
     }
   }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    const allowedTypes = [
-      'application/pdf', 
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ];
-    if (selectedFile && allowedTypes.includes(selectedFile.type)) {
+    const isAllowed = (f: File) => {
+      const allowedMimes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip', 'application/octet-stream'];
+      const allowedExts = ['.pdf', '.docx'];
+      const ext = '.' + f.name.split('.').pop()?.toLowerCase();
+      return allowedMimes.includes(f.type) || allowedExts.includes(ext);
+    };
+    if (selectedFile && isAllowed(selectedFile)) {
       setFile(selectedFile);
       setError(null);
     } else {
-      setError('Please upload a PDF or DOCX file.');
+      setError('Please upload a PDF or Word document (.docx).');
     }
   };
 
