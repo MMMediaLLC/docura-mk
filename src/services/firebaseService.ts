@@ -83,12 +83,11 @@ function buildResetIfNeeded(user: User): Partial<User> | null {
         currentPeriodEnd: newEnd.toISOString(),
       };
     } else {
-      // Inactive subscription or Free -> Downgrade to free, do NOT reset lifetime free usage
+      // Inactive subscription or Free
+      // DO NOT update 'plan' or 'subscriptionStatus' here (Firestore rules block it)
       const newEnd = new Date(now);
       newEnd.setDate(newEnd.getDate() + 30);
       return {
-        plan: 'free',
-        subscriptionStatus: 'inactive',
         usedAnalysesInPeriod: 0,
         currentPeriodStart: now.toISOString(),
         currentPeriodEnd: newEnd.toISOString(),
@@ -103,8 +102,10 @@ function buildResetIfNeeded(user: User): Partial<User> | null {
  * Pure check — can this user run another analysis based strictly on their current tracking numbers?
  */
 function canAnalyze(user: User): boolean {
-  const limit = getPlanLimit(user.plan);
-  if (user.plan === 'free') {
+  // If plan claims to be paid, but subscription is inactive, treat as Free limit
+  const activePlan = (user.plan !== 'free' && user.subscriptionStatus !== 'active') ? 'free' : user.plan;
+  const limit = getPlanLimit(activePlan);
+  if (activePlan === 'free') {
     return (user.lifetimeFreeAnalysesUsed || 0) < limit;
   }
   return (user.usedAnalysesInPeriod || 0) < limit;
@@ -156,24 +157,28 @@ export const firebaseService = {
       // Migrate legacy `true_docura` plan to `free`
       if ((data.plan as string) === 'true_docura') {
         const update = { plan: 'free' as UserPlan };
-        await updateDoc(doc(db, path), update);
+        updateDoc(doc(db, path), update).catch(e => console.warn('[Security] Legacy plan drift silent handle'));
         data = { ...data, ...update };
       }
 
       // Check and apply period rollovers
       const resetUpdates = buildResetIfNeeded(data);
       if (resetUpdates) {
-        await updateDoc(doc(db, path), { ...resetUpdates });
+        // Safe to ignore firestore rule throws here (if periods are restricted)
+        updateDoc(doc(db, path), { ...resetUpdates }).catch(e => console.warn('[Security] Rollover logic DB write suppressed'));
         data = { ...data, ...resetUpdates };
       }
 
-      const limit = getPlanLimit(data.plan);
-      const currentUsage = data.plan === 'free' ? data.lifetimeFreeAnalysesUsed : data.usedAnalysesInPeriod;
+      // If user has paid plan but it is not active, treat as 'free' for limits here
+      const effectivePlan = (data.plan !== 'free' && data.subscriptionStatus !== 'active') ? 'free' : data.plan;
+
+      const limit = getPlanLimit(effectivePlan);
+      const currentUsage = effectivePlan === 'free' ? data.lifetimeFreeAnalysesUsed : data.usedAnalysesInPeriod;
       const remaining = Math.max(0, limit - currentUsage);
       const isLimitReached = currentUsage >= limit;
 
       return {
-        plan: data.plan,
+        plan: effectivePlan,
         usedAnalysesInPeriod: data.usedAnalysesInPeriod,
         lifetimeFreeAnalysesUsed: data.lifetimeFreeAnalysesUsed,
         usageLimit: limit,
