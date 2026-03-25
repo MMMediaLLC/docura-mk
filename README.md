@@ -4,7 +4,7 @@
 
 # DOCURA Intelligence
 
-DOCURA is a premium AI-powered document analysis platform designed to help professionals extract insights, risks, and obligations from legal and business documents with absolute confidence.
+DOCURA.cc is a premium AI-powered document analysis platform designed to help professionals extract insights, risks, and obligations from legal and business documents with absolute confidence.
 
 ## Features
 
