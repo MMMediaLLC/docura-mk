@@ -333,11 +333,17 @@ export const firebaseService = {
     try {
       const q = query(
         collection(db, path),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
+        where('userId', '==', userId)
       );
       const snapshot = await getDocs(q);
-      return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Sort client-side to avoid requiring a composite Firestore index
+      docs.sort((a: any, b: any) => {
+        const aDate = a.createdAt || a.uploadDate || '';
+        const bDate = b.createdAt || b.uploadDate || '';
+        return bDate.localeCompare(aDate);
+      });
+      return docs;
     } catch (error) {
       handleFirestoreError(error, OperationType.LIST, path);
       throw error;

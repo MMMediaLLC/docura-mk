@@ -402,14 +402,10 @@ return (
                         <FileText className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="font-bold text-slate-800 group-hover:text-brand-700 transition-colors text-lg tracking-tight">{doc.fileName}</p>
+                        <p className="font-bold text-slate-800 group-hover:text-brand-700 transition-colors text-lg tracking-tight">{doc.documentName || doc.fileName || 'Untitled Document'}</p>
                         <div className="flex items-center gap-3 mt-1.5">
                           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                            {new Date(doc.uploadDate).toLocaleDateString()}
-                          </p>
-                          <span className="w-1 h-1 bg-slate-300 rounded-full" />
-                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                            {(doc.fileSize / 1024 / 1024).toFixed(2)} MB
+                            {new Date(doc.createdAt || doc.uploadDate).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
