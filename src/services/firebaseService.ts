@@ -346,5 +346,45 @@ export const firebaseService = {
         console.error('Please check your Firebase configuration.');
       }
     }
+  },
+
+  // ── Account Deletion ──────────────────────────────────────
+  
+  async deleteUserAccount(userId: string, email: string): Promise<void> {
+    if (!userId || !email) {
+      throw new Error("[Security] Missing required identity for account deletion.");
+    }
+    
+    // 1. Create the minimal retained record for long-term protection
+    const retainedRecordPath = `retained_identities/${userId}`;
+    const retainedIdentity = {
+      email,
+      normalizedEmail: email.toLowerCase().trim(),
+      originalUserId: userId,
+      createdAt: new Date().toISOString(), // Fallback base creation tracking
+      deletedAt: new Date().toISOString(),
+      status: 'deleted',
+      retentionReason: 'Security, abuse prevention, and account history'
+    };
+
+    try {
+      // Create retained record
+      await setDoc(doc(db, retainedRecordPath), retainedIdentity);
+
+      // 2. Query and delete all analyses for this user
+      const analysesPath = 'analyses';
+      const analysesQ = query(collection(db, analysesPath), where('userId', '==', userId));
+      const analysesSnap = await getDocs(analysesQ);
+      
+      const deletePromises = analysesSnap.docs.map(d => deleteDoc(doc(db, analysesPath, d.id)));
+      await Promise.all(deletePromises);
+
+      // 3. Delete the active user profile
+      const userPath = `users/${userId}`;
+      await deleteDoc(doc(db, userPath));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.DELETE, 'Account Deletion Pipeline');
+      throw error;
+    }
   }
 };

@@ -2,8 +2,7 @@ import {
   Check, 
   ArrowRight, 
   Sparkles, 
-  Zap,
-  Flame,
+  ShieldCheck,
   Gem
 } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -16,13 +15,13 @@ export default function PricingPage() {
       id: "free",
       name: PLANS.free.name,
       price: PLANS.free.price,
-      desc: "Perfect for testing the waters of AI analysis.",
+      desc: "Experience core document intelligence and risk detection.",
       icon: Sparkles,
       iconGradient: "from-blue-400 to-indigo-500",
       features: [
-        "1 document analysis",
-        "Basic AI summary",
-        "Standard processing",
+        "1 complete document review",
+        "Risk & liability extraction",
+        "Key clause identification",
       ],
       cta: "Current Plan",
       current: true
@@ -32,16 +31,16 @@ export default function PricingPage() {
       name: PLANS.pro.name,
       price: PLANS.pro.price,
       period: PLANS.pro.period,
-      desc: "For legal warriors and high-volume professionals.",
-      icon: Flame, // Changed from Zap to Flame for more premium feel
-      iconGradient: "from-orange-400 to-rose-600",
+      desc: "For professionals requiring deep document visibility.",
+      icon: ShieldCheck, 
+      iconGradient: "from-slate-600 to-slate-800",
       features: [
         "3 document analyses / month",
-        "Gemini 1.5 Pro engine",
-        "Risk & liability detection",
-        "Obligations extraction",
-        "Deadlines & dates detection",
-        "Document Q&A",
+        "Deep contextual processing",
+        "Comprehensive risk detection",
+        "Automated obligation tracking",
+        "Critical deadline extraction",
+        "Interactive document Q&A",
       ],
       cta: "Upgrade to Pro",
       highlight: true,
@@ -52,13 +51,13 @@ export default function PricingPage() {
       name: PLANS.business.name,
       price: PLANS.business.price,
       period: PLANS.business.period,
-      desc: "The ultimate power for agencies and legal teams.",
-      icon: Gem, // Changed from Building2 to Gem
+      desc: "Unlimited analysis for high-volume legal and business teams.",
+      icon: Gem,
       iconGradient: "from-fuchsia-500 to-purple-700",
       features: [
         "Unlimited document analysis",
         "Everything in Pro",
-        "Priority AI access",
+        "Priority processing speed",
         "Export professional reports",
         "Advanced data extraction",
         "Dedicated support",
@@ -81,8 +80,8 @@ export default function PricingPage() {
     <div className="min-h-screen bg-transparent py-4 px-4 font-sans selection:bg-brand-100 selection:text-brand-900 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="fixed inset-0 pointer-events-none -z-10">
-        <div className="absolute top-40 left-1/4 w-[500px] h-[500px] bg-brand-400/6 rounded-full blur-[180px]" />
-        <div className="absolute bottom-40 right-1/4 w-[500px] h-[500px] bg-indigo-400/6 rounded-full blur-[180px]" />
+        <div className="absolute top-40 left-1/4 w-[500px] h-[500px] bg-slate-200/20 rounded-full blur-[200px]" />
+        <div className="absolute bottom-40 right-1/4 w-[500px] h-[500px] bg-slate-200/20 rounded-full blur-[200px]" />
       </div>
 
       <div className="max-w-6xl mx-auto space-y-16 relative z-10">
@@ -99,9 +98,9 @@ export default function PricingPage() {
             Pricing Plans
           </div>
           <h1 className="font-display text-5xl md:text-6xl font-bold text-slate-900 tracking-tight mb-6 leading-tight">
-            Simple, transparent <span className="text-gradient">pricing</span>
+            Professional Document <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-600 to-indigo-500">Intelligence</span>
           </h1>
-          <p className="text-slate-500 text-xl font-medium leading-relaxed">Choose the plan that fits your document review needs. No hidden fees, cancel anytime.</p>
+          <p className="text-slate-500 text-xl font-medium leading-relaxed">Transparent pricing for structured document analysis, risk detection, and obligation tracking.</p>
         </motion.div>
 
         {/* Plans Grid */}
@@ -115,39 +114,37 @@ export default function PricingPage() {
               className={cn(
                 "relative rounded-[2.5rem] border flex flex-col h-full transition-all duration-500 group overflow-hidden",
                 plan.highlight 
-                  ? "bg-linear-to-b from-brand-700 via-brand-800 to-slate-900 text-white border-brand-600/50 shadow-2xl shadow-brand-900/40 md:scale-105 md:z-10" 
+                  ? "bg-linear-to-b from-brand-700 to-brand-900 text-white border-brand-600/50 shadow-2xl shadow-brand-900/30 md:scale-105 md:z-10" 
                   : "bg-white text-slate-900 border-slate-200/60 hover:border-brand-200 hover:shadow-2xl hover:shadow-brand-100/30 shadow-sm"
               )}
             >
               {/* Top glow for highlighted plan */}
               {plan.highlight && (
                 <>
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-brand-500/20 blur-[80px] rounded-full" />
-                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/20 blur-[80px] rounded-full" />
-                  <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-brand-400/20 blur-[80px] rounded-full pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/20 blur-[80px] rounded-full pointer-events-none" />
                 </>
               )}
 
               {plan.highlight && (
-                <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-linear-to-r from-orange-400 via-rose-500 to-brand-600 text-white text-[9px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg shadow-rose-500/20 border border-white/10 whitespace-nowrap">
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-white/20 backdrop-blur-md text-white border border-white/30 text-[9px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg shadow-brand-900/30 whitespace-nowrap">
                   Most Popular
                 </div>
               )}
 
               <div className="p-9 relative z-10 flex flex-col h-full">
                 {/* Plan header */}
-                <div className="mb-8">
-
+                <div className="mb-8 mt-4">
                   <h3 className={cn("font-display text-2xl font-bold mb-2 tracking-tight", plan.highlight ? "text-white" : "text-slate-900")}>{plan.name}</h3>
                   <div className="flex items-baseline gap-1 mb-4">
                     <span className={cn("text-5xl font-black tracking-tighter", plan.highlight ? "text-white" : "text-slate-900")}>{plan.price}</span>
-                    {plan.period && <span className={cn("text-sm font-bold uppercase tracking-widest ml-1", plan.highlight ? "text-brand-300" : "text-slate-400")}>{plan.period}</span>}
+                    {plan.period && <span className={cn("text-sm font-bold uppercase tracking-widest ml-1", plan.highlight ? "text-slate-400" : "text-slate-400")}>{plan.period}</span>}
                   </div>
                   <p className={cn("text-sm font-medium leading-relaxed", plan.highlight ? "text-brand-200" : "text-slate-500")}>{plan.desc}</p>
                 </div>
 
                 {/* Divider */}
-                <div className={cn("h-px w-full mb-8", plan.highlight ? "bg-white/10" : "bg-slate-100")} />
+                <div className={cn("h-px w-full mb-8", plan.highlight ? "bg-white/20" : "bg-slate-100")} />
 
                 {/* Features */}
                 <div className="space-y-4 mb-10 flex-1">
@@ -155,11 +152,11 @@ export default function PricingPage() {
                     <div key={j} className="flex items-center gap-3 text-sm font-medium">
                       <div className={cn(
                         "w-5 h-5 rounded-full flex items-center justify-center shrink-0",
-                        plan.highlight ? "bg-brand-500 text-white shadow-md shadow-brand-900/30" : "bg-emerald-100 text-emerald-600"
+                        plan.highlight ? "bg-white/20 text-white shadow-inner border border-white/10" : "bg-emerald-100 text-emerald-600"
                       )}>
                         <Check className="w-3 h-3" strokeWidth={3} />
                       </div>
-                      <span className={cn(plan.highlight ? "text-brand-100" : "text-slate-600")}>{feature}</span>
+                      <span className={cn(plan.highlight ? "text-brand-50" : "text-slate-600")}>{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -189,17 +186,17 @@ export default function PricingPage() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="rounded-[2.5rem] p-12 text-center border border-slate-200/60 bg-white shadow-sm relative overflow-hidden group"
+          className="rounded-[2.5rem] p-12 text-center border border-slate-200 bg-white shadow-sm relative overflow-hidden group"
         >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-400/15 blur-[100px] rounded-full -mr-32 -mt-32 transition-transform duration-700 group-hover:scale-110" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/15 blur-[100px] rounded-full -ml-32 -mb-32 transition-transform duration-700 group-hover:scale-110" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-slate-100/50 blur-[100px] rounded-full -mr-32 -mt-32 transition-transform duration-700 group-hover:scale-110 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-slate-100/50 blur-[100px] rounded-full -ml-32 -mb-32 transition-transform duration-700 group-hover:scale-110 pointer-events-none" />
           <div className="relative z-10">
-            <div className="w-16 h-16 bg-linear-to-br from-brand-500 to-indigo-600 rounded-[1.5rem] shadow-lg shadow-brand-200 flex items-center justify-center mx-auto mb-6">
-              <Zap className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 bg-slate-900 rounded-[1.5rem] shadow-lg shadow-slate-900/10 flex items-center justify-center mx-auto mb-6">
+              <ShieldCheck className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-display text-3xl font-bold text-slate-900 mb-3 tracking-tight">Need a custom solution?</h3>
-            <p className="text-slate-500 text-lg font-medium mb-8 max-w-xl mx-auto leading-relaxed">Enterprise-grade security, custom integrations, and dedicated support for high-volume users.</p>
-            <button className="inline-flex items-center gap-2 bg-slate-900 text-white font-bold px-8 py-4 rounded-2xl text-sm uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20 hover:-translate-y-0.5 group/btn">
+            <h3 className="font-display text-3xl font-bold text-slate-900 mb-3 tracking-tight">Enterprise & custom workflows</h3>
+            <p className="text-slate-500 text-lg font-medium mb-8 max-w-xl mx-auto leading-relaxed">Dedicated environments, custom legal playbooks, API access, and tailored reporting for scaling teams.</p>
+            <button className="inline-flex items-center gap-2 bg-brand-600 text-white font-bold px-8 py-4 rounded-2xl text-sm uppercase tracking-widest hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 group/btn">
               Talk to our team
               <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
             </button>

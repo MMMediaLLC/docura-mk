@@ -12,6 +12,9 @@ export default function SettingsPage() {
   const [isCanceling, setIsCanceling] = useState(false);
   const [cancelSuccess, setCancelSuccess] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,6 +51,28 @@ export default function SettingsPage() {
   const handleSignOut = async () => {
     await signOut(auth);
     navigate('/');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!auth.currentUser || !auth.currentUser.email) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      // 1. Wipe active data and retain minimal identity in DB
+      await firebaseService.deleteUserAccount(auth.currentUser.uid, auth.currentUser.email);
+      // 2. Delete Auth record
+      await auth.currentUser.delete();
+      navigate('/');
+    } catch (err: any) {
+      console.error("Delete account error:", err);
+      if (err.code === 'auth/requires-recent-login') {
+         setDeleteError("Missing recent authentication. Please sign out, sign back in, and try again.");
+      } else {
+         setDeleteError(err.message || "Failed to delete account. Please try again.");
+      }
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const planLabel = userStatus?.plan === 'true_docura' 
@@ -200,9 +225,12 @@ export default function SettingsPage() {
         <div className="glass-panel bg-rose-50/30 border-rose-200/50 p-10 flex flex-col md:flex-row items-center justify-between gap-6 group relative z-10">
           <div className="text-center md:text-left">
             <h4 className="font-display text-2xl font-bold text-rose-900 tracking-tight">Delete Account</h4>
-            <p className="text-sm text-rose-700 mt-2 font-medium leading-relaxed max-w-md">Permanently remove your account and all document data. This action is irreversible.</p>
+            <p className="text-sm text-rose-700 mt-2 font-medium leading-relaxed max-w-md">Permanently remove your active account and document data. A minimal identity record is retained for protection and abuse prevention.</p>
           </div>
-          <button className="flex items-center gap-3 px-8 py-4 bg-rose-600 text-white rounded-2xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-200 active:scale-95 shrink-0">
+          <button 
+            onClick={() => setShowDeleteConfirm(true)}
+            className="flex items-center gap-3 px-8 py-4 bg-rose-600 text-white rounded-2xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-200 active:scale-95 shrink-0"
+          >
             <Trash2 className="w-5 h-5" />
             Delete Account
           </button>
@@ -254,6 +282,67 @@ export default function SettingsPage() {
                 >
                   {isCanceling ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                   Yes, Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Account Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => !isDeleting && setShowDeleteConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="glass-panel max-w-md w-full p-8 relative border-rose-200 shadow-xl shadow-rose-500/10"
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                onClick={() => !isDeleting && setShowDeleteConfirm(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                disabled={isDeleting}
+              >
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+              <div className="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center mb-6 border border-rose-200">
+                <Trash2 className="w-7 h-7 text-rose-600" />
+              </div>
+              <h3 className="font-display text-2xl font-bold text-slate-900 mb-2 tracking-tight">Delete Account?</h3>
+              <p className="text-slate-500 mb-6 leading-relaxed font-medium">
+                This will permanently delete your active profile and all uploaded document data. A minimal identity record is retained to recognize this email in the future for platform security and abuse prevention.
+              </p>
+              
+              {deleteError && (
+                <div className="mb-6 p-4 rounded-xl bg-orange-50 border border-orange-200 text-orange-800 text-sm font-bold">
+                  {deleteError}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  className="flex-1 py-3 rounded-xl font-bold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting}
+                  className="flex-1 py-3 rounded-xl font-bold bg-rose-600 text-white hover:bg-rose-700 shadow-lg shadow-rose-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                >
+                  {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  Yes, Delete
                 </button>
               </div>
             </motion.div>
