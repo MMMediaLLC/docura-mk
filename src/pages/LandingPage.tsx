@@ -74,17 +74,17 @@ export default function LandingPage() {
           >
             <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-linear-to-r from-brand-50 to-indigo-50 border border-brand-200/60 text-brand-700 text-[11px] font-bold rounded-full mb-8 uppercase tracking-[0.2em] shadow-sm shadow-brand-100">
               <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-              AI Contract Intelligence
+              AI Documents Intelligence
             </div>
             <h1 className="font-display text-5xl md:text-7xl font-bold tracking-tight text-slate-900 mb-8 leading-[1.05]">
-              Never Miss a Hidden Liability <span className="text-gradient">Again.</span>
+              Protect Your Position Before <span className="text-gradient">Signing.</span>
             </h1>
             <p className="text-xl md:text-2xl text-slate-500 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-              Instantly extract risks, obligations, and deadlines from any contract or agreement. Secure, private, and powered by advanced AI.
+              Instantly identify risks, obligations, deadlines, and critical clauses in contracts and agreements. Private by design, secure by default.
             </p>
             <div className="flex justify-center">
               <Link to="/dashboard" className="btn-primary px-10 py-5 text-lg flex items-center justify-center gap-3 group shadow-xl shadow-brand-500/30">
-                Analyze First Document - Free
+                Analyze Your First Document Free
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
@@ -98,15 +98,15 @@ export default function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-10 text-slate-400 font-bold text-xs uppercase tracking-[0.1em] border-y border-slate-200/60 py-8 bg-white/50 backdrop-blur-md rounded-[2.5rem]">
             <div className="flex items-center gap-2">
               <Lock className="w-4 h-4 text-emerald-500" />
-              256-Bit Encrypted
+              256-Bit Encryption
             </div>
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              Zero Training on Your Data
+              Your Documents Are Never Used for Training
             </div>
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-emerald-500" />
-              Instant Deletion Option
+              Delete Your Files Anytime
             </div>
           </div>
         </div>
@@ -118,8 +118,8 @@ export default function LandingPage() {
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-500/10 blur-[200px] pointer-events-none" />
         
         <div className="max-w-7xl mx-auto relative z-10 text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-linear-to-br from-white to-slate-400 text-transparent bg-clip-text">See what DOCURA uncovers.</h2>
-          <p className="text-slate-400 text-xl font-medium max-w-2xl mx-auto">Get structured results instantly, highlighting critical clauses and hidden landmines.</p>
+          <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-linear-to-br from-white to-slate-400 text-transparent bg-clip-text">See What DOCURA Finds in Seconds.</h2>
+          <p className="text-slate-400 text-xl font-medium max-w-2xl mx-auto">Get a structured report that highlights critical clauses, obligations, deadlines, and high-risk terms in seconds.</p>
         </div>
 
         <div className="max-w-4xl mx-auto">
@@ -195,8 +195,8 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-12 text-center">
             {[
               { title: "1. Upload", desc: "Drag and drop any PDF or DOCX file. We support up to 20MB.", icon: FileText, color: "text-brand-600", bg: "bg-brand-50" },
-              { title: "2. AI Analysis", desc: "Gemini 1.5 Pro instantly scans for risks, deadlines, and core obligations.", icon: Zap, color: "text-amber-600", bg: "bg-amber-50" },
-              { title: "3. Review & Chat", desc: "Read the structured report, or 'Ask the Document' specific legal questions.", icon: Bot, color: "text-emerald-600", bg: "bg-emerald-50" }
+              { title: "2. AI Analysis", desc: "Advanced AI scans your document for risks, deadlines, obligations, and non-standard clauses.", icon: Zap, color: "text-amber-600", bg: "bg-amber-50" },
+              { title: "3. Review & Ask", desc: "Review the structured report or ask follow-up questions about specific clauses, obligations, or risks.", icon: Bot, color: "text-emerald-600", bg: "bg-emerald-50" }
             ].map((step, i) => (
               <div key={i} className="flex flex-col items-center">
                 <div className={cn("w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-lg mb-8", step.bg)}>
@@ -214,13 +214,13 @@ export default function LandingPage() {
       <section id="use-cases" className="py-32 px-6 bg-[#fafbff]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">Built for modern professionals</h2>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">Built for Teams That Review Important Documents</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { role: "For Legal Teams", needs: "NDAs, Employment Contracts, Vendor Agreements", icon: Scale, desc: "Accelerate your review process by having AI surface the most critical and non-standard clauses instantly." },
-              { role: "For Agencies & Freelancers", needs: "Master Service Agreements, SOWs", icon: Briefcase, desc: "Never agree to unfavorable payment terms or unlimited revisions buried in client contracts." },
-              { role: "For Operations", needs: "Leases, Compliance Documents, Financial Reports", icon: ListChecks, desc: "Extract dates, renewal periods, and compliance obligations into actionable checklists without reading 50 pages." }
+              { role: "For Legal Teams", needs: "NDAs, Employment Contracts, Vendor Agreements", icon: Scale, desc: "Speed up first-pass review by surfacing critical, unusual, and high-risk clauses in seconds." },
+              { role: "For Agencies & Freelancers", needs: "Master Service Agreements, SOWs", icon: Briefcase, desc: "Spot unfavorable payment terms, unclear scope, and risky revision language before you commit." },
+              { role: "For Operations", needs: "Leases, Compliance Documents, Financial Reports", icon: ListChecks, desc: "Turn dates, renewal periods, and compliance obligations into clear next steps without reading every page manually." }
             ].map((useCase, i) => (
               <div key={i} className="bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:-translate-y-2 transition-transform duration-500">
                 <useCase.icon className="w-10 h-10 text-brand-600 mb-6" />
@@ -237,14 +237,14 @@ export default function LandingPage() {
       <section className="py-32 px-6 bg-white border-y border-slate-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">Simple Pricing</h2>
-            <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Start for free. Upgrade when you need more power.</p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">Simple, Transparent Pricing</h2>
+            <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Start free. Upgrade when you need more analyses, history, and flexibility.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               { plan: "Free", price: "$0", docs: "1 Document Analysis", cta: "Try Now", link: "/auth" },
               { plan: "Pro", price: "$6", period: "/mo", docs: "3 Document Analyses / month", cta: "Upgrade to Pro", link: "/pricing", popular: true },
-              { plan: "Business", price: "$19", period: "/mo", docs: "Unlimited Analyses", cta: "Get Business", link: "/pricing" }
+              { plan: "Business", price: "$19", period: "/mo", docs: "High-Volume Analyses", cta: "Get Business", link: "/pricing" }
             ].map((p, i) => (
               <div key={i} className={cn("rounded-[2rem] p-8 flex flex-col items-center text-center border transition-all", p.popular ? "bg-slate-900 text-white shadow-2xl shadow-brand-900/20 border-slate-800 scale-105" : "bg-white text-slate-900 border-slate-200")}>
                 {p.popular && <span className="bg-brand-600 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full mb-6 relative -top-3">Most Popular</span>}
@@ -269,8 +269,8 @@ export default function LandingPage() {
           </div>
           <div className="space-y-4">
             {[
-              { q: "Is this legal advice?", a: "No. DOCURA is an AI document assistant. You should always consult with a qualified legal professional for legal decisions." },
-              { q: "Do you train AI on my documents?", a: "Never. Your files are processed in memory to generate the report and are not used to train our AI models or third-party models." },
+              { q: "Is this legal advice?", a: "No. DOCURA provides AI-assisted document analysis, not legal advice. Important legal decisions should always be reviewed by a qualified legal professional." },
+              { q: "Do you train AI on my documents?", a: "Never. Your files are processed only to generate your report and are never used to train DOCURA or third-party AI models." },
               { q: "What languages are supported?", a: "Our AI engine comprehends documents in English, Spanish, French, German, and many more, though English yields the highest accuracy for complex legal jargon." },
               { q: "How do I delete my data?", a: "You have full control. You can delete your documents and entire account permanently from the Settings page at any time." }
             ].map((faq, i) => (
@@ -287,13 +287,13 @@ export default function LandingPage() {
       <section className="py-32 px-6 bg-slate-950 text-white text-center">
         <div className="max-w-3xl mx-auto">
           <ShieldCheck className="w-16 h-16 text-emerald-400 mx-auto mb-8" />
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-8 tracking-tight">Stop reading 50-page contracts manually.</h2>
+          <h2 className="font-display text-4xl md:text-5xl font-bold mb-8 tracking-tight">Review Complex Contracts Faster and With More Clarity.</h2>
           <p className="text-xl text-slate-400 font-medium mb-12">Join professionals using DOCURA to save time and reduce risk every day.</p>
           <Link to="/auth" className="inline-flex items-center gap-3 bg-brand-600 text-white font-bold px-10 py-5 rounded-2xl text-lg hover:bg-brand-500 transition-all shadow-xl shadow-brand-900/50">
             Try DOCURA for Free
             <ArrowRight className="w-5 h-5" />
           </Link>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-12">Enterprise-Grade Security • AES-256 Encryption • GDPR Ready</p>
+          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-12">Private by Design • AES-256 Encryption • User-Controlled Deletion</p>
         </div>
       </section>
 
