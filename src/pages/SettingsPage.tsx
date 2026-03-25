@@ -68,7 +68,20 @@ export default function SettingsPage() {
       if (err.code === 'auth/requires-recent-login') {
          setDeleteError("Missing recent authentication. Please sign out, sign back in, and try again.");
       } else {
-         setDeleteError(err.message || "Failed to delete account. Please try again.");
+         let errorMessage = "Failed to delete account. Please try again.";
+         try {
+           const parsed = JSON.parse(err.message);
+           if (parsed.error && typeof parsed.error === 'string') {
+             if (parsed.error.includes("Missing or insufficient permissions")) {
+               errorMessage = "Secure deletion access denied. Please refresh or try again.";
+             } else {
+               errorMessage = parsed.error;
+             }
+           }
+         } catch(e) {
+           errorMessage = err.message || errorMessage;
+         }
+         setDeleteError(errorMessage);
       }
     } finally {
       setIsDeleting(false);

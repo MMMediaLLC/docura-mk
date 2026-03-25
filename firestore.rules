@@ -36,7 +36,15 @@ service cloud.firestore {
                     && request.resource.data.email == resource.data.email
                     && request.resource.data.id == resource.data.id;
                     
-      allow delete: if false; // Users shouldn't delete their core profile here
+      allow delete: if isOwner(userId); // Users can delete their profile during account deletion
+    }
+
+    // Retained Identities Security
+    match /retained_identities/{userId} {
+      allow create: if isOwner(userId)
+                    && request.resource.data.originalUserId == userId
+                    && request.resource.data.status == 'deleted';
+      allow read, update, delete: if false;
     }
 
     // Analyses Security
