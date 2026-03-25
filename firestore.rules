@@ -55,7 +55,7 @@ service cloud.firestore {
       // CREATE: Must assign yourself as the owner
       allow create: if isAuthenticated() 
                     && request.resource.data.userId == request.auth.uid
-                    && request.resource.data.keys().hasAll(['userId', 'documentType', 'title']);
+                    && request.resource.data.keys().hasAll(['userId', 'documentName', 'status']);
       
       // UPDATE: Prevent transferring ownership to someone else
       allow update: if isAuthenticated() 
