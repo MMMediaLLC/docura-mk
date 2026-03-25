@@ -80,7 +80,7 @@ export default function LandingPage() {
               Protect Your Position Before <span className="text-gradient">Signing.</span>
             </h1>
             <p className="text-xl md:text-2xl text-slate-500 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-              Instantly identify risks, obligations, deadlines, and critical clauses in contracts and agreements. Private by design, secure by default.
+              Instantly identify risks, obligations, deadlines, and critical clauses in contracts, tenders, and business documents. Private by design, secure by default.
             </p>
             <div className="flex justify-center">
               <Link to="/dashboard" className="btn-primary px-10 py-5 text-lg flex items-center justify-center gap-3 group shadow-xl shadow-brand-500/30">
@@ -119,7 +119,7 @@ export default function LandingPage() {
         
         <div className="max-w-7xl mx-auto relative z-10 text-center mb-16">
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-linear-to-br from-white to-slate-400 text-transparent bg-clip-text">See What DOCURA Finds in Seconds.</h2>
-          <p className="text-slate-400 text-xl font-medium max-w-2xl mx-auto">Get a structured report that highlights critical clauses, obligations, deadlines, and high-risk terms in seconds.</p>
+          <p className="text-slate-400 text-xl font-medium max-w-2xl mx-auto">Get a structured report covering summary, key points, risks, obligations, deadlines, and critical clauses — in seconds.</p>
         </div>
 
         <div className="max-w-4xl mx-auto">
@@ -194,7 +194,7 @@ export default function LandingPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-12 text-center">
             {[
-              { title: "1. Upload", desc: "Drag and drop any PDF or DOCX file. We support up to 20MB.", icon: FileText, color: "text-brand-600", bg: "bg-brand-50" },
+              { title: "1. Upload", desc: "Drag and drop any PDF or Word document (.docx). We support up to 20MB.", icon: FileText, color: "text-brand-600", bg: "bg-brand-50" },
               { title: "2. AI Analysis", desc: "Advanced AI scans your document for risks, deadlines, obligations, and non-standard clauses.", icon: Zap, color: "text-amber-600", bg: "bg-amber-50" },
               { title: "3. Review & Ask", desc: "Review the structured report or ask follow-up questions about specific clauses, obligations, or risks.", icon: Bot, color: "text-emerald-600", bg: "bg-emerald-50" }
             ].map((step, i) => (
@@ -270,6 +270,7 @@ export default function LandingPage() {
           <div className="space-y-4">
             {[
               { q: "Is this legal advice?", a: "No. DOCURA provides AI-assisted document analysis, not legal advice. Important legal decisions should always be reviewed by a qualified legal professional." },
+              { q: "What file types are supported?", a: "DOCURA accepts PDF files and Word documents (.docx). Both formats are fully supported for contracts, tenders, agreements, and general business documents." },
               { q: "Do you train AI on my documents?", a: "Never. Your files are processed only to generate your report and are never used to train DOCURA or third-party AI models." },
               { q: "What languages are supported?", a: "Our AI engine comprehends documents in English, Spanish, French, German, and many more, though English yields the highest accuracy for complex legal jargon." },
               { q: "How do I delete my data?", a: "You have full control. You can delete your documents and entire account permanently from the Settings page at any time." }

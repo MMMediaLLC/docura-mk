@@ -302,10 +302,10 @@ return (
                     <Upload className="w-10 h-10" />
                   </div>
                   <div>
-                    <h3 className="font-display text-2xl font-bold text-slate-800 mb-3 tracking-tight">Drop your PDF here</h3>
+                    <h3 className="font-display text-2xl font-bold text-slate-800 mb-3 tracking-tight">Drop your document here</h3>
                     <p className="text-slate-500 font-medium max-w-xs mx-auto leading-relaxed">
                       or click to browse from your computer. <br />
-                      <span className="text-slate-400 text-sm mt-1 block">Max file size 20MB.</span>
+                      <span className="text-slate-400 text-sm mt-1 block">PDF or Word document (.docx) — max 20MB.</span>
                     </p>
                   </div>
                   <div className="flex gap-8 text-[11px] font-bold text-slate-400 uppercase tracking-widest justify-center">

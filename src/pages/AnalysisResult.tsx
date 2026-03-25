@@ -90,78 +90,128 @@ export default function AnalysisResult() {
   const handleExport = () => {
     if (!analysis) return;
 
-    const formatSeverityLabel = (s: string) => s === 'high' ? '🔴 HIGH' : s === 'medium' ? '🟡 MEDIUM' : '🔵 LOW';
-    const formatDeadlineSeverity = (s: string) => s === 'urgent' ? '🔴 URGENT' : s === 'important' ? '🟡 IMPORTANT' : '⚪ INFO';
+    const sevBorder = (s: string) => s === 'high' ? '#ef4444' : s === 'medium' ? '#f59e0b' : '#3b82f6';
+    const sevBg = (s: string) => s === 'high' ? '#fff5f5' : s === 'medium' ? '#fffbeb' : '#eff6ff';
+    const sevColor = (s: string) => s === 'high' ? '#dc2626' : s === 'medium' ? '#b45309' : '#1d4ed8';
+    const sevLabel = (s: string) => s === 'high' ? 'HIGH' : s === 'medium' ? 'MEDIUM' : 'LOW';
+    const dlColor = (s: string) => s === 'urgent' ? '#dc2626' : s === 'important' ? '#b45309' : '#475569';
+    const dlLabel = (s: string) => s === 'urgent' ? 'URGENT' : s === 'important' ? 'IMPORTANT' : 'INFO';
+    const docType = (analysis.documentType || 'document').replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+    const analyzedDate = new Date(analysis.uploadDate || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
     const risksHtml = (analysis.risks || []).map(r => `
-      <div style="margin-bottom:16px;padding:16px;border-left:4px solid ${r.severity==='high'?'#ef4444':r.severity==='medium'?'#f59e0b':'#3b82f6'};background:#f8fafc;border-radius:4px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <strong style="font-size:15px;color:#1e293b">${r.title || ''}</strong>
-          <span style="font-size:11px;font-weight:700;text-transform:uppercase;color:${r.severity==='high'?'#dc2626':r.severity==='medium'?'#d97706':'#2563eb'}">${formatSeverityLabel(r.severity)}</span>
+      <div style="margin-bottom:12px;padding:14px 18px;border-left:3px solid ${sevBorder(r.severity)};background:${sevBg(r.severity)};page-break-inside:avoid">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:5px">
+          <span style="font-size:13px;font-weight:700;color:#0f172a;line-height:1.4">${r.title || ''}</span>
+          <span style="font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:${sevColor(r.severity)};white-space:nowrap;padding:2px 7px;border:1px solid ${sevBorder(r.severity)};flex-shrink:0">${sevLabel(r.severity)}</span>
         </div>
-        <p style="margin:0;color:#475569;line-height:1.6">${r.explanation || ''}</p>
+        <p style="margin:0;font-size:12.5px;color:#334155;line-height:1.65">${r.explanation || ''}</p>
+        ${(r as any).sourceHint ? `<div style="margin-top:5px;font-size:11px;color:#64748b;font-style:italic">Source: ${(r as any).sourceHint}</div>` : ''}
       </div>`).join('');
 
-    const obligationsHtml = (analysis.obligations || []).map(o => `
-      <tr style="border-bottom:1px solid #e2e8f0">
-        <td style="padding:10px 16px;font-weight:600;color:#64748b;white-space:nowrap">${o.party || ''}</td>
-        <td style="padding:10px 16px;color:#334155">${o.obligation || ''}</td>
-        <td style="padding:10px 16px;color:#64748b;white-space:nowrap">${o.timing || ''}</td>
+    const obligationsHtml = (analysis.obligations || []).map((o, i) => `
+      <tr style="background:${i % 2 === 0 ? '#fff' : '#f8fafc'}">
+        <td style="padding:9px 13px;font-size:12px;font-weight:700;color:#475569;border-bottom:1px solid #e2e8f0;vertical-align:top;white-space:nowrap">${o.party || ''}</td>
+        <td style="padding:9px 13px;font-size:12.5px;color:#1e293b;border-bottom:1px solid #e2e8f0;line-height:1.5;vertical-align:top">${o.obligation || ''}</td>
+        <td style="padding:9px 13px;font-size:12px;color:#64748b;border-bottom:1px solid #e2e8f0;vertical-align:top;white-space:nowrap">${o.timing || 'Not stated'}</td>
       </tr>`).join('');
 
     const deadlinesHtml = (analysis.deadlines || []).map(d => `
-      <div style="margin-bottom:12px;padding:14px 16px;background:#f8fafc;border-radius:6px;display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <strong style="color:#1e293b">${d.description || ''}</strong>
-          <div style="color:#6366f1;font-size:13px;margin-top:2px">${d.dateOrPeriod || ''}</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:10px 14px;border-bottom:1px solid #f1f5f9;gap:12px">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:#0f172a;margin-bottom:2px">${d.description || ''}</div>
+          <div style="font-size:12px;color:#4f46e5;font-weight:500">${d.dateOrPeriod || ''}</div>
         </div>
-        <span style="font-size:11px;font-weight:700;text-transform:uppercase">${formatDeadlineSeverity(d.severity)}</span>
+        <span style="font-size:9px;font-weight:800;letter-spacing:0.07em;text-transform:uppercase;color:${dlColor(d.severity)};white-space:nowrap;padding-top:2px">${dlLabel(d.severity)}</span>
       </div>`).join('');
 
-    const keyPointsHtml = (analysis.keyPoints || []).map(p => `
-      <li style="margin-bottom:8px;color:#334155;line-height:1.6">${p}</li>`).join('');
+    const keyPointsHtml = (analysis.keyPoints || []).map(p =>
+      `<li style="margin-bottom:7px;font-size:13px;color:#334155;line-height:1.6;padding-left:3px">${p}</li>`).join('');
 
-    const questionsHtml = (analysis.suggestedQuestions || []).map(q => `
-      <li style="margin-bottom:6px;color:#334155">${q}</li>`).join('');
+    const questionsHtml = (analysis.suggestedQuestions || []).map((q, i) =>
+      `<div style="padding:9px 0;border-bottom:1px solid #f1f5f9;font-size:12.5px;color:#1e293b;line-height:1.5">${i + 1}.&nbsp; ${q}</div>`).join('');
 
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Analysis Report — ${analysis.title || analysis.fileName}</title>
+  <title>DOCURA Report — ${analysis.title || analysis.fileName || 'Analysis'}</title>
   <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm 20mm 16mm;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; background: #fff; padding: 40px; max-width: 860px; margin: auto; }
-    h1 { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
-    h2 { font-size: 16px; font-weight: 700; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.1em; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e7ff; }
-    .meta { font-size: 13px; color: #64748b; margin-bottom: 32px; }
-    .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; text-transform:uppercase; background:#e0e7ff; color:#4f46e5; margin-left:8px; }
-    .summary-box { background:#f1f5f9; border-radius:8px; padding:20px 24px; font-size:15px; line-height:1.8; color:#334155; margin-bottom:8px; }
-    table { width:100%; border-collapse:collapse; background:#f8fafc; border-radius:8px; overflow:hidden; }
-    th { padding:10px 16px; background:#e2e8f0; font-size:11px; font-weight:700; text-transform:uppercase; color:#475569; text-align:left; }
-    ul { padding-left:20px; }
-    .footer { margin-top:40px; padding-top:16px; border-top:1px solid #e2e8f0; font-size:11px; color:#94a3b8; text-align:center; }
-    @media print { body { padding: 20px; } }
+    html, body { background: #fff; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
+      color: #1e293b;
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .report-header { border-bottom: 2px solid #0f172a; padding-bottom: 18px; margin-bottom: 26px; }
+    .brand-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .brand { font-size:10px; font-weight:800; letter-spacing:0.2em; text-transform:uppercase; color:#4f46e5; }
+    .report-label { font-size:10px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#94a3b8; }
+    .doc-title { font-size:21px; font-weight:800; color:#0f172a; line-height:1.25; margin-bottom:9px; letter-spacing:-0.01em; }
+    .doc-badge { display:inline-block; padding:2px 9px; background:#eef2ff; color:#4338ca; font-size:9.5px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; margin-left:9px; vertical-align:middle; }
+    .meta-row { font-size:11px; color:#64748b; }
+    .meta-row strong { color:#334155; font-weight:700; margin-right:4px; }
+    .meta-sep { color:#cbd5e1; margin: 0 10px; }
+    h2 { font-size:10px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; color:#4f46e5; margin:26px 0 11px; padding-bottom:7px; border-bottom:1px solid #e0e7ff; page-break-after:avoid; }
+    .summary-block { font-size:13.5px; color:#334155; line-height:1.75; background:#f8fafc; border-left:3px solid #4f46e5; padding:13px 17px; }
+    ul.kp { padding-left:16px; }
+    .obligations-table { width:100%; border-collapse:collapse; border:1px solid #e2e8f0; }
+    .obligations-table th { padding:8px 13px; background:#f1f5f9; font-size:9.5px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:#64748b; text-align:left; border-bottom:1px solid #e2e8f0; }
+    .deadlines-box { border:1px solid #e2e8f0; }
+    .questions-box { border:1px solid #e2e8f0; padding:0 14px; }
+    .report-footer { margin-top:32px; padding-top:12px; border-top:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .footer-brand { font-size:9.5px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:#4f46e5; flex-shrink:0; }
+    .footer-note { font-size:10px; color:#94a3b8; line-height:1.4; }
+    @media print { .report-header, h2, .summary-block { page-break-inside:avoid; } }
   </style>
 </head>
 <body>
-  <h1>${analysis.title || analysis.fileName || 'Document Analysis Report'}<span class="badge">${(analysis.documentType || 'document').replace('_', ' ')}</span></h1>
-  <div class="meta">File: ${analysis.fileName || ''} &nbsp;|&nbsp; Analyzed: ${new Date(analysis.uploadDate || Date.now()).toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' })}</div>
+  <div class="report-header">
+    <div class="brand-row">
+      <span class="brand">DOCURA Intelligence</span>
+      <span class="report-label">Automated Document Analysis Report</span>
+    </div>
+    <div class="doc-title">
+      ${analysis.title || analysis.fileName || 'Document Analysis'}
+      <span class="doc-badge">${docType}</span>
+    </div>
+    <div class="meta-row">
+      <strong>File:</strong>${analysis.fileName || '—'}<span class="meta-sep">|</span><strong>Analyzed:</strong>${analyzedDate}
+    </div>
+  </div>
 
   <h2>Executive Summary</h2>
-  <div class="summary-box">${analysis.summary || 'No summary available.'}</div>
+  <div class="summary-block">${analysis.summary || 'No summary available.'}</div>
 
-  ${analysis.keyPoints?.length ? `<h2>Key Points</h2><ul>${keyPointsHtml}</ul>` : ''}
+  ${analysis.keyPoints?.length ? `<h2>Key Points</h2><ul class="kp">${keyPointsHtml}</ul>` : ''}
 
-  ${analysis.risks?.length ? `<h2>Risks (${analysis.risks.length})</h2>${risksHtml}` : ''}
+  ${analysis.risks?.length ? `<h2>Identified Risks (${analysis.risks.length})</h2>${risksHtml}` : ''}
 
-  ${analysis.obligations?.length ? `<h2>Obligations</h2><table><thead><tr><th>Party</th><th>Obligation</th><th>Timing</th></tr></thead><tbody>${obligationsHtml}</tbody></table>` : ''}
+  ${analysis.obligations?.length ? `
+    <h2>Obligations</h2>
+    <table class="obligations-table">
+      <thead><tr><th>Party</th><th>Obligation</th><th>Timing</th></tr></thead>
+      <tbody>${obligationsHtml}</tbody>
+    </table>` : ''}
 
-  ${analysis.deadlines?.length ? `<h2>Deadlines (${analysis.deadlines.length})</h2>${deadlinesHtml}` : ''}
+  ${analysis.deadlines?.length ? `<h2>Deadlines &amp; Key Dates (${analysis.deadlines.length})</h2><div class="deadlines-box">${deadlinesHtml}</div>` : ''}
 
-  ${analysis.suggestedQuestions?.length ? `<h2>Suggested Questions</h2><ul>${questionsHtml}</ul>` : ''}
+  ${analysis.suggestedQuestions?.length ? `<h2>Suggested Review Questions</h2><div class="questions-box">${questionsHtml}</div>` : ''}
 
-  <div class="footer">Generated by DOCURA Intelligence &nbsp;|&nbsp; For informational purposes only. Not legal advice.</div>
+  <div class="report-footer">
+    <span class="footer-brand">DOCURA Intelligence</span>
+    <span class="footer-note">Automated analysis report — informational purposes only. Not legal advice. Consult a qualified professional before making legal or commercial decisions.</span>
+  </div>
 </body>
 </html>`;
 
@@ -170,8 +220,10 @@ export default function AnalysisResult() {
     win.document.write(html);
     win.document.close();
     win.focus();
-    setTimeout(() => win.print(), 400);
+    setTimeout(() => win.print(), 500);
   };
+
+
 
   if (error) {
     return (
