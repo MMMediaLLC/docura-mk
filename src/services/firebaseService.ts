@@ -253,18 +253,22 @@ export const firebaseService = {
       throw new Error("[Security] Missing authenticated userId for FireStore write.");
     }
     
-    // Minimal history record as requested
+    // Minimal history record — all fields required to render the Analysis page without crashing
     const minimalRecord = {
       id: analysis.id,
       userId,
       documentName: analysis.fileName || 'Untitled Document',
+      title: analysis.title || analysis.fileName || 'Untitled Document',
+      documentType: analysis.documentType || 'document',
       createdAt: new Date().toISOString(),
       status: 'completed',
       summary: typeof analysis.summary === 'string' ? analysis.summary.substring(0, 500) : '',
       keyPoints: Array.isArray(analysis.keyPoints) ? analysis.keyPoints.map(String).slice(0, 10) : [],
-      risks: Array.isArray(analysis.risks) ? analysis.risks.map(r => String(r.title || r.explanation || '')).filter(Boolean).slice(0, 10) : [],
-      obligations: Array.isArray(analysis.obligations) ? analysis.obligations.map(o => String(o.obligation || '')).filter(Boolean).slice(0, 10) : [],
-      deadlines: Array.isArray(analysis.deadlines) ? analysis.deadlines.map(d => String(`${d.dateOrPeriod || ''} - ${d.description || ''}`)).filter(Boolean).slice(0, 10) : [],
+      risks: Array.isArray(analysis.risks) ? analysis.risks.map(r => ({ title: String(r.title || ''), severity: r.severity || 'medium', explanation: String(r.explanation || ''), sourceHint: r.sourceHint })).slice(0, 10) : [],
+      obligations: Array.isArray(analysis.obligations) ? analysis.obligations.map(o => ({ party: String(o.party || 'unspecified'), obligation: String(o.obligation || ''), timing: String(o.timing || '') })).slice(0, 10) : [],
+      deadlines: Array.isArray(analysis.deadlines) ? analysis.deadlines.map(d => ({ dateOrPeriod: String(d.dateOrPeriod || ''), description: String(d.description || ''), severity: d.severity || 'info' })).slice(0, 10) : [],
+      keyClauses: Array.isArray(analysis.keyClauses) ? analysis.keyClauses.map(c => ({ title: String(c.title || ''), type: String(c.type || ''), summary: String(c.summary || ''), sourceHint: c.sourceHint })).slice(0, 10) : [],
+      confidenceNotes: Array.isArray(analysis.confidenceNotes) ? analysis.confidenceNotes.map(String).slice(0, 5) : [],
       questions: Array.isArray(analysis.suggestedQuestions) ? analysis.suggestedQuestions.map(String).slice(0, 10) : []
     };
 
@@ -282,13 +286,15 @@ export const firebaseService = {
     try {
       const snap = await getDoc(doc(db, path));
       if (!snap.exists()) return null;
-      const data = snap.data();
+      let data = snap.data();
       const { chunks, userId, ...rawAnalysis } = data;
       
-      // Map the minimal string arrays back to objects that satisfy AnalysisResult
+      // Map saved record back to a full AnalysisResult shape with safe fallbacks
       const analysis: Partial<AnalysisResult> = {
         ...rawAnalysis,
         id: rawAnalysis.id || id,
+        title: rawAnalysis.title || rawAnalysis.documentName || rawAnalysis.fileName || 'Untitled Document',
+        documentType: rawAnalysis.documentType || 'document',
         fileName: rawAnalysis.documentName || rawAnalysis.fileName || 'Untitled Document',
         uploadDate: rawAnalysis.createdAt || rawAnalysis.uploadDate || new Date().toISOString(),
         risks: Array.isArray(rawAnalysis.risks) ? rawAnalysis.risks.map((r: any) => 
@@ -300,6 +306,8 @@ export const firebaseService = {
         deadlines: Array.isArray(rawAnalysis.deadlines) ? rawAnalysis.deadlines.map((d: any) => 
           typeof d === 'string' ? { dateOrPeriod: 'Review', description: d, severity: 'info' } : d
         ) : [],
+        keyClauses: Array.isArray(rawAnalysis.keyClauses) ? rawAnalysis.keyClauses : [],
+        confidenceNotes: Array.isArray(rawAnalysis.confidenceNotes) ? rawAnalysis.confidenceNotes : [],
         suggestedQuestions: Array.isArray(rawAnalysis.questions) ? rawAnalysis.questions : (rawAnalysis.suggestedQuestions || [])
       };
 

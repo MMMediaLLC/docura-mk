@@ -130,7 +130,7 @@ export default function AnalysisResult() {
             <div className="flex items-center gap-3 mb-2">
               <h1 className="font-display text-3xl font-bold text-gradient tracking-tight max-w-2xl">{analysis.title}</h1>
               <span className="px-3 py-1 bg-brand-50 border border-brand-100/50 text-brand-700 text-[10px] font-bold uppercase tracking-widest rounded-full shadow-sm">
-                {analysis.documentType.replace('_', ' ')}
+                {(analysis.documentType || 'document').replace('_', ' ')}
               </span>
             </div>
             <div className="flex items-center gap-3 text-sm font-medium text-slate-500">
