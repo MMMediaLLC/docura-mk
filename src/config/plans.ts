@@ -48,8 +48,25 @@ export function getPlanConfig(plan: UserPlan): PlanConfig {
   return PLANS[plan] ?? PLANS.free;
 }
 
-export function getCheckoutUrl(plan: 'pro' | 'business'): string {
-  return PLANS[plan].lemonSqueezyUrl!;
+export function getCheckoutUrl(plan: 'pro' | 'business', userId?: string, email?: string): string {
+  let url = PLANS[plan].lemonSqueezyUrl!;
+  
+  if (userId || email) {
+    const params = new URLSearchParams();
+    if (userId) {
+      params.set('checkout[custom][user_id]', userId);
+    }
+    if (email) {
+      params.set('checkout[email]', email);
+    }
+    const queryString = params.toString();
+    if (queryString) {
+      // Determine if original url already has search params
+      url += url.includes('?') ? `&${queryString}` : `?${queryString}`;
+    }
+  }
+
+  return url;
 }
 
 // Reusable checker based on new "Active Documents" paradigm

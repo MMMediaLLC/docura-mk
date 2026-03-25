@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { Loader2, CheckCircle2, Mail, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
 import { auth } from '../firebase';
 import { firebaseService } from '../services/firebaseService';
-import { PLANS } from '../config/plans';
+import { PLANS, getCheckoutUrl } from '../config/plans';
 
 export default function ActivatePlanPage() {
   const navigate = useNavigate();
@@ -154,7 +154,7 @@ export default function ActivatePlanPage() {
           <p className="text-sm text-slate-500 font-medium mb-4">Haven't upgraded yet?</p>
           <div className="flex justify-center gap-4">
             <a
-              href="https://docura.lemonsqueezy.com/checkout/buy/dbdbb86d-e540-4a99-bceb-125f19334d23"
+              href={getCheckoutUrl("pro", auth.currentUser?.uid, auth.currentUser?.email || undefined)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 py-3 rounded-2xl border border-brand-200 text-brand-700 text-sm font-bold hover:bg-brand-50 transition-all text-center"
@@ -162,7 +162,7 @@ export default function ActivatePlanPage() {
               Get Pro — $6/mo
             </a>
             <a
-              href="https://docura.lemonsqueezy.com/checkout/buy/95ac39a4-6bcc-45c2-ba87-9739781f2f15"
+              href={getCheckoutUrl("business", auth.currentUser?.uid, auth.currentUser?.email || undefined)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 py-3 rounded-2xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition-all text-center"

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Zap, Rocket, Shield, ArrowRight } from 'lucide-react';
 import { getCheckoutUrl } from '../config/plans';
+import { auth } from '../firebase';
 import type { UserPlan } from '../types/user';
 
 interface UpgradeModalProps {
@@ -25,7 +26,7 @@ export default function UpgradeModal({
 }: UpgradeModalProps) {
   
   const handleCheckout = (plan: 'pro' | 'business') => {
-    window.open(getCheckoutUrl(plan), '_blank');
+    window.open(getCheckoutUrl(plan, auth.currentUser?.uid, auth.currentUser?.email || undefined), '_blank');
     onClose();
   };
 

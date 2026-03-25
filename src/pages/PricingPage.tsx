@@ -6,10 +6,19 @@ import {
   Gem
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { auth } from '../firebase';
 import { cn } from '../lib/utils';
 import { PLANS, getCheckoutUrl } from '../config/plans';
 
 export default function PricingPage() {
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged(setUser);
+    return () => unsub();
+  }, []);
+  
   const plans = [
     {
       id: "free",
@@ -44,7 +53,7 @@ export default function PricingPage() {
       ],
       cta: "Upgrade to Pro",
       highlight: true,
-      lemonSqueezyUrl: getCheckoutUrl("pro")
+      lemonSqueezyUrl: getCheckoutUrl("pro", user?.uid, user?.email || undefined)
     },
     {
       id: "business",
@@ -63,7 +72,7 @@ export default function PricingPage() {
         "Dedicated support",
       ],
       cta: "Start Business",
-      lemonSqueezyUrl: getCheckoutUrl("business")
+      lemonSqueezyUrl: getCheckoutUrl("business", user?.uid, user?.email || undefined)
     }
   ];
 
