@@ -87,6 +87,92 @@ export default function AnalysisResult() {
     }
   };
 
+  const handleExport = () => {
+    if (!analysis) return;
+
+    const formatSeverityLabel = (s: string) => s === 'high' ? '🔴 HIGH' : s === 'medium' ? '🟡 MEDIUM' : '🔵 LOW';
+    const formatDeadlineSeverity = (s: string) => s === 'urgent' ? '🔴 URGENT' : s === 'important' ? '🟡 IMPORTANT' : '⚪ INFO';
+
+    const risksHtml = (analysis.risks || []).map(r => `
+      <div style="margin-bottom:16px;padding:16px;border-left:4px solid ${r.severity==='high'?'#ef4444':r.severity==='medium'?'#f59e0b':'#3b82f6'};background:#f8fafc;border-radius:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <strong style="font-size:15px;color:#1e293b">${r.title || ''}</strong>
+          <span style="font-size:11px;font-weight:700;text-transform:uppercase;color:${r.severity==='high'?'#dc2626':r.severity==='medium'?'#d97706':'#2563eb'}">${formatSeverityLabel(r.severity)}</span>
+        </div>
+        <p style="margin:0;color:#475569;line-height:1.6">${r.explanation || ''}</p>
+      </div>`).join('');
+
+    const obligationsHtml = (analysis.obligations || []).map(o => `
+      <tr style="border-bottom:1px solid #e2e8f0">
+        <td style="padding:10px 16px;font-weight:600;color:#64748b;white-space:nowrap">${o.party || ''}</td>
+        <td style="padding:10px 16px;color:#334155">${o.obligation || ''}</td>
+        <td style="padding:10px 16px;color:#64748b;white-space:nowrap">${o.timing || ''}</td>
+      </tr>`).join('');
+
+    const deadlinesHtml = (analysis.deadlines || []).map(d => `
+      <div style="margin-bottom:12px;padding:14px 16px;background:#f8fafc;border-radius:6px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong style="color:#1e293b">${d.description || ''}</strong>
+          <div style="color:#6366f1;font-size:13px;margin-top:2px">${d.dateOrPeriod || ''}</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;text-transform:uppercase">${formatDeadlineSeverity(d.severity)}</span>
+      </div>`).join('');
+
+    const keyPointsHtml = (analysis.keyPoints || []).map(p => `
+      <li style="margin-bottom:8px;color:#334155;line-height:1.6">${p}</li>`).join('');
+
+    const questionsHtml = (analysis.suggestedQuestions || []).map(q => `
+      <li style="margin-bottom:6px;color:#334155">${q}</li>`).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Analysis Report — ${analysis.title || analysis.fileName}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; background: #fff; padding: 40px; max-width: 860px; margin: auto; }
+    h1 { font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+    h2 { font-size: 16px; font-weight: 700; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.1em; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e7ff; }
+    .meta { font-size: 13px; color: #64748b; margin-bottom: 32px; }
+    .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; text-transform:uppercase; background:#e0e7ff; color:#4f46e5; margin-left:8px; }
+    .summary-box { background:#f1f5f9; border-radius:8px; padding:20px 24px; font-size:15px; line-height:1.8; color:#334155; margin-bottom:8px; }
+    table { width:100%; border-collapse:collapse; background:#f8fafc; border-radius:8px; overflow:hidden; }
+    th { padding:10px 16px; background:#e2e8f0; font-size:11px; font-weight:700; text-transform:uppercase; color:#475569; text-align:left; }
+    ul { padding-left:20px; }
+    .footer { margin-top:40px; padding-top:16px; border-top:1px solid #e2e8f0; font-size:11px; color:#94a3b8; text-align:center; }
+    @media print { body { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <h1>${analysis.title || analysis.fileName || 'Document Analysis Report'}<span class="badge">${(analysis.documentType || 'document').replace('_', ' ')}</span></h1>
+  <div class="meta">File: ${analysis.fileName || ''} &nbsp;|&nbsp; Analyzed: ${new Date(analysis.uploadDate || Date.now()).toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' })}</div>
+
+  <h2>Executive Summary</h2>
+  <div class="summary-box">${analysis.summary || 'No summary available.'}</div>
+
+  ${analysis.keyPoints?.length ? `<h2>Key Points</h2><ul>${keyPointsHtml}</ul>` : ''}
+
+  ${analysis.risks?.length ? `<h2>Risks (${analysis.risks.length})</h2>${risksHtml}` : ''}
+
+  ${analysis.obligations?.length ? `<h2>Obligations</h2><table><thead><tr><th>Party</th><th>Obligation</th><th>Timing</th></tr></thead><tbody>${obligationsHtml}</tbody></table>` : ''}
+
+  ${analysis.deadlines?.length ? `<h2>Deadlines (${analysis.deadlines.length})</h2>${deadlinesHtml}` : ''}
+
+  ${analysis.suggestedQuestions?.length ? `<h2>Suggested Questions</h2><ul>${questionsHtml}</ul>` : ''}
+
+  <div class="footer">Generated by DOCURA Intelligence &nbsp;|&nbsp; For informational purposes only. Not legal advice.</div>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => win.print(), 400);
+  };
+
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
@@ -141,9 +227,9 @@ export default function AnalysisResult() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <button className="btn-secondary flex items-center gap-2 py-2">
+          <button onClick={handleExport} className="btn-secondary flex items-center gap-2 py-2">
             <Download className="w-4 h-4" />
-            Export
+            Export PDF
           </button>
           <button className="btn-primary flex items-center gap-2 py-2 shadow-brand-500/20">
             <Share2 className="w-4 h-4" />
