@@ -3,7 +3,7 @@
 // Vercel serverless function — Lemon Squeezy webhook handler
 //
 // Route: POST /api/lemonsqueezy/webhook
-// Verifies X-Signature-256 via HMAC-SHA256 and updates
+// Verifies X-Signature via HMAC-SHA256 and updates
 // Firestore user plan via Firebase Admin SDK.
 // ==========================================================
 
@@ -93,17 +93,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  // 1. Read raw body (Vercel buffers it automatically)
-  const rawBody = req.body instanceof Buffer
-    ? req.body
-    : Buffer.from(typeof req.body === 'string' ? req.body : JSON.stringify(req.body));
+  // 1. Read raw body by buffering the stream.
+  //    bodyParser is DISABLED — req.body is not available.
+  //    We must accumulate chunks to get the exact bytes Lemon signed.
+  const rawBody = await new Promise<Buffer>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
 
-  // 2. Verify HMAC signature
+  // 2. Verify HMAC-SHA256 using the correct header: X-Signature
+  //    (Lemon Squeezy sends X-Signature; Node.js lowercases all headers)
   const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET || '';
-  const signature = req.headers['x-signature-256'];
+  const signature = req.headers['x-signature'];
 
   if (!verifySignature(rawBody, signature, secret)) {
-    console.warn('[LS Webhook] Invalid signature — rejecting');
+    console.warn('[LS Webhook] Signature mismatch. Header present:', !!signature, '| Secret set:', !!secret);
     return res.status(401).json({ error: 'Invalid signature' });
   }
 
