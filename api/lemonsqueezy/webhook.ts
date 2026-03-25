@@ -138,10 +138,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Invalid JSON payload format' });
     }
 
-    // 5. Extract strictly guarded properties
+    // 5. Extract strictly guarded properties (Defensive extraction)
     const eventName: string = payload?.meta?.event_name || 'unknown';
-    const attrs = payload?.data?.attributes || {};
-    const rels = payload?.data?.relationships || {};
+    // Lemon Squeezy wraps resource data in 'data'
+    const objData = payload?.data || {};
+    const attrs = objData?.attributes || {};
+    const rels = objData?.relationships || {};
+
+    // Prioritize custom_data.userId over string matching the billing email
+    const customDataUserId = payload?.meta?.custom_data?.user_id || payload?.meta?.custom_data?.userId;
 
     const userEmail: string | undefined =
       attrs.user_email ||
@@ -150,11 +155,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const variantId: string | number | undefined =
       attrs.variant_id ||
-      rels.variant?.data?.id;
+      rels.variant?.data?.id ||
+      payload?.meta?.custom_data?.variant_id;
 
-    console.log(`[LS Webhook] Event: ${eventName} | Email: ${userEmail} | Variant: ${variantId}`);
+    console.log(`[LS Webhook] Event: ${eventName} | Email: ${userEmail} | custom_id: ${customDataUserId} | Variant: ${variantId}`);
 
-    // If no email or event name, log and ignore (return 200 safely)
+    // If no recognizable event, safely exit with 200
     if (!eventName || eventName === 'unknown') {
       return res.status(200).json({ received: true, ignored: 'Unknown event name' });
     }
@@ -163,49 +169,61 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const app = getAdminApp();
     const db = admin.firestore(app);
 
-    // 7. Process recognized events
+    // Helper: find user doc ID
+    async function resolveUserId(): Promise<string | null> {
+      if (customDataUserId) {
+        // Direct ID lookup ensures we match exactly the user who paid, regardless of their Apple Pay/PayPal email
+        const docRef = await db.collection('users').doc(String(customDataUserId)).get();
+        if (docRef.exists) return String(customDataUserId);
+      }
+      if (userEmail) {
+        // Fallback to email match
+        const snap = await db.collection('users').where('email', '==', String(userEmail)).limit(1).get();
+        if (!snap.empty) return snap.docs[0].id;
+      }
+      return null;
+    }
+
+    // 7. Process recognized events safely
     switch (eventName) {
       case 'order_created':
       case 'subscription_created':
       case 'subscription_payment_success':
       case 'subscription_updated': {
-        if (!userEmail) {
-          console.warn(`[LS Webhook] Ignored ${eventName} - missing userEmail`);
+        const userId = await resolveUserId();
+        if (!userId) {
+          console.warn(`[LS Webhook] Ignored ${eventName} - user not found. Extracted Email: ${userEmail}, Custom ID: ${customDataUserId}`);
           break;
         }
+
         const plan = resolvePlan(variantId);
         if (!plan) {
           console.warn(`[LS Webhook] Ignored ${eventName} - unmapped variant ${variantId}`);
           break;
         }
-        const userId = await getUserDocIdByEmail(db, String(userEmail));
-        if (!userId) {
-          console.warn(`[LS Webhook] Ignored ${eventName} - user not found in DB: ${userEmail}`);
-          break;
-        }
+
         await activateUserPlan(db, userId, plan);
-        console.log(`[LS Webhook] ✅ Success: Activated ${plan} for ${userEmail}`);
+        console.log(`[LS Webhook] ✅ Success: Activated ${plan} for user ${userId}`);
         break;
       }
 
       case 'subscription_payment_failed': {
-        console.warn(`[LS Webhook] Alert: Payment failed for ${userEmail || 'unknown'}`);
+        const userId = await resolveUserId();
+        console.warn(`[LS Webhook] Alert: Payment failed for user ${userId || userEmail || 'unknown'}`);
+        // Optionally lock them out here, or wait for subscription_expired.
         break;
       }
 
       case 'subscription_cancelled':
       case 'subscription_expired': {
-        if (!userEmail) {
-          console.warn(`[LS Webhook] Ignored ${eventName} - missing userEmail`);
-          break;
-        }
-        const userId = await getUserDocIdByEmail(db, String(userEmail));
+        const userId = await resolveUserId();
         if (!userId) {
-          console.warn(`[LS Webhook] Ignored ${eventName} - user not found in DB: ${userEmail}`);
+          console.warn(`[LS Webhook] Ignored ${eventName} - user not found to cancel. Email: ${userEmail}`);
           break;
         }
+
         await downgradeUserToFree(db, userId);
-        console.log(`[LS Webhook] ℹ️ Success: Downgraded ${userEmail} to free (${eventName})`);
+        console.log(`[LS Webhook] ℹ️ Success: Downgraded ${userId} to free (${eventName})`);
         break;
       }
 
@@ -214,7 +232,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         break;
     }
 
-    return res.status(200).json({ received: true, event: eventName });
+    // ALWAYS RETURN 200 IF WE MADE IT THIS FAR
+    return res.status(200).json({ received: true, event: eventName, processed: true });
 
   } catch (globalError: any) {
     // 8. Trap ALL fatal exceptions so we NEVER throw HTTP 500 randomly.
