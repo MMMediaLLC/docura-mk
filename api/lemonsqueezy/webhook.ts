@@ -9,22 +9,35 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as crypto from 'crypto';
-import * as admin from 'firebase-admin';
+import admin from 'firebase-admin';
 
 // ── Firebase Admin SDK singleton ────────────────────────────
 
 function getAdminApp(): admin.app.App {
-  if (admin.apps.length > 0) return admin.apps[0]!;
+  // Guard against undefined admin or admin.apps runtime error in ESM
+  if (admin?.apps?.length) {
+    return admin.apps[0]!;
+  }
 
-  const serviceAccount = {
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    // Vercel env vars store \n as a literal backslash+n — fix it:
-    privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-  };
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+  // Explicit environment variable validation (Fail fast)
+  if (!projectId || !clientEmail || !privateKey) {
+    console.error('[LS Webhook] FATAL: Missing Firebase environment variables. Check FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY.');
+    throw new Error('Firebase Admin initialization failed: Missing required environment variables.');
+  }
+
+  // Vercel env vars store \n as a literal backslash+n — fix it:
+  privateKey = privateKey.replace(/\\n/g, '\n');
 
   return admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+    credential: admin.credential.cert({
+      projectId,
+      clientEmail,
+      privateKey,
+    }),
   });
 }
 
@@ -146,7 +159,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ received: true, ignored: 'Unknown event name' });
     }
 
-    // 6. Init DB
+    // 6. Init DB (will fail fast if env vars are missing)
     const app = getAdminApp();
     const db = admin.firestore(app);
 
