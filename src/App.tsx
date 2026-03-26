@@ -185,57 +185,13 @@ export default function App() {
               </nav>
 
               <div className="p-6">
-                {userStatus && (
-                  <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 mb-6 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-brand-50/50 blur-2xl rounded-full -mr-12 -mt-12 transition-transform duration-700 group-hover:scale-110" />
-                    
-                    <div className="relative z-10">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
-                            {userStatus.plan === 'free' ? 'Free Plan' : userStatus.plan === 'pro' ? 'Pro Plan' : 'Business Plan'}
-                          </span>
-                          <span className="text-sm font-black text-slate-900">
-                             {userStatus.plan === 'business' ? `${userStatus.usageCount} Docs` : `${userStatus.usageCount} / ${userStatus.usageLimit} Docs`}
-                          </span>
-                        </div>
-                        <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100">
-                          <Zap className={cn("w-4 h-4", userStatus.plan === 'free' ? "text-slate-300" : "text-brand-500 fill-brand-500")} />
-                        </div>
-                      </div>
-                      
-                      <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden mb-4 relative">
-                        {userStatus.plan === 'business' ? (
-                          <div className="absolute inset-0 bg-linear-to-r from-brand-400 via-brand-600 to-brand-400 animate-gradient" />
-                        ) : (
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${Math.min(100, (userStatus.usageCount / userStatus.usageLimit) * 100)}%` }}
-                            className="h-full bg-brand-600 rounded-full"
-                          />
-                        )}
-                      </div>
 
-                      {userStatus.plan === 'free' && (
-                        <Link to="/pricing" className="flex items-center justify-center gap-2 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">
-                          <Sparkles className="w-3 h-3 text-brand-400" />
-                          Upgrade to Pro
-                        </Link>
-                      )}
-                      {userStatus.plan !== 'free' && (
-                        <Link to="/activate-plan" className="flex items-center justify-center gap-2 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition-all">
-                          Already paid? Activate
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 <button 
                   onClick={handleSignOut}
-                  className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all group"
+                  className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all group"
                 >
-                  <LogOut className="w-4.5 h-4.5 text-slate-400 group-hover:text-rose-500" />
+                  <LogOut className="w-4.5 h-4.5 text-rose-500 group-hover:text-rose-600" />
                   Sign Out
                 </button>
 
