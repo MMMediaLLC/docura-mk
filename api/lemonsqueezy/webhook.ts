@@ -11,6 +11,14 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as crypto from 'crypto';
 import admin from 'firebase-admin';
 
+// ── Plan Configuration ──────────────────────────────────────
+
+const PLAN_CONFIG = {
+  free: { usageLimit: 1 },
+  pro: { usageLimit: 2 },
+  business: { usageLimit: 15 }
+} as const;
+
 // ── Firebase Admin SDK singleton ────────────────────────────
 
 function getAdminApp(): admin.app.App {
@@ -82,17 +90,20 @@ async function activateUserPlan(db: admin.firestore.Firestore, userId: string, p
 
   await db.collection('users').doc(userId).update({
     plan,
+    usageLimit: PLAN_CONFIG[plan].usageLimit,
     usageCount: 0,
     usedAnalysesInPeriod: 0,
     subscriptionStatus: 'active',
     currentPeriodStart: now.toISOString(),
     currentPeriodEnd: end.toISOString(),
+    usageResetDate: end.toISOString(),
   });
 }
 
 async function downgradeUserToFree(db: admin.firestore.Firestore, userId: string): Promise<void> {
   await db.collection('users').doc(userId).update({
     plan: 'free',
+    usageLimit: PLAN_CONFIG.free.usageLimit,
     usageCount: 0,
     usedAnalysesInPeriod: 0,
     subscriptionStatus: 'inactive',
