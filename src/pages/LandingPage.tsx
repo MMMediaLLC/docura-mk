@@ -242,9 +242,9 @@ export default function LandingPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
-              { plan: "Бесплатно", price: "$0", docs: "1 доживотна анализа на документ", cta: "Започнете бесплатно", link: "/auth" },
-              { plan: "Про", price: "$6", period: "/месечно", docs: "2 анализи на документи / месечно", cta: "Изберете Про", link: "/pricing", popular: true },
-              { plan: "Бизнис", price: "$19", period: "/месечно", docs: "15 анализи на документи / месечно", cta: "Изберете Бизнис", link: "/pricing" }
+              { plan: "Бесплатно", price: "0 ден.", docs: "1 доживотна анализа на документ", cta: "Започнете бесплатно", link: "/auth" },
+              { plan: "Про", price: "370 ден.", period: "/месечно", docs: "2 анализи на документи / месечно", cta: "Изберете Про", link: "/pricing", popular: true },
+              { plan: "Бизнис", price: "1.170 ден.", period: "/месечно", docs: "15 анализи на документи / месечно", cta: "Изберете Бизнис", link: "/pricing" }
             ].map((p, i) => (
               <div key={i} className={cn("rounded-[2rem] p-8 flex flex-col items-center text-center border transition-all", p.popular ? "bg-slate-900 text-white shadow-2xl shadow-brand-900/20 border-slate-800 scale-105" : "bg-white text-slate-900 border-slate-200")}>
                 {p.popular && <span className="bg-brand-600 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full mb-6 relative -top-3">Најпопуларно</span>}
