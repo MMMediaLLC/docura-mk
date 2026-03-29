@@ -19,12 +19,12 @@ export default function ActivatePlanPage() {
     setError(null);
     
     if (!auth.currentUser) {
-      setError('You must be signed in to activate a subscription.');
+      setError('Мора да сте најавени за да активирате претплата.');
       return;
     }
 
     if (!billEmail.trim() || !billEmail.includes('@')) {
-      setError('Please enter the email address you used at checkout.');
+      setError('Ве молиме внесете ја е-поштата што ја користевте при плаќањето.');
       return;
     }
 
@@ -34,7 +34,7 @@ export default function ActivatePlanPage() {
       setSuccess(true);
       setTimeout(() => navigate('/dashboard'), 2500);
     } catch (err) {
-      setError('Activation failed. Please contact support at support@docura.ai');
+      setError('Активацијата не успеа. Ве молиме контактирајте ја поддршката на support@docura.ai');
     } finally {
       setIsActivating(false);
     }
@@ -52,9 +52,9 @@ export default function ActivatePlanPage() {
             <CheckCircle2 className="w-10 h-10 text-emerald-600" />
           </div>
           <h2 className="font-display text-3xl font-bold text-slate-900 mb-3 tracking-tight">
-            Welcome to {PLANS[selectedPlan].name}!
+            Добредојдовте во {PLANS[selectedPlan].name}!
           </h2>
-          <p className="text-slate-500 font-medium">Your subscription has been activated. Redirecting to your dashboard...</p>
+          <p className="text-slate-500 font-medium">Вашата претплата е активирана. Ве пренасочуваме кон вашата контролна табла...</p>
         </motion.div>
       </div>
     );
@@ -79,15 +79,15 @@ export default function ActivatePlanPage() {
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight">Activate Subscription</h1>
-            <p className="text-sm text-slate-500 font-medium">Already paid? Enter your checkout email below.</p>
+            <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight">Активирај претплата</h1>
+            <p className="text-sm text-slate-500 font-medium">Веќе плативте? Внесете ја вашата е-пошта подолу.</p>
           </div>
         </div>
 
         <form onSubmit={handleActivate} className="space-y-6">
           {/* Plan selector */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 block mb-3">Select your plan</label>
+            <label className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 block mb-3">Изберете го вашиот план</label>
             <div className="grid grid-cols-2 gap-3">
               {(['pro', 'business'] as const).map((plan) => (
                 <button
@@ -110,7 +110,7 @@ export default function ActivatePlanPage() {
           {/* Email input */}
           <div>
             <label htmlFor="billing-email" className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 block mb-2">
-              Billing Email
+              Е-пошта за наплата
             </label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -124,7 +124,7 @@ export default function ActivatePlanPage() {
                 className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:border-brand-400 transition-all"
               />
             </div>
-            <p className="text-xs text-slate-400 mt-2 font-medium">Enter the exact email you used on the Lemon Squeezy checkout page.</p>
+            <p className="text-xs text-slate-400 mt-2 font-medium">Внесете ја точната е-пошта што ја користевте на страницата за плаќање на Lemon Squeezy.</p>
           </div>
 
           {/* Error */}
@@ -142,16 +142,16 @@ export default function ActivatePlanPage() {
             className="w-full btn-primary py-4 flex items-center justify-center gap-2 disabled:opacity-60"
           >
             {isActivating ? (
-              <><Loader2 className="w-5 h-5 animate-spin" /> Activating...</>
+              <><Loader2 className="w-5 h-5 animate-spin" /> Активирање...</>
             ) : (
-              <>Activate {PLANS[selectedPlan].name} Plan <ArrowRight className="w-4 h-4" /></>
+              <>Активирај го {PLANS[selectedPlan].name} планот <ArrowRight className="w-4 h-4" /></>
             )}
           </button>
         </form>
 
         {/* Haven't paid yet? */}
         <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-          <p className="text-sm text-slate-500 font-medium mb-4">Haven't upgraded yet?</p>
+          <p className="text-sm text-slate-500 font-medium mb-4">Сè уште не сте ја надградиле вашата претплата?</p>
           <div className="flex justify-center gap-4">
             <a
               href={getCheckoutUrl("pro", auth.currentUser?.uid, auth.currentUser?.email || undefined)}
@@ -159,7 +159,7 @@ export default function ActivatePlanPage() {
               rel="noopener noreferrer"
               className="flex-1 py-3 rounded-2xl border border-brand-200 text-brand-700 text-sm font-bold hover:bg-brand-50 transition-all text-center"
             >
-              Get Pro — $6/mo
+              Купи Про — $6/мес
             </a>
             <a
               href={getCheckoutUrl("business", auth.currentUser?.uid, auth.currentUser?.email || undefined)}
@@ -167,14 +167,14 @@ export default function ActivatePlanPage() {
               rel="noopener noreferrer"
               className="flex-1 py-3 rounded-2xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition-all text-center"
             >
-              Get Business — $19/mo
+              Купи Бизнис — $19/мес
             </a>
           </div>
         </div>
 
         <div className="mt-4 text-center">
           <Link to="/dashboard" className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">
-            ← Back to Dashboard
+            ← Назад кон контролната табла
           </Link>
         </div>
       </motion.div>

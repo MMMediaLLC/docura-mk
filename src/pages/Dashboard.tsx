@@ -91,7 +91,7 @@ export default function Dashboard() {
       setFile(droppedFile);
       setError(null);
     } else {
-      setError('Please upload a PDF or Word document (.docx).');
+      setError('Ве молиме прикачете PDF или Word документ (.docx).');
     }
   }, []);
 
@@ -107,19 +107,19 @@ export default function Dashboard() {
       setFile(selectedFile);
       setError(null);
     } else {
-      setError('Please upload a PDF or Word document (.docx).');
+      setError('Ве молиме прикачете PDF или Word документ (.docx).');
     }
   };
 
   const processFile = async () => {
     if (!file) {
-      setError("Please select a file first.");
+      setError("Ве молиме прво изберете датотека.");
       return;
     }
 
     const user = auth.currentUser;
     if (!user) {
-      setError("You must be signed in to analyze documents.");
+      setError("Мора да сте најавени за да анализирате документи.");
       return;
     }
 
@@ -155,7 +155,7 @@ export default function Dashboard() {
           // Status re-fetched and we're within limit — allow proceeding
           checkResult = { allowed: true };
         } catch {
-          setError("Unable to verify your plan status. Please refresh and try again.");
+          setError("Не може да се потврди статусот на вашиот план. Ве молиме освежете ја страницата.");
           return;
         }
       }
@@ -183,7 +183,7 @@ export default function Dashboard() {
     } catch (err: any) {
       // Real system/pipeline failure — show inline error, not upgrade panel.
       console.error("[Dashboard] Analysis pipeline error:", err);
-      setError(err.message || "Analysis failed. Please try again.");
+      setError(err.message || "Анализата не успеа. Ве молиме обидете се повторно.");
     } finally {
       setIsProcessing(false);
     }
@@ -197,17 +197,17 @@ return (
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-brand-50/50 border border-brand-200/50 text-brand-700 text-[10px] font-bold rounded-full mb-6 uppercase tracking-[0.2em] shadow-sm backdrop-blur-md">
             <Sparkles className="w-3.5 h-3.5" />
-            Welcome {auth.currentUser?.displayName?.split(' ')[0] || 'Back'}
+            Добредојде {auth.currentUser?.displayName?.split(' ')[0] || 'назад'}
           </div>
-          <h1 className="font-display text-5xl font-bold tracking-tight text-gradient mb-3">Document Analysis</h1>
-          <p className="text-slate-500 font-medium text-lg max-w-lg">Upload your contract or agreement to instantly extract key intelligence, risks, and obligations.</p>
+          <h1 className="font-display text-5xl font-bold tracking-tight text-gradient mb-3">Анализа на документи</h1>
+          <p className="text-slate-500 font-medium text-lg max-w-lg">Прикачете го вашиот договор за инстантно да ги извлечете клучните информации, ризици и обврски.</p>
         </div>
         <div className="flex gap-3">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
             <input
               type="text"
-              placeholder="Search documents..."
+              placeholder="Пребарај документи..."
               className="bg-white text-slate-700 border border-slate-200 pl-11 pr-5 py-2.5 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all shadow-sm w-64"
             />
           </div>
@@ -228,12 +228,12 @@ return (
                 </div>
                 <div>
                   <h2 className="font-display text-2xl font-bold text-slate-900 tracking-tight mb-3">
-                    Free plan limit reached
+                    Лимитот за бесплатниот план е достигнат
                   </h2>
                   <p className="text-slate-500 font-medium leading-relaxed">
-                    You've used your 1 included document analysis.
-                    Upgrade to <strong className="text-slate-700">Pro</strong> to analyze up to 3 documents,
-                    or choose <strong className="text-slate-700">Business</strong> for higher usage.
+                    Ја искористивте вашата вклучена бесплатна анализа на документи.
+                    Надградете во <strong className="text-slate-700">Про</strong> за да анализирате повеќе документи,
+                    или изберете <strong className="text-slate-700">Бизнис</strong> за зголемен капацитет.
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
@@ -242,28 +242,28 @@ return (
                     className="btn-primary flex items-center justify-center gap-2 py-3 px-6 shadow-brand-500/20"
                   >
                     <Zap className="w-4 h-4 fill-brand-200 text-brand-100" />
-                    Upgrade to Pro
+                    Надгради во Про
                   </button>
                   <button
                     onClick={() => navigate('/pricing')}
                     className="px-6 py-3 bg-white border border-slate-200/60 rounded-2xl text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all shadow-sm"
                   >
-                    View Pricing
+                    Види цени
                   </button>
                   <button
                     onClick={() => navigate('/history')}
                     className="px-6 py-3 bg-white border border-slate-200/60 rounded-2xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-all shadow-sm"
                   >
-                    View History
+                    Види историја
                   </button>
                 </div>
                 <p className="text-xs text-slate-400 font-medium">
-                  Already upgraded?{' '}
+                  Веќе надградивте?{' '}
                   <button
                     onClick={() => { setIsPlanLimitReached(false); fetchData(); }}
                     className="text-brand-600 hover:underline font-bold"
                   >
-                    Refresh status
+                    Освежете го статусот
                   </button>
                 </p>
               </div>
@@ -308,16 +308,16 @@ return (
                     <Upload className="w-10 h-10" />
                   </div>
                   <div>
-                    <h3 className="font-display text-2xl font-bold text-slate-800 mb-3 tracking-tight">Drop your document here</h3>
+                    <h3 className="font-display text-2xl font-bold text-slate-800 mb-3 tracking-tight">Довлечете го вашиот документ тука</h3>
                     <p className="text-slate-500 font-medium max-w-xs mx-auto leading-relaxed">
-                      or click to browse from your computer. <br />
-                      <span className="text-slate-400 text-sm mt-1 block">PDF or Word document (.docx) — max 20MB.</span>
+                      или кликнете за да изберете од вашиот компјутер. <br />
+                      <span className="text-slate-400 text-sm mt-1 block">PDF или Word документ (.docx) — макс 20MB.</span>
                     </p>
                   </div>
                   <div className="flex gap-8 text-[11px] font-bold text-slate-400 uppercase tracking-widest justify-center">
-                    <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-brand-500" /> Secure</span>
-                    <span className="flex items-center gap-2"><Lock className="w-4 h-4 text-brand-500" /> Private</span>
-                    <span className="flex items-center gap-2"><Zap className="w-4 h-4 text-brand-500" /> AI-Powered</span>
+                    <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-brand-500" /> Безбедно</span>
+                    <span className="flex items-center gap-2"><Lock className="w-4 h-4 text-brand-500" /> Приватно</span>
+                    <span className="flex items-center gap-2"><Zap className="w-4 h-4 text-brand-500" /> Со ВИ</span>
                   </div>
                 </motion.div>
               ) : (
@@ -354,11 +354,11 @@ return (
                     {isProcessing ? (
                       <>
                         <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-                        Analyzing Intelligence...
+                        Анализирање...
                       </>
                     ) : (
                       <>
-                        Start Analysis
+                        Започни анализа
                         <ArrowRight className="w-5 h-5" />
                       </>
                     )}
@@ -377,21 +377,21 @@ return (
           )}
 
           <p className="text-xs text-center text-slate-400 font-bold uppercase tracking-widest leading-relaxed max-w-lg mx-auto">
-            Automated analysis for informational purposes only. Not legal advice.
+            Автоматизирана анализа само за информативни цели. Не е правен совет.
           </p>
 
           {/* Recent Activity */}
           <div className="space-y-6 pt-6">
             <div className="flex items-center justify-between">
               <h3 className="font-display text-2xl font-bold text-slate-900 flex items-center gap-3">
-                Recent Analyses
+                Последни анализи
                 <span className="px-3 py-1 bg-slate-100 text-slate-500 text-xs rounded-full font-bold">{recentAnalyses.length}</span>
               </h3>
               <button
                 onClick={() => navigate('/history')}
                 className="text-sm font-bold text-brand-600 hover:text-brand-700 transition-colors flex items-center gap-1"
               >
-                View all history
+                Види ја целата историја
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -408,7 +408,7 @@ return (
                         <FileText className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="font-bold text-slate-800 group-hover:text-brand-700 transition-colors text-lg tracking-tight">{doc.documentName || doc.fileName || 'Untitled Document'}</p>
+                        <p className="font-bold text-slate-800 group-hover:text-brand-700 transition-colors text-lg tracking-tight">{doc.documentName || doc.fileName || 'Неименуван документ'}</p>
                         <div className="flex items-center gap-3 mt-1.5">
                           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                             {new Date(doc.createdAt || doc.uploadDate).toLocaleDateString()}
@@ -418,7 +418,7 @@ return (
                     </div>
                     <div className="flex items-center gap-6">
                       <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200/60">
-                        Completed
+                        Завршено
                       </span>
                       <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-brand-50 group-hover:text-brand-600 transition-all border border-transparent group-hover:border-brand-100">
                         <ChevronRight className="w-5 h-5" />
@@ -428,7 +428,7 @@ return (
                 ))
               ) : (
                 <div className="text-center py-12 bg-white border border-slate-100 rounded-[2rem]">
-                  <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No recent analyses</p>
+                  <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Нема последни анализи</p>
                 </div>
               )}
             </div>
@@ -439,13 +439,13 @@ return (
         <div className="space-y-8">
           <div className="glass-panel rounded-[2.5rem] p-10 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-40 h-40 bg-brand-400/10 blur-[50px] rounded-full -mr-16 -mt-16 pointer-events-none" />
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-10">Plan Usage</h3>
+            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-10">Употреба на планот</h3>
             <div className="space-y-10 relative z-10">
               {userStatus ? (
                 <>
                   <div className="space-y-5">
                       <div className="flex justify-between items-end">
-                        <span className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Analyses Used</span>
+                        <span className="text-sm font-semibold text-slate-500 uppercase tracking-widest">Искористени анализи</span>
                         <span className="text-2xl font-display font-bold text-slate-800 tracking-tight">
                             <>{userStatus.plan === 'free' ? userStatus.lifetimeFreeAnalysesUsed : userStatus.usedAnalysesInPeriod} <span className="text-slate-300 font-medium">/</span> {userStatus.usageLimit}</>
                         </span>
@@ -464,11 +464,11 @@ return (
                     <p className="text-sm font-medium text-slate-600 leading-relaxed">
                       {userStatus.isLimitReached
                         ? userStatus.plan === 'free'
-                          ? "Free plan includes 1 lifetime analysis. Upgrade to Pro for 2/mo, or Business for 15/mo."
-                          : `You've used all ${userStatus.usageLimit} analyses on your ${userStatus.plan} plan this month.`
+                          ? "Бесплатниот план вклучува 1 анализа. Надградете во Про за 2 месечно, или Бизнис за 15 месечно."
+                          : `Ги искористивте сите ${userStatus.usageLimit} анализи за вашиот ${userStatus.plan} план овој месец.`
                         : userStatus.plan === 'free'
-                          ? "Free plan includes 1 lifetime analysis. Upgrade to Pro ($6/mo) for 2/mo, or Business ($19/mo) for 15/mo."
-                          : `${userStatus.remaining} of ${userStatus.usageLimit} analyses remaining this month.`}
+                          ? "Бесплатниот план вклучува 1 анализа. Надградете во Про (370 ден./месечно) за 2 месечно, или Бизнис (1.170 ден./месечно) за 15 месечно."
+                          : `${userStatus.remaining} од ${userStatus.usageLimit} преостанати анализи овој месец.`}
                     </p>
                   </div>
 
@@ -478,7 +478,7 @@ return (
                       className="w-full bg-slate-900 text-white py-4 rounded-2xl font-semibold hover:bg-slate-800 shadow-xl shadow-slate-900/10 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                     >
                       <Zap className="w-4 h-4 text-brand-400 fill-brand-400" />
-                      Upgrade Plan
+                      Надгради план
                     </button>
                   )}
                 </>
@@ -500,24 +500,24 @@ return (
               <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center mb-8 border border-white/10">
                 <Sparkles className="w-6 h-6 text-brand-200" />
               </div>
-              <h4 className="font-display text-2xl font-bold mb-4 tracking-tight">Ask the Document</h4>
+              <h4 className="font-display text-2xl font-bold mb-4 tracking-tight">Прашај го документот</h4>
               <p className="text-brand-100 text-base leading-relaxed font-medium mb-8 opacity-90">
-                After analysis, use the chat button to ask specific questions about any clause, obligation, or risk found in the document.
+                По анализата, користете го копчето за чат за да поставите специфични прашања за било која клаузула, обврска или ризик пронајден во документот.
               </p>
               <button className="text-xs font-bold uppercase tracking-[0.2em] bg-white text-brand-600 hover:bg-brand-50 px-6 py-3 rounded-xl transition-all shadow-lg active:scale-95">
-                Try it on a document
+                Пробај на документ
               </button>
             </div>
           </div>
 
           <div className="bg-white border border-slate-200/60 rounded-[2.5rem] p-10 shadow-sm">
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-8">Quick Tips</h3>
+            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-8">Брзи совети</h3>
             <ul className="space-y-5">
               {[
-                "Use high-quality PDF exports",
-                "Ensure text is selectable",
-                "Check for missing pages",
-                "Review risks carefully"
+                "Користете квалитетно извезени PDF документи",
+                "Осигурете се дека текстот може да се селектира",
+                "Проверете дали недостасуваат страници",
+                "Внимателно прегледајте ги ризиците"
               ].map((tip, i) => (
                 <li key={i} className="flex items-start gap-4 text-sm text-slate-600 font-bold group cursor-default">
                   <div className="w-2 h-2 bg-brand-400 rounded-full mt-1.5 shrink-0 group-hover:scale-125 transition-transform" />

@@ -41,14 +41,14 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="hidden md:flex items-center gap-12">
-            <a href="#how-it-works" className="text-sm font-bold text-slate-500 hover:text-brand-600 transition-all uppercase tracking-widest">How it works</a>
-            <a href="#use-cases" className="text-sm font-bold text-slate-500 hover:text-brand-600 transition-all uppercase tracking-widest">Use Cases</a>
-            <Link to="/pricing" className="text-sm font-bold text-slate-500 hover:text-brand-600 transition-all uppercase tracking-widest">Pricing</Link>
+            <a href="#how-it-works" className="text-sm font-bold text-slate-500 hover:text-brand-600 transition-all uppercase tracking-widest">Како функционира</a>
+            <a href="#use-cases" className="text-sm font-bold text-slate-500 hover:text-brand-600 transition-all uppercase tracking-widest">Примена</a>
+            <Link to="/pricing" className="text-sm font-bold text-slate-500 hover:text-brand-600 transition-all uppercase tracking-widest">Цени</Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link to="/auth" className="text-sm font-bold text-slate-600 hover:text-brand-600 px-4 py-2 transition-colors uppercase tracking-widest hidden sm:block">Sign In</Link>
+            <Link to="/auth" className="text-sm font-bold text-slate-600 hover:text-brand-600 px-4 py-2 transition-colors uppercase tracking-widest hidden sm:block">Најава</Link>
             <Link to="/dashboard" className="btn-primary text-sm uppercase tracking-widest py-3 px-7 flex items-center gap-2">
-              Get Started
+              Почнете бесплатно
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -74,17 +74,17 @@ export default function LandingPage() {
           >
             <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-linear-to-r from-brand-50 to-indigo-50 border border-brand-200/60 text-brand-700 text-[11px] font-bold rounded-full mb-8 uppercase tracking-[0.2em] shadow-sm shadow-brand-100">
               <Sparkles className="w-3.5 h-3.5 text-brand-500" />
-              AI Documents Intelligence
+              Интелигенција за документи со ВИ
             </div>
-            <h1 className="font-display text-5xl md:text-7xl font-bold tracking-tight text-slate-900 mb-8 leading-[1.05]">
-              Protect Your Position Before <span className="text-gradient">Signing.</span>
+            <h1 className="font-display text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.1]">
+              Заштитете ја вашата позиција пред да <span className="text-gradient">потпишете.</span>
             </h1>
             <p className="text-xl md:text-2xl text-slate-500 mb-12 max-w-3xl mx-auto leading-relaxed font-medium">
-              Instantly identify risks, obligations, deadlines, and critical clauses in contracts, tenders, and business documents. Private by design, secure by default.
+              Брзо откријте ризици, обврски, рокови и критични клаузули во договори, тендери и деловни документи. Приватноста и безбедноста се вградени во самиот систем.
             </p>
             <div className="flex justify-center">
               <Link to="/dashboard" className="btn-primary px-10 py-5 text-lg flex items-center justify-center gap-3 group shadow-xl shadow-brand-500/30">
-                Analyze Your First Document Free
+                Анализирајте го првиот документ бесплатно
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
@@ -98,15 +98,15 @@ export default function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-10 text-slate-400 font-bold text-xs uppercase tracking-[0.1em] border-y border-slate-200/60 py-8 bg-white/50 backdrop-blur-md rounded-[2.5rem]">
             <div className="flex items-center gap-2">
               <Lock className="w-4 h-4 text-emerald-500" />
-              256-Bit Encryption
+              Не е потребна платежна картичка
             </div>
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              Your Documents Are Never Used for Training
+              Вашите документи не се користат за обучување на модели
             </div>
             <div className="flex items-center gap-2">
               <Check className="w-4 h-4 text-emerald-500" />
-              Delete Your Files Anytime
+              Јасен извештај со клучните точки, ризици и обврски
             </div>
           </div>
         </div>
@@ -118,8 +118,8 @@ export default function LandingPage() {
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-500/10 blur-[200px] pointer-events-none" />
         
         <div className="max-w-7xl mx-auto relative z-10 text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-linear-to-br from-white to-slate-400 text-transparent bg-clip-text">See What DOCURA Finds in Seconds.</h2>
-          <p className="text-slate-400 text-xl font-medium max-w-2xl mx-auto">Get a structured report covering summary, key points, risks, obligations, deadlines, and critical clauses — in seconds.</p>
+          <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-linear-to-br from-white to-slate-400 text-transparent bg-clip-text">Погледнете што открива DOCURA за неколку секунди</h2>
+          <p className="text-slate-400 text-xl font-medium max-w-2xl mx-auto">Добијте структуриран извештај со клучни точки, ризици, обврски, рокови и критични клаузули — јасно издвоени за брз преглед.</p>
         </div>
 
         <div className="max-w-4xl mx-auto">
@@ -132,15 +132,15 @@ export default function LandingPage() {
                   <div className="w-3 h-3 rounded-full bg-amber-500/50" />
                   <div className="w-3 h-3 rounded-full bg-emerald-500/50" />
                 </div>
-                <div className="ml-4 font-bold text-xs text-slate-400 uppercase tracking-widest">Master Services Agreement.pdf</div>
+                <div className="ml-4 font-bold text-xs text-slate-400 uppercase tracking-widest">Главен договор за услуги.pdf</div>
               </div>
               
               <div className="p-6 md:p-10 space-y-8">
                 {/* Score Header */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-8 border-b border-white/5">
                   <div>
-                    <h3 className="text-2xl font-bold text-white tracking-tight mb-2">High Risk Identified</h3>
-                    <p className="text-slate-400 text-sm font-medium">Our AI found 3 critical liabilities in this agreement.</p>
+                    <h3 className="text-2xl font-bold text-white tracking-tight mb-2">Идентификуван е висок ризик</h3>
+                    <p className="text-slate-400 text-sm font-medium">Нашата ВИ пронајде 3 критични одговорности во овој договор.</p>
                   </div>
                   <div className="w-20 h-20 rounded-full border-4 border-rose-500/30 border-t-rose-500 flex items-center justify-center">
                     <span className="text-xl font-black text-rose-500">82%</span>
@@ -156,10 +156,10 @@ export default function LandingPage() {
                         <ShieldCheck className="w-4 h-4 text-rose-500" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-widest">Limitation of Liability</h4>
+                        <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-widest">Ограничување на одговорност</h4>
                         <p className="text-slate-400 text-sm leading-relaxed font-medium">
-                          <span className="text-rose-400 bg-rose-400/10 px-1 py-0.5 rounded">"The vendor's liability is capped at $500, regardless of actual damages incurred."</span><br/><br/>
-                          This clause severely limits your recourse in case of vendor failure.
+                          <span className="text-rose-400 bg-rose-400/10 px-1 py-0.5 rounded">"Одговорноста на продавачот е ограничена на 500 долари, без оглед на реално направената штета."</span><br/><br/>
+                          Оваа клаузула значително ги ограничува вашите можности за отштета во случај на неуспех на продавачот.
                         </p>
                       </div>
                     </div>
@@ -172,9 +172,9 @@ export default function LandingPage() {
                         <Calendar className="w-4 h-4 text-emerald-500" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-widest">Termination Notice</h4>
+                        <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-widest">Известување за раскинување</h4>
                         <p className="text-slate-400 text-sm leading-relaxed font-medium">
-                          Either party may terminate with <span className="text-white px-1 py-0.5 bg-white/10 rounded">30 days written notice</span>.
+                          Секоја страна може да го раскине договорот со <span className="text-white px-1 py-0.5 bg-white/10 rounded">писмено известување од 30 дена</span>.
                         </p>
                       </div>
                     </div>
@@ -190,13 +190,13 @@ export default function LandingPage() {
       <section id="how-it-works" className="py-32 px-6 bg-white border-b border-slate-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">How it works</h2>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">Како функционира</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-12 text-center">
             {[
-              { title: "1. Upload", desc: "Drag and drop any PDF or Word document (.docx). We support up to 20MB.", icon: FileText, color: "text-brand-600", bg: "bg-brand-50" },
-              { title: "2. AI Analysis", desc: "Advanced AI scans your document for risks, deadlines, obligations, and non-standard clauses.", icon: Zap, color: "text-amber-600", bg: "bg-amber-50" },
-              { title: "3. Review & Ask", desc: "Review the structured report or ask follow-up questions about specific clauses, obligations, or risks.", icon: Bot, color: "text-emerald-600", bg: "bg-emerald-50" }
+              { title: "1. Прикачете документ", desc: "Прикачете PDF или Word документ, како договор, понуда, тендерска документација или деловен прилог.", icon: FileText, color: "text-brand-600", bg: "bg-brand-50" },
+              { title: "2. ВИ анализа", desc: "Системот автоматски ги издвојува ризиците, обврските, роковите, спорните точки и нејасните клаузули.", icon: Zap, color: "text-amber-600", bg: "bg-amber-50" },
+              { title: "3. Прегледајте и прашајте", desc: "Прегледајте го извештајот и поставете дополнителни прашања за конкретни клаузули, рокови, обврски или ризици.", icon: Bot, color: "text-emerald-600", bg: "bg-emerald-50" }
             ].map((step, i) => (
               <div key={i} className="flex flex-col items-center">
                 <div className={cn("w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-lg mb-8", step.bg)}>
@@ -214,13 +214,13 @@ export default function LandingPage() {
       <section id="use-cases" className="py-32 px-6 bg-[#fafbff]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">Built for Teams That Review Important Documents</h2>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">Создадено за тимови што работат со важни документи</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { role: "For Legal Teams", needs: "NDAs, Employment Contracts, Vendor Agreements", icon: Scale, desc: "Speed up first-pass review by surfacing critical, unusual, and high-risk clauses in seconds." },
-              { role: "For Agencies & Freelancers", needs: "Master Service Agreements, SOWs", icon: Briefcase, desc: "Spot unfavorable payment terms, unclear scope, and risky revision language before you commit." },
-              { role: "For Operations", needs: "Leases, Compliance Documents, Financial Reports", icon: ListChecks, desc: "Turn dates, renewal periods, and compliance obligations into clear next steps without reading every page manually." }
+              { role: "За правни тимови", needs: "Договори за доверливост, договори за вработување, договори со добавувачи", icon: Scale, desc: "Забрзајте го првичниот преглед на договори, анекси и правна документација со јасно издвоени ризици, обврски и критични клаузули." },
+              { role: "За агенции и фриленсери", needs: "Главни договори за услуги, Описи на работа (SOW)", icon: Briefcase, desc: "Проверувајте договори со клиенти, понуди и работни услови побрзо и со поголема сигурност пред прифаќање." },
+              { role: "За операции", needs: "Закупи, документи за усогласеност, финансиски извештаи", icon: ListChecks, desc: "Намалете го ризикот при работа со добавувачи, услуги, рокови и деловни обврски преку побрз и појасен преглед на документацијата." }
             ].map((useCase, i) => (
               <div key={i} className="bg-white rounded-[2rem] p-10 border border-slate-100 shadow-xl shadow-slate-200/50 hover:-translate-y-2 transition-transform duration-500">
                 <useCase.icon className="w-10 h-10 text-brand-600 mb-6" />
@@ -237,17 +237,17 @@ export default function LandingPage() {
       <section className="py-32 px-6 bg-white border-y border-slate-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">Simple, Transparent Pricing</h2>
-            <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Start free. Upgrade when you need more analyses, history, and flexibility.</p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-6 text-slate-900 tracking-tight">Едноставни и јасни цени</h2>
+            <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Започнете бесплатно и надградете кога ќе ви треба поголем обем и повеќе можности.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
-              { plan: "Free", price: "$0", docs: "1 Lifetime Document Analysis", cta: "Try Now", link: "/auth" },
-              { plan: "Pro", price: "$6", period: "/mo", docs: "2 Document Analyses / month", cta: "Upgrade to Pro", link: "/pricing", popular: true },
-              { plan: "Business", price: "$19", period: "/mo", docs: "15 Document Analyses / month", cta: "Get Business", link: "/pricing" }
+              { plan: "Бесплатно", price: "$0", docs: "1 доживотна анализа на документ", cta: "Започнете бесплатно", link: "/auth" },
+              { plan: "Про", price: "$6", period: "/месечно", docs: "2 анализи на документи / месечно", cta: "Изберете Про", link: "/pricing", popular: true },
+              { plan: "Бизнис", price: "$19", period: "/месечно", docs: "15 анализи на документи / месечно", cta: "Изберете Бизнис", link: "/pricing" }
             ].map((p, i) => (
               <div key={i} className={cn("rounded-[2rem] p-8 flex flex-col items-center text-center border transition-all", p.popular ? "bg-slate-900 text-white shadow-2xl shadow-brand-900/20 border-slate-800 scale-105" : "bg-white text-slate-900 border-slate-200")}>
-                {p.popular && <span className="bg-brand-600 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full mb-6 relative -top-3">Most Popular</span>}
+                {p.popular && <span className="bg-brand-600 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full mb-6 relative -top-3">Најпопуларно</span>}
                 <h3 className="font-display text-xl font-bold mb-2">{p.plan}</h3>
                 <div className="flex items-baseline gap-1 mb-8">
                   <span className="text-5xl font-black">{p.price}</span>
@@ -265,15 +265,15 @@ export default function LandingPage() {
       <section className="py-32 px-6 bg-[#fafbff]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl font-bold text-slate-900 tracking-tight">Frequently Asked Questions</h2>
+            <h2 className="font-display text-4xl font-bold text-slate-900 tracking-tight">Често поставувани прашања</h2>
           </div>
           <div className="space-y-4">
             {[
-              { q: "Is this legal advice?", a: "No. DOCURA provides AI-assisted document analysis, not legal advice. Important legal decisions should always be reviewed by a qualified legal professional." },
-              { q: "What file types are supported?", a: "DOCURA accepts PDF files and Word documents (.docx). Both formats are fully supported for contracts, tenders, agreements, and general business documents." },
-              { q: "Do you train AI on my documents?", a: "Never. Your files are processed only to generate your report and are never used to train DOCURA or third-party AI models." },
-              { q: "What languages are supported?", a: "Our AI engine comprehends documents in English, Spanish, French, German, and many more, though English yields the highest accuracy for complex legal jargon." },
-              { q: "How do I delete my data?", a: "You have full control. You can delete your documents and entire account permanently from the Settings page at any time." }
+              { q: "Дали ова е правен совет?", a: "Не. DOCURA обезбедува информативна анализа на документот за полесен преглед и разбирање. Таа не претставува правен совет и не е замена за адвокат или друг квалификуван професионалец." },
+              { q: "Кои формати на документи се поддржани?", a: "DOCURA поддржува PDF и Word документи (.docx). Најдобри резултати се добиваат со јасни, читливи и текстуално достапни документи." },
+              { q: "Дали моите документи се користат за обучување на ВИ?", a: "Не. Вашите документи не се користат за обучување на модели. Тие се обработуваат исклучиво за целите на анализата што ја побаравте." },
+              { q: "Кои јазици се поддржани?", a: "DOCURA поддржува македонски јазик." },
+              { q: "Како да побарам бришење на моите податоци?", a: "За бришење на документи и поврзани податоци, контактирајте ја нашата поддршка." }
             ].map((faq, i) => (
               <div key={i} className="bg-white rounded-2xl p-8 border border-slate-100 shadow-sm">
                 <h3 className="font-bold text-lg mb-3 text-slate-900">{faq.q}</h3>
@@ -288,25 +288,25 @@ export default function LandingPage() {
       <section className="py-32 px-6 bg-slate-950 text-white text-center">
         <div className="max-w-3xl mx-auto">
           <ShieldCheck className="w-16 h-16 text-emerald-400 mx-auto mb-8" />
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-8 tracking-tight">Review Complex Contracts Faster and With More Clarity.</h2>
-          <p className="text-xl text-slate-400 font-medium mb-12">Join professionals using DOCURA to save time and reduce risk every day.</p>
+          <h2 className="font-display text-4xl md:text-5xl font-bold mb-8 tracking-tight">Прегледувајте сложени договори побрзо и со поголема јасност</h2>
+          <p className="text-xl text-slate-400 font-medium mb-12">Прикачете документ и за неколку секунди добијте јасен извештај со ризици, обврски, рокови и критични клаузули.</p>
           <Link to="/auth" className="inline-flex items-center gap-3 bg-brand-600 text-white font-bold px-10 py-5 rounded-2xl text-lg hover:bg-brand-500 transition-all shadow-xl shadow-brand-900/50">
-            Try DOCURA for Free
+            Пробајте ja DOCURA бесплатно
             <ArrowRight className="w-5 h-5" />
           </Link>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-12">Private by Design • AES-256 Encryption • User-Controlled Deletion</p>
+          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-12">Приватност по дизајн • AES-256 енкрипција • Бришење под контрола на корисникот</p>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="py-12 border-t border-slate-800 bg-slate-950 text-slate-400 text-sm font-bold uppercase tracking-widest text-center">
-         <div className="flex flex-wrap justify-center gap-8 mb-6">
-            <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
-            <Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link>
-         </div>
-         <p>© 2026 DOCURA. All rights reserved.</p>
+          <div className="flex flex-wrap justify-center gap-8 mb-6">
+            <Link to="/terms" className="hover:text-white transition-colors">Услови</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors">Приватност</Link>
+            <Link to="/disclaimer" className="hover:text-white transition-colors">Одрекување</Link>
+            <Link to="/pricing" className="hover:text-white transition-colors">Цени</Link>
+          </div>
+          <p>© 2026 DOCURA. Сите права се задржани.</p>
       </footer>
     </div>
   );

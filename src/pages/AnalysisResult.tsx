@@ -47,11 +47,11 @@ export default function AnalysisResult() {
           setAnalysis(data.analysis);
           setChunks(data.chunks || []);
         } else {
-          setError('Analysis not found');
+          setError('Анализата не е пронајдена');
         }
       } catch (err) {
         console.error("Failed to fetch analysis", err);
-        setError('Failed to load analysis');
+        setError('Неуспешно вчитување на анализата');
       }
     };
     fetchAnalysis();
@@ -79,7 +79,7 @@ export default function AnalysisResult() {
     } catch (err) {
       const assistantMsg: ChatMessage = { 
         role: 'assistant', 
-        content: "I'm sorry, I couldn't process your question at this time.",
+        content: "Жалам, не можев да го процесирам вашето прашање во овој момент.",
       };
       setChatMessages(prev => [...prev, assistantMsg]);
     } finally {
@@ -93,11 +93,11 @@ export default function AnalysisResult() {
     const sevBorder = (s: string) => s === 'high' ? '#ef4444' : s === 'medium' ? '#f59e0b' : '#3b82f6';
     const sevBg = (s: string) => s === 'high' ? '#fff5f5' : s === 'medium' ? '#fffbeb' : '#eff6ff';
     const sevColor = (s: string) => s === 'high' ? '#dc2626' : s === 'medium' ? '#b45309' : '#1d4ed8';
-    const sevLabel = (s: string) => s === 'high' ? 'HIGH' : s === 'medium' ? 'MEDIUM' : 'LOW';
+    const sevLabel = (s: string) => s === 'high' ? 'ВИСОК' : s === 'medium' ? 'СРЕДЕН' : 'НИЗОК';
     const dlColor = (s: string) => s === 'urgent' ? '#dc2626' : s === 'important' ? '#b45309' : '#475569';
-    const dlLabel = (s: string) => s === 'urgent' ? 'URGENT' : s === 'important' ? 'IMPORTANT' : 'INFO';
-    const docType = (analysis.documentType || 'document').replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
-    const analyzedDate = new Date(analysis.uploadDate || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+    const dlLabel = (s: string) => s === 'urgent' ? 'ИТНО' : s === 'important' ? 'ВАЖНО' : 'ИНФО';
+    const docType = (analysis.documentType || 'документ').replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+    const analyzedDate = new Date(analysis.uploadDate || Date.now()).toLocaleDateString('mk-MK', { day: '2-digit', month: 'long', year: 'numeric' });
 
     const risksHtml = (analysis.risks || []).map(r => `
       <div style="margin-bottom:12px;padding:14px 18px;border-left:3px solid ${sevBorder(r.severity)};background:${sevBg(r.severity)};page-break-inside:avoid">
@@ -106,14 +106,14 @@ export default function AnalysisResult() {
           <span style="font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:${sevColor(r.severity)};white-space:nowrap;padding:2px 7px;border:1px solid ${sevBorder(r.severity)};flex-shrink:0">${sevLabel(r.severity)}</span>
         </div>
         <p style="margin:0;font-size:12.5px;color:#334155;line-height:1.65">${r.explanation || ''}</p>
-        ${(r as any).sourceHint ? `<div style="margin-top:5px;font-size:11px;color:#64748b;font-style:italic">Source: ${(r as any).sourceHint}</div>` : ''}
+        ${(r as any).sourceHint ? `<div style="margin-top:5px;font-size:11px;color:#64748b;font-style:italic">Извор: ${(r as any).sourceHint}</div>` : ''}
       </div>`).join('');
 
     const obligationsHtml = (analysis.obligations || []).map((o, i) => `
       <tr style="background:${i % 2 === 0 ? '#fff' : '#f8fafc'}">
         <td style="padding:9px 13px;font-size:12px;font-weight:700;color:#475569;border-bottom:1px solid #e2e8f0;vertical-align:top;white-space:nowrap">${o.party || ''}</td>
         <td style="padding:9px 13px;font-size:12.5px;color:#1e293b;border-bottom:1px solid #e2e8f0;line-height:1.5;vertical-align:top">${o.obligation || ''}</td>
-        <td style="padding:9px 13px;font-size:12px;color:#64748b;border-bottom:1px solid #e2e8f0;vertical-align:top;white-space:nowrap">${o.timing || 'Not stated'}</td>
+        <td style="padding:9px 13px;font-size:12px;color:#64748b;border-bottom:1px solid #e2e8f0;vertical-align:top;white-space:nowrap">${o.timing || 'Не е наведено'}</td>
       </tr>`).join('');
 
     const deadlinesHtml = (analysis.deadlines || []).map(d => `
@@ -135,7 +135,7 @@ export default function AnalysisResult() {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>DOCURA Report — ${analysis.title || analysis.fileName || 'Analysis'}</title>
+  <title>DOCURA Извештај — ${analysis.title || analysis.fileName || 'Анализа'}</title>
   <style>
     @page {
       size: A4;
@@ -179,38 +179,38 @@ export default function AnalysisResult() {
   <div class="report-header">
     <div class="brand-row">
       <span class="brand">DOCURA Intelligence</span>
-      <span class="report-label">Automated Document Analysis Report</span>
+      <span class="report-label">Автоматизиран извештај од анализа</span>
     </div>
     <div class="doc-title">
-      ${analysis.title || analysis.fileName || 'Document Analysis'}
+      ${analysis.title || analysis.fileName || 'Анализа на документ'}
       <span class="doc-badge">${docType}</span>
     </div>
     <div class="meta-row">
-      <strong>File:</strong>${analysis.fileName || '—'}<span class="meta-sep">|</span><strong>Analyzed:</strong>${analyzedDate}
+      <strong>Датотека:</strong>${analysis.fileName || '—'}<span class="meta-sep">|</span><strong>Анализирано:</strong>${analyzedDate}
     </div>
   </div>
 
-  <h2>Executive Summary</h2>
-  <div class="summary-block">${analysis.summary || 'No summary available.'}</div>
+  <h2>Извршно резиме</h2>
+  <div class="summary-block">${analysis.summary || 'Нема достапно резиме.'}</div>
 
-  ${analysis.keyPoints?.length ? `<h2>Key Points</h2><ul class="kp">${keyPointsHtml}</ul>` : ''}
+  ${analysis.keyPoints?.length ? `<h2>Клучни точки</h2><ul class="kp">${keyPointsHtml}</ul>` : ''}
 
-  ${analysis.risks?.length ? `<h2>Identified Risks (${analysis.risks.length})</h2>${risksHtml}` : ''}
+  ${analysis.risks?.length ? `<h2>Идентификувани ризици (${analysis.risks.length})</h2>${risksHtml}` : ''}
 
   ${analysis.obligations?.length ? `
-    <h2>Obligations</h2>
+    <h2>Обврски</h2>
     <table class="obligations-table">
-      <thead><tr><th>Party</th><th>Obligation</th><th>Timing</th></tr></thead>
+      <thead><tr><th>Страна</th><th>Обврска</th><th>Рок/Време</th></tr></thead>
       <tbody>${obligationsHtml}</tbody>
     </table>` : ''}
 
-  ${analysis.deadlines?.length ? `<h2>Deadlines &amp; Key Dates (${analysis.deadlines.length})</h2><div class="deadlines-box">${deadlinesHtml}</div>` : ''}
+  ${analysis.deadlines?.length ? `<h2>Рокови и клучни датуми (${analysis.deadlines.length})</h2><div class="deadlines-box">${deadlinesHtml}</div>` : ''}
 
-  ${analysis.suggestedQuestions?.length ? `<h2>Suggested Review Questions</h2><div class="questions-box">${questionsHtml}</div>` : ''}
+  ${analysis.suggestedQuestions?.length ? `<h2>Предложени прашања за преглед</h2><div class="questions-box">${questionsHtml}</div>` : ''}
 
   <div class="report-footer">
     <span class="footer-brand">DOCURA Intelligence</span>
-    <span class="footer-note">Automated analysis report — informational purposes only. Not legal advice. Consult a qualified professional before making legal or commercial decisions.</span>
+    <span class="footer-note">Автоматизиран извештај од анализа — само за информативни цели. Не е правен совет. Консултирајте се со квалификуван професионалец пред да донесете правни или комерцијални одлуки.</span>
   </div>
 </body>
 </html>`;
@@ -230,7 +230,7 @@ export default function AnalysisResult() {
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <AlertTriangle className="w-12 h-12 text-red-400" />
         <p className="text-zinc-900 font-bold text-xl">{error}</p>
-        <Link to="/dashboard" className="text-brand-600 font-bold hover:underline">Return to Dashboard</Link>
+        <Link to="/dashboard" className="text-brand-600 font-bold hover:underline">Врати се на контролната табла</Link>
       </div>
     );
   }
@@ -239,17 +239,17 @@ export default function AnalysisResult() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <Loader2 className="w-8 h-8 text-zinc-400 animate-spin" />
-        <p className="text-zinc-500 font-medium">Loading analysis...</p>
+        <p className="text-zinc-500 font-medium">Вчитување на анализата...</p>
       </div>
     );
   }
 
   const tabs = [
-    { id: 'summary', label: 'Summary', icon: FileText },
-    { id: 'risks', label: 'Risks', icon: Shield, count: analysis.risks.length },
-    { id: 'obligations', label: 'Obligations', icon: CheckCircle2 },
-    { id: 'deadlines', label: 'Deadlines', icon: Clock, count: analysis.deadlines.length },
-    { id: 'clauses', label: 'Key Clauses', icon: Zap },
+    { id: 'summary', label: 'Резиме', icon: FileText },
+    { id: 'risks', label: 'Ризици', icon: Shield, count: analysis.risks.length },
+    { id: 'obligations', label: 'Обврски', icon: CheckCircle2 },
+    { id: 'deadlines', label: 'Рокови', icon: Clock, count: analysis.deadlines.length },
+    { id: 'clauses', label: 'Клучни клаузули', icon: Zap },
   ];
 
   return (
@@ -274,18 +274,18 @@ export default function AnalysisResult() {
             <div className="flex items-center gap-3 text-sm font-medium text-slate-500">
               <span className="flex items-center gap-1.5"><FileText className="w-4 h-4 text-slate-400" /> {analysis.fileName}</span>
               <span className="w-1 h-1 bg-slate-300 rounded-full" />
-              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-slate-400" /> Analyzed {new Date(analysis.uploadDate).toLocaleDateString()}</span>
+              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-slate-400" /> Анализирано на {new Date(analysis.uploadDate).toLocaleDateString()}</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={handleExport} className="btn-secondary flex items-center gap-2 py-2">
             <Download className="w-4 h-4" />
-            Export PDF
+            Извези PDF
           </button>
           <button className="btn-primary flex items-center gap-2 py-2 shadow-brand-500/20">
             <Share2 className="w-4 h-4" />
-            Share
+            Сподели
           </button>
         </div>
       </div>
@@ -339,7 +339,7 @@ export default function AnalysisResult() {
                       <div className="p-2 bg-brand-100 text-brand-600 rounded-xl">
                         <FileText className="w-5 h-5" />
                       </div>
-                      Executive Summary
+                      Извршно резиме
                     </h3>
                     <div className="soft-card p-8 leading-relaxed text-slate-600 text-lg shadow-sm">
                       {analysis.summary}
@@ -351,7 +351,7 @@ export default function AnalysisResult() {
                       <div className="p-2 bg-emerald-100 text-emerald-600 rounded-xl">
                         <Zap className="w-5 h-5" />
                       </div>
-                      Key Points
+                      Клучни точки
                     </h3>
                     <div className="grid sm:grid-cols-2 gap-5">
                       {analysis.keyPoints.map((point, i) => (
@@ -394,14 +394,14 @@ export default function AnalysisResult() {
                             risk.severity === 'high' ? "bg-rose-50 text-rose-700 border-rose-200" : 
                             risk.severity === 'medium' ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-blue-50 text-blue-700 border-blue-200"
                           )}>
-                            {risk.severity} risk
+                            {risk.severity === 'high' ? 'висок' : risk.severity === 'medium' ? 'среден' : 'низок'} ризик
                           </span>
                         </div>
                         <p className="text-slate-600 leading-relaxed font-medium bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">{risk.explanation}</p>
                         {risk.sourceHint && (
                           <div className="flex items-center gap-2 text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-2">
                             <Info className="w-3.5 h-3.5" />
-                            Source: <span className="text-brand-600">{risk.sourceHint}</span>
+                            Извор: <span className="text-brand-600">{risk.sourceHint}</span>
                           </div>
                         )}
                       </div>
@@ -422,9 +422,9 @@ export default function AnalysisResult() {
                     <table className="w-full text-left text-sm">
                       <thead className="bg-slate-50/80 border-b border-slate-200/60 backdrop-blur-sm">
                         <tr>
-                          <th className="px-6 py-5 font-bold text-slate-800 uppercase tracking-wider text-[11px]">Party</th>
-                          <th className="px-6 py-5 font-bold text-slate-800 uppercase tracking-wider text-[11px]">Obligation</th>
-                          <th className="px-6 py-5 font-bold text-slate-800 uppercase tracking-wider text-[11px]">Timing</th>
+                          <th className="px-6 py-5 font-bold text-slate-800 uppercase tracking-wider text-[11px]">Страна</th>
+                          <th className="px-6 py-5 font-bold text-slate-800 uppercase tracking-wider text-[11px]">Обврска</th>
+                          <th className="px-6 py-5 font-bold text-slate-800 uppercase tracking-wider text-[11px]">Рок/Време</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
@@ -511,21 +511,21 @@ export default function AnalysisResult() {
         <div className="space-y-8">
           {/* Quick Stats */}
           <div className="glass-panel p-8 rounded-[2rem] space-y-5">
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Analysis Overview</h3>
+            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Преглед на анализата</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="soft-card p-4 bg-white/50 border-white/40">
                 <p className="text-3xl font-display font-bold text-slate-800 tracking-tight">{analysis.risks.length}</p>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Risks Found</p>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Пронајдени ризици</p>
               </div>
               <div className="soft-card p-4 bg-white/50 border-white/40">
                 <p className="text-3xl font-display font-bold text-slate-800 tracking-tight">{analysis.deadlines.length}</p>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Deadlines</p>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Рокови</p>
               </div>
             </div>
             <div className="pt-5 border-t border-slate-200/50">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">
                 <Shield className="w-4 h-4 text-brand-500" />
-                Extraction Confidence
+                Доверливост на извлекувањето
               </div>
               {analysis.confidenceNotes && analysis.confidenceNotes.length > 0 ? (
                 <p className="text-[11px] text-amber-600 font-medium leading-relaxed mt-2 bg-amber-50 p-3 rounded-xl border border-amber-100">
@@ -536,7 +536,7 @@ export default function AnalysisResult() {
                   <div className="h-2.5 w-full bg-slate-200/60 rounded-full overflow-hidden shadow-inner mt-3">
                     <div className="h-full bg-emerald-500 w-[92%] rounded-full shadow-sm" />
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-2 font-medium">Document text was clear and well-structured.</p>
+                  <p className="text-[10px] text-slate-400 mt-2 font-medium">Текстот на документот беше јасен и добро структуриран.</p>
                 </>
               )}
             </div>
@@ -544,8 +544,8 @@ export default function AnalysisResult() {
 
           {/* Suggested Questions */}
           <div className="glass-panel p-8 rounded-[2rem]">
-            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Ask the Document</h3>
-            <p className="text-xs text-slate-400 font-medium mb-5">Click a question to open the chat assistant.</p>
+            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Прашај го документот</h3>
+            <p className="text-xs text-slate-400 font-medium mb-5">Кликнете на прашање за да го отворите асистентот за чат.</p>
             <div className="space-y-3">
               {analysis.suggestedQuestions.map((q, i) => (
                 <button 
@@ -567,10 +567,10 @@ export default function AnalysisResult() {
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-[2rem] p-6 shadow-sm">
             <div className="flex items-center gap-2 text-slate-700 font-bold text-sm mb-3 uppercase tracking-widest text-[10px]">
               <HelpCircle className="w-4 h-4 text-brand-500" />
-              For Informational Use Only
+              Само за информативна употреба
             </div>
             <p className="text-xs text-slate-500 font-medium leading-relaxed">
-              This is an AI-generated summary for informational purposes. It does not constitute legal advice. Always review the original document and consult a qualified professional for legal or commercial decisions.
+              Ова е резиме генерирано од ВИ за информативни цели. Не претставува правен совет. Секогаш прегледувајте го оригиналниот документ и консултирајте се со квалификуван професионалец за правни или комерцијални одлуки.
             </p>
           </div>
         </div>
@@ -593,8 +593,8 @@ export default function AnalysisResult() {
                     <MessageSquare className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-sm block">Ask the Document</span>
-                    <span className="text-[10px] text-brand-100 uppercase tracking-widest font-bold">Pro Intelligence</span>
+                    <span className="font-bold text-sm block">Прашај го документот</span>
+                    <span className="text-[10px] text-brand-100 uppercase tracking-widest font-bold">Про Интелигенција</span>
                   </div>
                 </div>
                 <button onClick={() => setIsChatOpen(false)} className="relative z-10 p-2 hover:bg-white/10 rounded-xl transition-all">
@@ -609,8 +609,8 @@ export default function AnalysisResult() {
                       <Sparkles className="w-8 h-8 text-brand-400" />
                     </div>
                     <div>
-                      <p className="text-base font-bold text-slate-800">No messages yet</p>
-                      <p className="text-sm text-slate-500 mt-2 font-medium">Ask anything about the document and get instant answers.</p>
+                      <p className="text-base font-bold text-slate-800">Сè уште нема пораки</p>
+                      <p className="text-sm text-slate-500 mt-2 font-medium">Прашајте било што за документот и добијте инстант одговори.</p>
                     </div>
                   </div>
                 )}
@@ -629,8 +629,8 @@ export default function AnalysisResult() {
                     </div>
                     {msg.sourceHint && (
                       <span className="text-[10px] text-brand-500 mt-1.5 font-bold uppercase tracking-wider flex items-center gap-1 bg-brand-50 px-2 py-0.5 rounded-md border border-brand-100">
-                        <Info className="w-3 h-3" />
-                        Source: {msg.sourceHint}
+                        <info className="w-3 h-3" />
+                        Извор: {msg.sourceHint}
                       </span>
                     )}
                   </div>
@@ -638,7 +638,7 @@ export default function AnalysisResult() {
                 {isAsking && (
                   <div className="flex items-center gap-2 text-brand-500 text-xs font-bold uppercase tracking-widest bg-brand-50 w-fit px-4 py-2 rounded-full border border-brand-100">
                     <Loader2 className="w-3 h-3 animate-spin" />
-                    Thinking...
+                    Размислувам...
                   </div>
                 )}
               </div>
@@ -649,7 +649,7 @@ export default function AnalysisResult() {
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Ask a question..."
+                    placeholder="Постави прашање..."
                     className="flex-1 bg-slate-50 border border-slate-200/60 rounded-2xl px-5 py-3.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all shadow-inner"
                   />
                   <button 

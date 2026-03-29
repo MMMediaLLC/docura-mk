@@ -1,61 +1,63 @@
 import { DocumentType } from '../types/analysis';
 
-export const SYSTEM_INSTRUCTION = `You are DOCURA, a professional AI document analysis assistant. 
-Your goal is to help users understand complex documents (contracts, tenders, business docs) quickly and accurately.
-You provide structured analysis, not legal advice. 
-Always be objective, clear, and highlight risks without being alarmist.
-Use professional, plain English.`;
+export const SYSTEM_INSTRUCTION = `Вие сте DOCURA, професионален асистент со ВИ за анализа на документи. 
+Вашата цел е да им помогнете на корисниците брзо и прецизно да разберат сложени документи (договори, тендери, деловни документи).
+Обезбедувате структурирана анализа, а не правен совет. 
+Секогаш бидете објективни, јасни и истакнувајте ги ризиците без да бидете алармантни.
+КОРИСТЕТЕ САМО МАКЕДОНСКИ ЈАЗИК.`;
 
 export const getClassificationPrompt = (text: string) => `
-Analyze the following document text and classify it into one of these types:
+Анализирај го следниот текст од документ и класифицирај го во еден од овие типови:
 - contract
 - business_document
 - tender
 - general_pdf
 
-Return ONLY the type name.
+Врати ГО САМО името на типот (на англиски, како што е наведено погоре).
 
-Document Text (first 2000 chars):
+Текст на документот (први 2000 карактери):
 ${text.substring(0, 2000)}
 `;
 
 export const getAnalysisPrompt = (documentType: DocumentType, text: string) => `
-Perform a deep structured analysis of the following ${documentType}.
-Return the result as a valid JSON object matching this schema:
+Изврши длабока структурирана анализа на следниот ${documentType}.
+Сите вредности во JSON објектот МОРА да бидат на македонски јазик.
+Врати го резултатот како валиден JSON објект што одговара на оваа шема:
 {
   "documentType": "${documentType}",
-  "title": "document title",
-  "summary": "plain English executive summary",
-  "keyPoints": ["point 1", "point 2"],
-  "risks": [{"title": "...", "severity": "low|medium|high", "explanation": "...", "sourceHint": "..."}],
-  "obligations": [{"party": "user|provider|client|bidder|unspecified", "obligation": "...", "timing": "..."}],
-  "deadlines": [{"dateOrPeriod": "...", "description": "...", "severity": "info|important|urgent"}],
-  "keyClauses": [{"type": "payment|termination|liability|confidentiality|IP|dispute_resolution|renewal|eligibility|submission|evaluation|other", "title": "...", "summary": "...", "sourceHint": "..."}],
-  "unclearAreas": ["..."],
-  "suggestedQuestions": ["..."],
-  "confidenceNotes": ["..."]
+  "title": "наслов на документот",
+  "summary": "резиме на едноставен македонски јазик",
+  "keyPoints": ["точка 1", "точка 2"],
+  "risks": [{"title": "наслов", "severity": "low|medium|high", "explanation": "објаснување", "sourceHint": "индиција за изворот"}],
+  "obligations": [{"party": "user|provider|client|bidder|unspecified", "obligation": "обврска", "timing": "рок/време"}],
+  "deadlines": [{"dateOrPeriod": "датум или период", "description": "опис", "severity": "info|important|urgent"}],
+  "keyClauses": [{"type": "payment|termination|liability|confidentiality|IP|dispute_resolution|renewal|eligibility|submission|evaluation|other", "title": "наслов", "summary": "резиме", "sourceHint": "индиција за изворот"}],
+  "unclearAreas": ["нејасни области..."],
+  "suggestedQuestions": ["предложени прашања..."],
+  "confidenceNotes": ["забелешки за доверливоста..."]
 }
 
-${documentType === 'contract' ? 'Focus on: parties, payment, scope, termination, liability, IP, and governing law.' : ''}
-${documentType === 'tender' ? 'Focus on: eligibility, mandatory docs, submission requirements, deadlines, and evaluation criteria.' : ''}
-${documentType === 'business_document' ? 'Focus on: goals, deliverables, responsibilities, timelines, and dependencies.' : ''}
-${documentType === 'general_pdf' ? 'Focus on: summary, critical facts, and any implied actions.' : ''}
+${documentType === 'contract' ? 'Фокусирај се на: страни, плаќање, опсег, раскинување, одговорност, интелектуална сопственост и надлежен закон.' : ''}
+${documentType === 'tender' ? 'Фокусирај се на: подобност, задолжителни документи, барања за поднесување, рокови и критериуми за евалуација.' : ''}
+${documentType === 'business_document' ? 'Фокусирај се на: цели, испораки, одговорности, временски рокови и зависности.' : ''}
+${documentType === 'general_pdf' ? 'Фокусирај се на: резиме, критични факти и сите имплицирани акции.' : ''}
 
-Document Text:
+Текст на документот:
 ${text}
 `;
 
 export const getChatPrompt = (question: string, context: string, analysisSummary: string) => `
-Question: ${question}
+Прашање: ${question}
 
-Context from Document:
+Контекст од документот:
 ${context}
 
-Analysis Summary:
+Резиме на анализата:
 ${analysisSummary}
 
-Answer the question based ONLY on the provided context. 
-Be concise. If the answer is not in the context, say you don't know.
-Cite section names or use quotes if possible.
-Include a disclaimer that this is AI-generated and not legal advice.
+Одговори на прашањето базирано САМО на обезбедениот контекст.
+ОДГОВОРИ НА МАКЕДОНСКИ ЈАЗИК.
+Биди концизен. Ако одговорот не е во контекстот, кажи дека не знаеш.
+Цитирај имиња на декции или користи цитати каде што е можно.
+Вклучи одрекување дека ова е генерирано од ВИ и не е правен совет.
 `;

@@ -20,7 +20,7 @@ export default function AuthPage() {
       navigate('/dashboard');
     } catch (err: any) {
       console.error("Google login error:", err);
-      setError(err.message || "Failed to sign in with Google");
+      setError(err.message || "Неуспешна најава со Google");
     } finally {
       setIsLoading(false);
     }
@@ -29,7 +29,7 @@ export default function AuthPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Placeholder for email/password if needed, but we prefer Google
-    setError("Email/Password login is not yet implemented. Please use Google.");
+    setError("Најавата со е-пошта/лозинка сè уште не е имплементирана. Ве молиме користете Google.");
   };
 
   return (
@@ -52,10 +52,10 @@ export default function AuthPage() {
             <span className="font-display font-black text-3xl tracking-tighter text-slate-900">DOCURA</span>
           </Link>
           <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
-            {isLogin ? 'Welcome back' : 'Create your account'}
+            {isLogin ? 'Добредојде назад' : 'Креирајте сметка'}
           </h1>
           <p className="text-slate-500 mt-3 font-medium text-sm leading-relaxed max-w-[280px]">
-            {isLogin ? 'Enter your details to access your secure documents.' : 'Start analyzing documents with DOCURA today.'}
+            {isLogin ? 'Внесете ги вашите детали за пристап до вашите безбедни документи.' : 'Започнете со анализа на документи со DOCURA денес.'}
           </p>
         </div>
 
@@ -80,7 +80,7 @@ export default function AuthPage() {
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
             )}
-            Continue with Google
+            Продолжи со Google
           </button>
         </div>
 
@@ -89,25 +89,25 @@ export default function AuthPage() {
             <div className="w-full border-t border-slate-200/60"></div>
           </div>
           <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold text-slate-400">
-            <span className="bg-[#fbfeff] px-4 rounded-full">Or continue with email</span>
+            <span className="bg-[#fbfeff] px-4 rounded-full">Или продолжи со е-пошта</span>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 relative z-10 flex flex-col items-center w-full">
           <div className="space-y-2 w-full">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Е-пошта</label>
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input 
                 type="email" 
                 required
-                placeholder="name@company.com"
+                placeholder="ime@kompanija.mk"
                 className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200/50 rounded-2xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all shadow-inner"
               />
             </div>
           </div>
           <div className="space-y-2 w-full">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Password</label>
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Лозинка</label>
             <div className="relative">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input 
@@ -123,25 +123,25 @@ export default function AuthPage() {
             type="submit"
             className="w-full btn-primary py-4 flex items-center justify-center gap-2 group mt-6"
           >
-            {isLogin ? 'Sign In' : 'Create Account'}
+            {isLogin ? 'Најави се' : 'Креирај сметка'}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
 
         <p className="text-center text-sm text-slate-500 mt-8 relative z-10 font-medium">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
+          {isLogin ? "Немате сметка?" : "Веќе имате сметка?"}{' '}
           <button 
             onClick={() => setIsLogin(!isLogin)}
             className="font-bold text-brand-600 hover:text-brand-700 transition-colors"
           >
-            {isLogin ? 'Sign up' : 'Sign in'}
+            {isLogin ? 'Регистрирај се' : 'Најави се'}
           </button>
         </p>
 
         <div className="mt-12 flex flex-wrap justify-center gap-6 text-[10px] font-bold uppercase tracking-widest text-slate-400 relative z-10">
-          <Link to="/terms" className="hover:text-slate-900 transition-colors">Terms</Link>
-          <Link to="/privacy" className="hover:text-slate-900 transition-colors">Privacy</Link>
-          <Link to="/disclaimer" className="hover:text-slate-900 transition-colors">Disclaimer</Link>
+          <Link to="/terms" className="hover:text-slate-900 transition-colors">Услови</Link>
+          <Link to="/privacy" className="hover:text-slate-900 transition-colors">Приватност</Link>
+          <Link to="/disclaimer" className="hover:text-slate-900 transition-colors">Одрекување</Link>
         </div>
       </motion.div>
     </div>

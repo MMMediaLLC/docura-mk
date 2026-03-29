@@ -24,15 +24,15 @@ export default function PricingPage() {
       id: "free",
       name: PLANS.free.name,
       price: PLANS.free.price,
-      desc: "Experience core document intelligence and risk detection.",
+      desc: "Основа за брз преглед на документи и детекција на ризици.",
       icon: Sparkles,
       iconGradient: "from-blue-400 to-indigo-500",
       features: [
-        "1 complete document review",
-        "Risk & liability extraction",
-        "Key clause identification",
+        "1 комплетен преглед на документ",
+        "Извлекување на ризици и одговорности",
+        "Идентификација на клучни клаузули",
       ],
-      cta: "Current Plan",
+      cta: "Ваш тековен план",
       current: true
     },
     {
@@ -40,18 +40,18 @@ export default function PricingPage() {
       name: PLANS.pro.name,
       price: PLANS.pro.price,
       period: PLANS.pro.period,
-      desc: "For professionals requiring deep document visibility.",
+      desc: "За професионалци на кои им е потребна длабока видливост на документите.",
       icon: ShieldCheck, 
       iconGradient: "from-slate-600 to-slate-800",
       features: [
-        "2 document analyses / month",
-        "Comprehensive risk detection",
-        "Automated obligation tracking",
-        "Critical deadline extraction",
-        "History",
-        "PDF export",
+        "2 анализи на документи / месечно",
+        "Сеопфатна детекција на ризици",
+        "Автоматизирано следење на обврски",
+        "Извлекување на критични рокови",
+        "Историја",
+        "PDF извоз",
       ],
-      cta: "Upgrade to Pro",
+      cta: "Изберете Про",
       highlight: true,
       lemonSqueezyUrl: getCheckoutUrl("pro", user?.uid, user?.email || undefined)
     },
@@ -60,18 +60,18 @@ export default function PricingPage() {
       name: PLANS.business.name,
       price: PLANS.business.price,
       period: PLANS.business.period,
-      desc: "Advanced processing power and expanded capacity for teams.",
+      desc: "Максимална моќ за анализа и поголем капацитет за професионални тимови.",
       icon: Gem,
       iconGradient: "from-fuchsia-500 to-purple-700",
       features: [
-        "15 document analyses / month",
-        "Everything in Pro",
-        "Priority processing speed",
-        "Advanced data extraction",
-        "Export professional reports",
-        "Dedicated support",
+        "15 анализи на документи / месечно",
+        "Сè од Про планот",
+        "Приоритетна брзина на процесирање",
+        "Напредно извлекување на податоци",
+        "Извоз на професионални извештаи",
+        "Посветена поддршка",
       ],
-      cta: "Start Business",
+      cta: "Изберете Бизнис",
       lemonSqueezyUrl: getCheckoutUrl("business", user?.uid, user?.email || undefined)
     }
   ];
@@ -104,12 +104,12 @@ export default function PricingPage() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-50 border border-brand-100 text-brand-700 text-[10px] font-bold rounded-full mb-6 uppercase tracking-[0.25em] shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
-            Pricing Plans
+            Планови за цени
           </div>
           <h1 className="font-display text-5xl md:text-6xl font-bold text-slate-900 tracking-tight mb-6 leading-tight">
-            Professional Document <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-600 to-indigo-500">Intelligence</span>
+            Интелигентна анализа на <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-600 to-indigo-500">документи</span>
           </h1>
-          <p className="text-slate-500 text-xl font-medium leading-relaxed">Transparent pricing for structured document analysis, risk detection, and obligation tracking.</p>
+          <p className="text-slate-500 text-xl font-medium leading-relaxed">Едноставни и јасни цени за прецизна анализа, откривање ризици и следење на обврски.</p>
         </motion.div>
 
         {/* Plans Grid */}
@@ -137,7 +137,7 @@ export default function PricingPage() {
 
               {plan.highlight && (
                 <div className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-white/20 backdrop-blur-md text-white border border-white/30 text-[9px] font-bold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg shadow-brand-900/30 whitespace-nowrap">
-                  Most Popular
+                  Најпопуларно
                 </div>
               )}
 
@@ -203,10 +203,10 @@ export default function PricingPage() {
             <div className="w-16 h-16 bg-slate-900 rounded-[1.5rem] shadow-lg shadow-slate-900/10 flex items-center justify-center mx-auto mb-6">
               <ShieldCheck className="w-8 h-8 text-white" />
             </div>
-            <h3 className="font-display text-3xl font-bold text-slate-900 mb-3 tracking-tight">Enterprise & custom workflows</h3>
-            <p className="text-slate-500 text-lg font-medium mb-8 max-w-xl mx-auto leading-relaxed">Dedicated environments, custom legal playbooks, API access, and tailored reporting for scaling teams.</p>
+            <h3 className="font-display text-3xl font-bold text-slate-900 mb-3 tracking-tight">Ентерпрајз и прилагодени работни процеси</h3>
+            <p className="text-slate-500 text-lg font-medium mb-8 max-w-xl mx-auto leading-relaxed">Посветени средини, прилагодени правни упатства, пристап до API и прилагодено известување за тимови во развој.</p>
             <button className="inline-flex items-center gap-2 bg-brand-600 text-white font-bold px-8 py-4 rounded-2xl text-sm uppercase tracking-widest hover:bg-brand-700 transition-all shadow-lg shadow-brand-500/20 hover:-translate-y-0.5 group/btn">
-              Talk to our team
+              Контактирајте го нашиот тим
               <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
             </button>
           </div>

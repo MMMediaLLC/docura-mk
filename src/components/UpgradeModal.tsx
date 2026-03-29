@@ -32,7 +32,7 @@ export default function UpgradeModal({
 
   // Build usage context message
   const usageMessage = currentPlan && usageCount != null && usageLimit != null && currentPlan !== 'business'
-    ? `You have reached your limit of ${usageLimit} active ${usageLimit === 1 ? 'document' : 'documents'}.`
+    ? `Го достигнавте вашиот лимит од ${usageLimit} активен ${usageLimit === 1 ? 'документ' : 'документи'}.`
     : null;
 
   return (
@@ -68,7 +68,7 @@ export default function UpgradeModal({
               
               {/* Headline */}
               <h2 className="font-display text-3xl font-bold text-slate-900 mb-3 tracking-tight">
-                {title || "You've reached your plan limit."}
+                {title || "Го достигнавте лимитот на вашиот план."}
               </h2>
 
               {/* Usage context */}
@@ -76,7 +76,7 @@ export default function UpgradeModal({
                 <p className="text-sm font-bold text-rose-500 mb-1">{usageMessage}</p>
               )}
               <p className="text-slate-500 mb-8 font-medium leading-relaxed">
-                {message || "Upgrade your plan to analyze more documents. Business users get unlimited analyses."}
+                {message || "Надградете го вашиот план за да анализирате повеќе документи. Бизнис корисниците добиваат најголем капацитет."}
               </p>
 
               {/* Plan options */}
@@ -91,8 +91,8 @@ export default function UpgradeModal({
                       <Shield className="w-6 h-6 text-brand-600" />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-900 text-base">Upgrade to Pro</p>
-                      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-0.5">$6 / month • 3 active docs</p>
+                      <p className="font-bold text-slate-900 text-base">Надгради на Про</p>
+                      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-0.5">370 ден. / месечно • 2 анализи</p>
                     </div>
                   </div>
                   <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-brand-500 transition-colors" />
@@ -108,8 +108,8 @@ export default function UpgradeModal({
                       <Rocket className="w-6 h-6 text-brand-400" />
                     </div>
                     <div>
-                      <p className="font-bold text-lg">Upgrade to Business</p>
-                      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-0.5">$19 / month • Unlimited</p>
+                      <p className="font-bold text-lg">Надгради на Бизнис</p>
+                      <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mt-0.5">1.170 ден. / месечно • 15 анализи</p>
                     </div>
                   </div>
                   <ArrowRight className="w-5 h-5 text-brand-400 group-hover:text-brand-300 transition-colors" />
@@ -120,7 +120,7 @@ export default function UpgradeModal({
                 onClick={onClose}
                 className="mt-8 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
               >
-                Maybe later
+                Можеби подоцна
               </button>
             </div>
           </motion.div>

@@ -41,14 +41,14 @@ export default function HistoryPage() {
   }, [fetchHistory]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this analysis?')) return;
+    if (!window.confirm('Дали сте сигурни дека сакате да ја избришете оваа анализа?')) return;
     
     try {
       await firebaseService.deleteAnalysis(id);
       setDocuments(prev => prev.filter(doc => doc.id !== id));
     } catch (err) {
       console.error("Failed to delete analysis", err);
-      alert("Failed to delete analysis");
+      alert("Неуспешно бришење на анализата");
     }
   };
 
@@ -60,15 +60,15 @@ export default function HistoryPage() {
     <div className="space-y-10 font-sans selection:bg-brand-100 selection:text-brand-900">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
         <div>
-          <h1 className="font-display text-4xl font-bold text-slate-900 tracking-tight">Document History</h1>
-          <p className="text-slate-500 font-medium mt-2 leading-relaxed">Manage and review your previously analyzed intelligence reports.</p>
+          <h1 className="font-display text-4xl font-bold text-slate-900 tracking-tight">Историја на документи</h1>
+          <p className="text-slate-500 font-medium mt-2 leading-relaxed">Управувајте и прегледувајте ги вашите претходно анализирани извештаи.</p>
         </div>
         <div className="flex gap-3">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-600 transition-colors" />
             <input 
               type="text"
-              placeholder="Search documents..."
+              placeholder="Пребарај документи..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-white/80 backdrop-blur-md border border-white/60 pl-11 pr-5 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all shadow-sm w-64 text-slate-800"
@@ -76,7 +76,7 @@ export default function HistoryPage() {
           </div>
           <button className="flex items-center gap-2 px-5 py-3 bg-white/80 backdrop-blur-md border border-white/60 rounded-2xl text-sm font-bold text-slate-700 hover:bg-white transition-all shadow-sm active:scale-95">
             <Filter className="w-4 h-4" />
-            Filter
+            Филтер
           </button>
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function HistoryPage() {
                 <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
               </div>
             </div>
-            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Loading history...</p>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Вчитување на историјата...</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
@@ -105,8 +105,8 @@ export default function HistoryPage() {
             <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center border border-slate-200/50 mb-4 shadow-inner">
                <FileText className="w-8 h-8 text-slate-300" />
             </div>
-            <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">No documents found</p>
-            <p className="text-slate-400 text-sm font-medium">Upload a document from the dashboard to see it here.</p>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Не се пронајдени документи</p>
+            <p className="text-slate-400 text-sm font-medium">Прикачете документ од почетната страница за да го видите тука.</p>
           </div>
         ) : (
           <div className="space-y-4 p-4 lg:p-8">
@@ -119,7 +119,7 @@ export default function HistoryPage() {
                     </div>
                     <div className="min-w-0">
                       <h3 className="font-bold text-slate-900 group-hover:text-brand-700 transition-colors text-lg truncate">
-                        {doc.documentName || doc.fileName || 'Untitled Document'}
+                        {doc.documentName || doc.fileName || 'Неименуван документ'}
                       </h3>
                       <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-0.5">
                         {new Date(doc.createdAt || doc.uploadDate).toLocaleDateString()}
@@ -136,15 +136,15 @@ export default function HistoryPage() {
                   <div className="flex flex-wrap items-center gap-3 mt-4 md:ml-13">
                     <div className="px-3 py-1.5 bg-rose-50 border border-rose-100/50 text-rose-700 rounded-lg text-xs font-bold leading-none flex items-center gap-2">
                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                       {doc.risks?.length || 0} Risks
+                       {doc.risks?.length || 0} Ризици
                     </div>
                     <div className="px-3 py-1.5 bg-amber-50 border border-amber-100/50 text-amber-700 rounded-lg text-xs font-bold leading-none flex items-center gap-2">
                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                       {doc.obligations?.length || 0} Obligations
+                       {doc.obligations?.length || 0} Обврски
                     </div>
                     <div className="px-3 py-1.5 bg-indigo-50 border border-indigo-100/50 text-indigo-700 rounded-lg text-xs font-bold leading-none flex items-center gap-2">
                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                       {doc.deadlines?.length || 0} Deadlines
+                       {doc.deadlines?.length || 0} Рокови
                     </div>
                   </div>
                 </div>
@@ -154,12 +154,12 @@ export default function HistoryPage() {
                     to={`/analysis/${doc.id}`}
                     className="flex-1 md:flex-none btn-primary py-2.5 px-6 rounded-xl text-sm justify-center shadow-sm"
                   >
-                    Open Report
+                    Отвори извештај
                   </Link>
                   <button 
                     onClick={() => handleDelete(doc.id)}
                     className="p-2.5 bg-white hover:bg-rose-50 rounded-xl text-slate-400 hover:text-rose-600 transition-all border border-slate-200 hover:border-rose-200 shadow-sm shrink-0" 
-                    title="Delete"
+                    title="Избриши"
                   >
                     <Trash2 className="w-4.5 h-4.5" />
                   </button>
@@ -172,7 +172,7 @@ export default function HistoryPage() {
         {/* Pagination */}
         <div className="px-8 py-6 border-t border-slate-200/40 flex items-center justify-between bg-white/20 rounded-b-[2.5rem]">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-            Showing {filteredDocs.length} of {documents.length} documents
+            Прикажани {filteredDocs.length} од {documents.length} документи
           </p>
           <div className="flex items-center gap-3">
             <button disabled className="p-2 border border-slate-200 rounded-xl bg-white/50 backdrop-blur-sm disabled:opacity-30 shadow-sm hover:bg-white transition-all">

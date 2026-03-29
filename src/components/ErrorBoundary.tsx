@@ -39,23 +39,23 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <AlertTriangle className="w-8 h-8" />
           </div>
           <h1 className="font-display text-3xl font-bold text-slate-800 mb-3 tracking-tight">
-            Something went wrong
+            Нешто не е во ред
           </h1>
           <p className="text-slate-500 font-medium mb-8 max-w-sm mx-auto leading-relaxed">
-            The application encountered an unexpected error. Trying to recover or refresh the page.
+            Апликацијата наиде на неочекувана грешка. Може да пробате со освежување на страницата.
           </p>
           <div className="flex gap-4">
             <button
               onClick={() => window.location.reload()}
               className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl shadow-lg transition-all"
             >
-              Refresh Page
+              Освежи ја страницата
             </button>
             <button
               onClick={() => { window.location.href = '/dashboard'; }}
               className="px-6 py-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-2xl shadow-sm transition-all"
             >
-              Go to Dashboard
+              Оди на контролната табла
             </button>
           </div>
         </div>

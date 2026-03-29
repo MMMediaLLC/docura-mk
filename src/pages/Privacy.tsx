@@ -12,7 +12,7 @@ export default function PrivacyPage() {
             <div className="p-2 rounded-lg group-hover:bg-slate-100 transition-colors">
               <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-slate-900 transition-colors" />
             </div>
-            <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 transition-colors">Back to Home</span>
+            <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 transition-colors">Назад кон почетната</span>
           </Link>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center shadow-sm shadow-brand-200">
@@ -27,29 +27,29 @@ export default function PrivacyPage() {
         <header className="mb-16">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-brand-50 border border-brand-100 text-brand-700 text-[10px] font-bold rounded-full mb-6 uppercase tracking-widest">
             <ShieldCheck className="w-3 h-3" />
-            Privacy & Security
+            Приватност и безбедност
           </div>
-          <h1 className="font-display text-5xl font-bold tracking-tight text-slate-900 mb-4">Privacy Policy</h1>
-          <p className="text-slate-500 font-medium">Last Updated: March 16, 2026</p>
+          <h1 className="font-display text-5xl font-bold tracking-tight text-slate-900 mb-4">Политика за приватност</h1>
+          <p className="text-slate-500 font-medium">Последно ажурирано: 16 март, 2026</p>
         </header>
 
         <div className="space-y-12 text-slate-600 leading-relaxed font-medium">
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">1. Introduction</h2>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">1. Вовед</h2>
             <p>
-              At DOCURA, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our AI-powered document analysis platform.
+              Во DOCURA, ние сме посветени на заштитата на вашата приватност. Оваа Политика за приватност објаснува како ги собираме, користиме, откриваме и ги штитиме вашите информации кога ја користите нашата платформа за анализа на документи напојувана со вештачка интелигенција.
             </p>
           </section>
 
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">2. Information We Collect</h2>
-            <p className="mb-4">We collect several types of information from and about users of our Service, including:</p>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">2. Информации кои ги собираме</h2>
+            <p className="mb-4">Собираме неколку типови на информации од и за корисниците на нашата Услуга, вклучително:</p>
             <ul className="space-y-3">
               {[
-                { label: "Account Information", desc: "Name, email address, and authentication credentials." },
-                { label: "Uploaded Documents", desc: "The content of the documents you upload for analysis." },
-                { label: "Usage Data", desc: "Information about how you use the Service, including features accessed." },
-                { label: "Logs", desc: "Technical data such as IP addresses, browser types, and system activity." }
+                { label: "Информации за сметката", desc: "Име, е-пошта и креденцијали за автентикација." },
+                { label: "Прикачени документи", desc: "Содржината на документите што ги прикачувате за анализа." },
+                { label: "Податоци за употреба", desc: "Информации за тоа како ја користите Услугата, вклучително и пристапените функции." },
+                { label: "Логови", desc: "Технички податоци како IP адреси, типови на прелистувачи и системски активности." }
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-brand-400 rounded-full mt-2 shrink-0" />
@@ -62,26 +62,26 @@ export default function PrivacyPage() {
           <section className="bg-brand-600 p-8 rounded-3xl text-white shadow-xl shadow-brand-100">
             <h2 className="font-display text-2xl font-bold mb-4 flex items-center gap-3">
               <ShieldCheck className="w-6 h-6 text-brand-200" />
-              3. Document Processing
+              3. Процесирање на документи
             </h2>
             <p className="text-brand-50 font-bold mb-4">
-              When you upload a document, it is processed by our automated systems and artificial intelligence models.
+              Кога прикачувате документ, тој се процесира од нашите автоматизирани системи и модели на вештачка интелигенција.
             </p>
             <p className="text-brand-100">
-              This processing is necessary to provide the analysis, summaries, and insights you request. Your documents are used solely for the purpose of providing the Service to you.
+              Ова процесирање е неопходно за да се обезбеди анализата, резимеата и согледувањата што ги барате. Вашите документи се користат исклучиво за целта на обезбедување на Услугата за вас.
             </p>
           </section>
 
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">4. Use of Data</h2>
-            <p className="mb-4">We use the information we collect to:</p>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">4. Употреба на податоци</h2>
+            <p className="mb-4">Ги користиме информациите што ги собираме за да:</p>
             <ul className="space-y-3">
               {[
-                "Provide, maintain, and improve the Service",
-                "Process your documents and generate AI insights",
-                "Communicate with you about your account or Service updates",
-                "Monitor and analyze usage trends to enhance user experience",
-                "Protect the security and integrity of our platform"
+                "Обезбедување, одржување и подобрување на Услугата",
+                "Процесирање на вашите документи и генерирање на согледувања со ВИ",
+                "Комуникација со вас за вашата сметка или ажурирања на Услугата",
+                "Следење и анализа на трендовите на користење за подобрување на корисничкото искуство",
+                "Заштита на безбедноста и интегритетот на нашата платформа"
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <div className="w-1.5 h-1.5 bg-brand-400 rounded-full mt-2 shrink-0" />
@@ -92,51 +92,51 @@ export default function PrivacyPage() {
           </section>
 
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">5. Document Storage</h2>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">5. Складирање на документи</h2>
             <p>
-              Uploaded documents are stored securely on our servers. You have the option to delete your documents and their associated analysis at any time through the Dashboard. Once deleted, the data is removed from our active databases.
+              Прикачените документи се складираат безбедно на нашите сервери. Имате опција да ги избришете вашите документи и нивните поврзани анализи во секое време преку контролната табла. Откако ќе се избришат, податоците се отстрануваат од нашите активни бази на податоци.
             </p>
           </section>
 
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">6. Third Party Services</h2>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">6. Услуги од трети страни</h2>
             <p>
-              We may use third-party service providers to facilitate our Service, such as cloud hosting providers (e.g., Google Cloud) and AI model providers. These third parties may process your data only to perform tasks on our behalf and are obligated not to disclose or use it for any other purpose.
+              Можеме да користиме даватели на услуги од трети страни за да ја олесниме нашата Услуга, како што се даватели на хостинг во облак (на пр., Google Cloud) и даватели на модели на ВИ. Овие трети страни можат да ги процесираат вашите податоци само за да извршуваат задачи во наше име и се обврзани да не ги откриваат или користат за која било друга цел.
             </p>
           </section>
 
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">7. Data Security</h2>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">7. Безбедност на податоци</h2>
             <p>
-              We implement reasonable administrative, technical, and physical security measures designed to protect your information from unauthorized access, disclosure, or destruction. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.
+              Спроведуваме разумни административни, технички и физички безбедносни мерки дизајнирани да ги заштитат вашите информации од неовластен пристап, откривање или уништување. Сепак, ниту еден метод на пренос преку интернет не е 100% безбеден и не можеме да гарантираме апсолутна безбедност.
             </p>
           </section>
 
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">8. User Rights</h2>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">8. Кориснички права</h2>
             <p>
-              Depending on your location, you may have rights regarding your personal data, including the right to access, correct, or delete your information. You can manage your data directly through your account settings or by contacting our support team.
+              Во зависност од вашата локација, може да имате права во врска со вашите лични податоци, вклучително и право на пристап, исправка или бришење на вашите информации. Можете да управувате со вашите податоци директно преку поставките на вашата сметка или со контактирање на нашиот тим за поддршка.
             </p>
           </section>
 
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">9. Data Retention</h2>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">9. Задржување на податоци</h2>
             <p>
-              We retain your information for as long as your account is active or as needed to provide the Service. We will also retain and use your information as necessary to comply with our legal obligations, resolve disputes, and enforce our agreements.
+              Ние ги задржуваме вашите информации онолку долго колку што е вашата сметка активна или колку што е потребно за обезбедување на Услугата. Исто така, ќе ги задржиме и користиме вашите информации колку што е потребно за да ги исполниме нашите законски обврски, да разрешиме спорови и да ги спроведеме нашите договори.
             </p>
           </section>
 
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">10. Cookies and Analytics</h2>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">10. Колачиња и аналитика</h2>
             <p>
-              We use cookies and similar tracking technologies to track activity on our Service and hold certain information. We may use third-party analytics tools to help us understand how users interact with the platform.
+              Користиме колачиња и слични технологии за следење за да ја следиме активноста на нашата Услуга и да чуваме одредени информации. Можеме да користиме алатки за аналитика од трети страни за да ни помогнат да разбереме како корисниците комуницираат со платформата.
             </p>
           </section>
 
           <section className="bg-white p-8 rounded-3xl border border-slate-200/60 shadow-sm">
-            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">11. Updates to Privacy Policy</h2>
+            <h2 className="font-display text-2xl font-bold text-slate-900 mb-4">11. Ажурирања на Политиката за приватност</h2>
             <p>
-              We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date at the top of this policy.
+              Можеме да ја ажурираме нашата Политика за приватност одвреме-навреме. Ќе ве известиме за сите промени со објавување на новата Политика за приватност на оваа страница и ажурирање на датумот „Последно ажурирано“ на врвот на оваа политика.
             </p>
           </section>
         </div>

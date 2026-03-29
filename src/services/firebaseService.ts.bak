@@ -316,30 +316,40 @@ export const firebaseService = {
   },
 
   async getAnalysis(id: string): Promise<{ analysis: AnalysisResult, chunks: any[] } | null> {
-    // MOCK FOR PRODUCT HUNT
-    return {
-      analysis: {
-        id,
-        title: 'Договор за деловни услуги',
-        documentType: 'document',
-        fileName: 'Enterprise_Agreement_2026.pdf',
-        uploadDate: new Date().toISOString(),
-        risks: [
-          { title: 'Клаузула за автоматско обновување', severity: 'high', explanation: 'Автоматски се обновува за 12 месеци без претходна најава.' },
-          { title: 'Неограничена одговорност', severity: 'high', explanation: 'Одговорноста е целосно неограничена за небрежност.' },
-        ],
-        obligations: [
-          { party: 'Клиент', obligation: 'Да се обезбеди известување од 90 дена пред прекин.', timing: '90 дена пред истекот.' }
-        ],
-        deadlines: [
-          { dateOrPeriod: '31 декември, 2026', description: 'Датум на истекување на почетниот рок', severity: 'warning' }
-        ],
-        keyClauses: [],
-        confidenceNotes: [],
-        suggestedQuestions: ['Кои се условите за прекин?']
-      } as any,
-      chunks: []
-    };
+    const path = `analyses/${id}`;
+    try {
+      const snap = await getDoc(doc(db, path));
+      if (!snap.exists()) return null;
+      let data = snap.data();
+      const { chunks, userId, ...rawAnalysis } = data;
+      
+      // Map saved record back to a full AnalysisResult shape with safe fallbacks
+      const analysis: Partial<AnalysisResult> = {
+        ...rawAnalysis,
+        id: rawAnalysis.id || id,
+        title: rawAnalysis.title || rawAnalysis.documentName || rawAnalysis.fileName || 'Untitled Document',
+        documentType: rawAnalysis.documentType || 'document',
+        fileName: rawAnalysis.documentName || rawAnalysis.fileName || 'Untitled Document',
+        uploadDate: rawAnalysis.createdAt || rawAnalysis.uploadDate || new Date().toISOString(),
+        risks: Array.isArray(rawAnalysis.risks) ? rawAnalysis.risks.map((r: any) => 
+          typeof r === 'string' ? { title: r, severity: 'medium', explanation: r } : r
+        ) : [],
+        obligations: Array.isArray(rawAnalysis.obligations) ? rawAnalysis.obligations.map((o: any) => 
+          typeof o === 'string' ? { party: 'unspecified', obligation: o, timing: 'See document' } : o
+        ) : [],
+        deadlines: Array.isArray(rawAnalysis.deadlines) ? rawAnalysis.deadlines.map((d: any) => 
+          typeof d === 'string' ? { dateOrPeriod: 'Review', description: d, severity: 'info' } : d
+        ) : [],
+        keyClauses: Array.isArray(rawAnalysis.keyClauses) ? rawAnalysis.keyClauses : [],
+        confidenceNotes: Array.isArray(rawAnalysis.confidenceNotes) ? rawAnalysis.confidenceNotes : [],
+        suggestedQuestions: Array.isArray(rawAnalysis.questions) ? rawAnalysis.questions : (rawAnalysis.suggestedQuestions || [])
+      };
+
+      return { analysis: analysis as AnalysisResult, chunks: chunks || [] };
+    } catch (error) {
+      handleFirestoreError(error, OperationType.GET, path);
+      throw error;
+    }
   },
 
   async deleteAnalysis(id: string): Promise<void> {
@@ -353,27 +363,25 @@ export const firebaseService = {
   },
 
   async listAnalyses(userId: string) {
-    // MOCK FOR PRODUCT HUNT
-    return [
-      {
-        id: 'mock-1',
-        title: 'Договор за деловни услуги',
-        documentName: 'Enterprise_Agreement_2026.pdf',
-        documentType: 'document',
-        createdAt: new Date().toISOString(),
-        status: 'completed',
-        summary: 'Анализата е завршена. Пронајдени се 3 критични ризици.',
-      },
-      {
-        id: 'mock-2',
-        title: 'Договор за доверливост (NDA)',
-        documentName: 'NDA_TechNova_v2.docx',
-        documentType: 'document',
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-        status: 'completed',
-        summary: 'Стандарден NDA. Не се пронајдени необични клаузули.',
-      }
-    ];
+    const path = 'analyses';
+    try {
+      const q = query(
+        collection(db, path),
+        where('userId', '==', userId)
+      );
+      const snapshot = await getDocs(q);
+      const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      // Sort client-side to avoid requiring a composite Firestore index
+      docs.sort((a: any, b: any) => {
+        const aDate = a.createdAt || a.uploadDate || '';
+        const bDate = b.createdAt || b.uploadDate || '';
+        return bDate.localeCompare(aDate);
+      });
+      return docs;
+    } catch (error) {
+      handleFirestoreError(error, OperationType.LIST, path);
+      throw error;
+    }
   },
 
   // ── Connection Test ───────────────────────────────────────

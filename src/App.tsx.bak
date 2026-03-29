@@ -45,19 +45,21 @@ export default function App() {
   const isLegal = ['/terms', '/privacy', '/disclaimer'].includes(location.pathname);
 
   useEffect(() => {
-    // MOCK FOR PRODUCT HUNT
-    setUser({ uid: 'mock-user-123', email: 'founder@docura.com', displayName: 'Docura Founder' });
-    setUserStatus({
-      plan: 'pro',
-      usedAnalysesInPeriod: 2,
-      lifetimeFreeAnalysesUsed: 0,
-      usageLimit: 30,
-      remaining: 28,
-      isLimitReached: false,
-      usageResetDate: new Date().toISOString(),
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setUser(user);
+      if (user) {
+        try {
+          const status = await firebaseService.getUserStatus(user.uid);
+          setUserStatus(status);
+        } catch (err) {
+          console.error("Failed to fetch user status:", err);
+        }
+      } else {
+        setUserStatus(null);
+      }
+      setLoading(false);
     });
-    setLoading(false);
-    return () => {};
+    return () => unsubscribe();
   }, []);
 
   // Refresh status on navigation to dashboard or history
@@ -112,10 +114,10 @@ export default function App() {
   }
 
   const navItems = [
-    { name: 'Контролна табла', path: '/dashboard', icon: LayoutGrid },
-    { name: 'Историја', path: '/history', icon: Clock },
-    { name: 'Цени', path: '/pricing', icon: CreditCard },
-    { name: 'Поставки', path: '/settings', icon: Sliders },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutGrid },
+    { name: 'History', path: '/history', icon: Clock },
+    { name: 'Pricing', path: '/pricing', icon: CreditCard },
+    { name: 'Settings', path: '/settings', icon: Sliders },
   ];
 
   return (
@@ -190,13 +192,13 @@ export default function App() {
                   className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-all group"
                 >
                   <LogOut className="w-4.5 h-4.5 text-rose-500 group-hover:text-rose-600" />
-                  Одјави се
+                  Sign Out
                 </button>
 
                 <div className="mt-6 pt-6 border-t border-slate-100 flex flex-wrap gap-x-4 gap-y-2 px-4">
-                  <Link to="/terms" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-600 transition-colors">Услови</Link>
-                  <Link to="/privacy" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-600 transition-colors">Приватност</Link>
-                  <Link to="/disclaimer" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-600 transition-colors">Правно</Link>
+                  <Link to="/terms" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-600 transition-colors">Terms</Link>
+                  <Link to="/privacy" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-600 transition-colors">Privacy</Link>
+                  <Link to="/disclaimer" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-brand-600 transition-colors">Legal</Link>
                 </div>
               </div>
             </motion.aside>

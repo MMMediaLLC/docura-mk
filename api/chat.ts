@@ -28,8 +28,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     Question: ${question}
     
-    Provide a clear, professional, and accurate answer based ONLY on the provided context. 
-    If the information is not in the context, state that clearly.
+    Provide a clear, professional, and accurate answer in Macedonian (македонски јазик) based ONLY on the provided context. 
+    If the information is not in the context, state that clearly in Macedonian.
+    Do not respond in English.
+    
+    Answer precisely, citing source sections if present.
   `;
 
   try {

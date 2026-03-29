@@ -6,9 +6,9 @@ import { auth } from '../firebase';
 const ONBOARDING_KEY = 'docura_onboarding_shown';
 
 const features = [
-  { title: 'AI Contract Analysis', desc: 'Upload any PDF and extract key clauses, risks, and obligations instantly.' },
-  { title: 'Document Intelligence', desc: 'Get summaries, red flags, and actionable insights from complex legal documents.' },
-  { title: 'Secure & Private', desc: 'Your documents are isolated and only accessible to you — always.' },
+  { title: 'ВИ анализа на договори', desc: 'Прикачете кој било PDF и веднаш извлечете ги клучните клаузули, ризици и обврски.' },
+  { title: 'Интелигенција за документи', desc: 'Добијте резимеа, предупредувања и корисни согледувања од сложени правни документи.' },
+  { title: 'Безбедно и приватно', desc: 'Вашите документи се изолирани и достапни само за вас — секогаш.' },
 ];
 
 export default function OnboardingModal() {
@@ -75,7 +75,7 @@ export default function OnboardingModal() {
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
               <div>
-                <p className="text-[10px] font-bold text-brand-600 uppercase tracking-[0.3em]">Welcome to</p>
+                <p className="text-[10px] font-bold text-brand-600 uppercase tracking-[0.3em]">Добредојдовте во</p>
                 <h2 className="font-display text-2xl font-black tracking-tighter text-slate-900">DOCURA</h2>
               </div>
             </div>
@@ -111,16 +111,16 @@ export default function OnboardingModal() {
                 onClick={handleClose}
                 className="px-5 py-3 rounded-xl font-bold text-slate-500 hover:text-slate-700 transition-colors text-sm"
               >
-                Skip
+                Прескокни
               </button>
               <button
                 onClick={handleNext}
                 className="flex-1 btn-primary flex items-center justify-center gap-2 py-3"
               >
                 {step < features.length - 1 ? (
-                  <>Next <ArrowRight className="w-4 h-4" /></>
+                  <>Следно <ArrowRight className="w-4 h-4" /></>
                 ) : (
-                  <>Start Analyzing <Check className="w-4 h-4" /></>
+                  <>Започни со анализа <Check className="w-4 h-4" /></>
                 )}
               </button>
             </div>

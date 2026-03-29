@@ -66,18 +66,18 @@ export default function SettingsPage() {
     } catch (err: any) {
       console.error("Delete account error:", err);
       if (err.code === 'auth/requires-recent-login') {
-         setDeleteError("Missing recent authentication. Please sign out, sign back in, and try again.");
+         setDeleteError("Недостасува неодамнешна автентикација. Ве молиме одјавете се, најавете се повторно и пробајте пак.");
       } else {
-         let errorMessage = "Failed to delete account. Please try again.";
+         let errorMessage = "Неуспешно бришење на сметката. Ве молиме обидете се повторно.";
          try {
            const parsed = JSON.parse(err.message);
-           if (parsed.error && typeof parsed.error === 'string') {
-             if (parsed.error.includes("Missing or insufficient permissions")) {
-               errorMessage = "Secure deletion access denied. Please refresh or try again.";
-             } else {
-               errorMessage = parsed.error;
-             }
-           }
+            if (parsed.error && typeof parsed.error === 'string') {
+              if (parsed.error.includes("Missing or insufficient permissions")) {
+                errorMessage = "Пристапот за безбедно бришење е одбиен. Ве молиме освежете или обидете се повторно.";
+              } else {
+                errorMessage = parsed.error;
+              }
+            }
          } catch(e) {
            errorMessage = err.message || errorMessage;
          }
@@ -89,26 +89,26 @@ export default function SettingsPage() {
   };
 
   const planLabel = userStatus?.plan === 'true_docura' 
-    ? 'True Docura (Free)'
+    ? 'Бесплатен'
     : userStatus?.plan === 'pro' 
-      ? 'Pro — $6/mo' 
+      ? 'Про — $6/мес' 
       : userStatus?.plan === 'business' 
-        ? 'Business — $19/mo' 
-        : 'Loading...';
+        ? 'Бизнис — $19/мес' 
+        : 'Се вчитува...';
 
   const usageValue = !userStatus
-    ? 'Loading...'
+    ? 'Се вчитува...'
     : userStatus.plan === 'business'
-      ? 'Unlimited'
-      : `${userStatus.usageCount} / ${userStatus.usageLimit} documents`;
+      ? 'Неограничено'
+      : `${userStatus.usageCount} / ${userStatus.usageLimit} документи`;
 
   const isPaidPlan = userStatus && userStatus.plan !== 'true_docura';
 
   return (
     <div className="space-y-10 max-w-4xl font-sans selection:bg-brand-100 selection:text-brand-900 relative z-10">
       <div>
-        <h1 className="font-display text-4xl font-bold text-slate-900 tracking-tight">Settings</h1>
-        <p className="text-slate-500 font-medium mt-2 leading-relaxed">Manage your account preferences, security, and subscription details.</p>
+        <h1 className="font-display text-4xl font-bold text-slate-900 tracking-tight">Поставки</h1>
+        <p className="text-slate-500 font-medium mt-2 leading-relaxed">Управувајте со вашите параметри на сметката, безбедноста и деталите за претплата.</p>
       </div>
 
       {/* Success toast */}
@@ -121,7 +121,7 @@ export default function SettingsPage() {
             className="flex items-center gap-3 px-6 py-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-700 font-medium text-sm shadow-sm"
           >
             <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-            Your plan has been downgraded to True Docura.
+            Вашиот план е вратен на True Docura.
           </motion.div>
         )}
       </AnimatePresence>
@@ -133,13 +133,13 @@ export default function SettingsPage() {
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-brand-600 transition-colors shadow-sm border border-slate-100/50">
               <User className="w-6 h-6" />
             </div>
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Profile</h3>
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Профил</h3>
           </div>
           <div className="divide-y divide-white/40 bg-white/20 rounded-b-[2rem]">
             {[
-              { label: 'Display Name', value: auth.currentUser?.displayName || '—' },
-              { label: 'Email Address', value: auth.currentUser?.email || '—' },
-              { label: 'Auth Provider', value: 'Google' },
+              { label: 'Име за приказ', value: auth.currentUser?.displayName || '—' },
+              { label: 'Е-пошта', value: auth.currentUser?.email || '—' },
+              { label: 'Провајдер на автентикација', value: 'Google' },
             ].map((item, i) => (
               <div key={i} className="px-8 py-6 flex items-center justify-between last:rounded-b-[2rem]">
                 <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">{item.label}</span>
@@ -155,27 +155,27 @@ export default function SettingsPage() {
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-brand-600 transition-colors shadow-sm border border-slate-100/50">
               <CreditCard className="w-6 h-6" />
             </div>
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Subscription</h3>
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Претплата</h3>
           </div>
           <div className="divide-y divide-white/40 bg-white/20 rounded-b-[2rem]">
             <div className="px-8 py-6 flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Current Plan</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Тековен план</span>
               <span className="text-base font-bold text-slate-600">{planLabel}</span>
             </div>
             <div className="px-8 py-6 flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Usage This Period</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Употреба во овој период</span>
               <span className="text-base font-bold text-slate-600">{usageValue}</span>
             </div>
             <div className="px-8 py-6 flex items-center justify-between last:rounded-b-[2rem]">
               <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">
-                {isPaidPlan ? 'Manage Plan' : 'Upgrade Plan'}
+                {isPaidPlan ? 'Управувај со планот' : 'Надгради план'}
               </span>
               {isPaidPlan ? (
                 <button
                   onClick={() => setShowCancelConfirm(true)}
                   className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-rose-200 text-rose-600 hover:bg-rose-50 transition-all"
                 >
-                  Cancel Plan
+                  Откажи план
                 </button>
               ) : (
                 <Link
@@ -183,7 +183,7 @@ export default function SettingsPage() {
                   className="flex items-center gap-2 px-5 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700 transition-all shadow-md shadow-brand-100"
                 >
                   <Zap className="w-4 h-4" />
-                  Upgrade
+                  Надгради
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               )}
@@ -195,19 +195,19 @@ export default function SettingsPage() {
         <div className="glass-panel border-white/60 p-1 sm:p-2 group relative z-10">
           <div className="px-8 py-6 bg-white/40 border-b border-white/60 flex items-center gap-4 rounded-t-[2rem]">
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-brand-600 transition-colors shadow-sm border border-slate-100/50">
-              <Shield className="w-6 h-6" />
+              <User className="w-6 h-6" />
             </div>
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Security</h3>
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Безбедност</h3>
           </div>
           <div className="divide-y divide-white/40 bg-white/20 rounded-b-[2rem]">
             <div className="px-8 py-6 flex items-center justify-between last:rounded-b-[2rem]">
-              <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Session</span>
+              <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">Сесија</span>
               <button
                 onClick={handleSignOut}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold border border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-rose-600 hover:border-rose-200 transition-all"
               >
                 <LogOut className="w-4 h-4" />
-                Sign Out
+                Одјави се
               </button>
             </div>
           </div>
@@ -219,12 +219,12 @@ export default function SettingsPage() {
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-brand-600 transition-colors shadow-sm border border-slate-100/50">
               <Bell className="w-6 h-6" />
             </div>
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Notifications</h3>
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Известувања</h3>
           </div>
           <div className="divide-y divide-white/40 bg-white/20 rounded-b-[2rem]">
             {[
-              { label: 'Email Alerts', value: 'Enabled (coming soon)' },
-              { label: 'Analysis Updates', value: 'Enabled (coming soon)' },
+              { label: 'Е-пошта известувања', value: 'Овозможено (наскоро)' },
+              { label: 'Ажурирања на анализи', value: 'Овозможено (наскоро)' },
             ].map((item, i) => (
               <div key={i} className="px-8 py-6 flex items-center justify-between last:rounded-b-[2rem]">
                 <span className="text-sm font-bold text-slate-500 uppercase tracking-widest">{item.label}</span>
@@ -237,15 +237,15 @@ export default function SettingsPage() {
         {/* Delete Account */}
         <div className="glass-panel bg-rose-50/30 border-rose-200/50 p-10 flex flex-col md:flex-row items-center justify-between gap-6 group relative z-10">
           <div className="text-center md:text-left">
-            <h4 className="font-display text-2xl font-bold text-rose-900 tracking-tight">Delete Account</h4>
-            <p className="text-sm text-rose-700 mt-2 font-medium leading-relaxed max-w-md">Permanently remove your active account and document data. A minimal identity record is retained for protection and abuse prevention.</p>
+            <h4 className="font-display text-2xl font-bold text-rose-900 tracking-tight">Избриши сметка</h4>
+            <p className="text-sm text-rose-700 mt-2 font-medium leading-relaxed max-w-md">Трајно отстранете ја вашата активна сметка и податоците од документи. Се задржува минимален рекорд за идентитет за заштита и спречување злоупотреба.</p>
           </div>
           <button 
             onClick={() => setShowDeleteConfirm(true)}
             className="flex items-center gap-3 px-8 py-4 bg-rose-600 text-white rounded-2xl font-bold hover:bg-rose-700 transition-all shadow-lg shadow-rose-200 active:scale-95 shrink-0"
           >
             <Trash2 className="w-5 h-5" />
-            Delete Account
+            Избриши сметка
           </button>
         </div>
       </div>
@@ -277,16 +277,16 @@ export default function SettingsPage() {
               <div className="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center mb-6">
                 <Zap className="w-7 h-7 text-amber-600" />
               </div>
-              <h3 className="font-display text-2xl font-bold text-slate-900 mb-2 tracking-tight">Cancel your plan?</h3>
+              <h3 className="font-display text-2xl font-bold text-slate-900 mb-2 tracking-tight">Да го откажете вашиот план?</h3>
               <p className="text-slate-500 mb-8 leading-relaxed font-medium">
-                You'll be downgraded to <strong>True Docura (Free)</strong> immediately and lose access to your remaining analyses in this billing period.
+                Веднаш ќе бидете вратени на <strong>Бесплатен</strong> план и ќе изгубите пристап до преостанатите анализи во овој период на наплата.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowCancelConfirm(false)}
                   className="flex-1 py-3 rounded-xl font-bold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all"
                 >
-                  Keep My Plan
+                  Задржи го мојот план
                 </button>
                 <button
                   onClick={handleCancelPlan}
@@ -294,7 +294,7 @@ export default function SettingsPage() {
                   className="flex-1 py-3 rounded-xl font-bold bg-rose-600 text-white hover:bg-rose-700 shadow-lg shadow-rose-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   {isCanceling ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Yes, Cancel
+                  Да, откажи
                 </button>
               </div>
             </motion.div>
@@ -330,9 +330,9 @@ export default function SettingsPage() {
               <div className="w-14 h-14 bg-rose-100 rounded-2xl flex items-center justify-center mb-6 border border-rose-200">
                 <Trash2 className="w-7 h-7 text-rose-600" />
               </div>
-              <h3 className="font-display text-2xl font-bold text-slate-900 mb-2 tracking-tight">Delete Account?</h3>
+              <h3 className="font-display text-2xl font-bold text-slate-900 mb-2 tracking-tight">Избриши сметка?</h3>
               <p className="text-slate-500 mb-6 leading-relaxed font-medium">
-                This will permanently delete your active profile and all uploaded document data. A minimal identity record is retained to recognize this email in the future for platform security and abuse prevention.
+                Ова трајно ће го избрише вашиот активен профил и сите прикачени податоци од документи. Се задржува минимален рекорд за идентитет за препознавање на оваа е-пошта во иднина за безбедност на платформата и спречување злоупотреба.
               </p>
               
               {deleteError && (
@@ -347,7 +347,7 @@ export default function SettingsPage() {
                   disabled={isDeleting}
                   className="flex-1 py-3 rounded-xl font-bold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all disabled:opacity-60"
                 >
-                  Cancel
+                  Откажи
                 </button>
                 <button
                   onClick={handleDeleteAccount}
@@ -355,7 +355,7 @@ export default function SettingsPage() {
                   className="flex-1 py-3 rounded-xl font-bold bg-rose-600 text-white hover:bg-rose-700 shadow-lg shadow-rose-100 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Yes, Delete
+                  Да, избриши
                 </button>
               </div>
             </motion.div>

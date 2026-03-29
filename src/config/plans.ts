@@ -15,26 +15,26 @@ export interface PlanConfig {
 
 export const PLANS: Record<UserPlan, PlanConfig> = {
   free: {
-    name: 'Free',
-    price: '$0',
+    name: 'Бесплатно',
+    price: '0 ден.',
     limit: 1, // Lifetime total
   },
   true_docura: {
     name: 'True Docura',
-    price: '$0',
+    price: '0 ден.',
     limit: 1,
   },
   pro: {
-    name: 'Pro',
-    price: '$6',
-    period: '/month',
+    name: 'Про',
+    price: '370 ден.',
+    period: '/месечно',
     limit: 2, // Per billing period
     lemonSqueezyUrl: 'https://docura.lemonsqueezy.com/checkout/buy/dbdbb86d-e540-4a99-bceb-125f19334d23',
   },
   business: {
-    name: 'Business',
-    price: '$19',
-    period: '/month',
+    name: 'Бизнис',
+    price: '1.170 ден.',
+    period: '/месечно',
     limit: 15, // Per billing period
     lemonSqueezyUrl: 'https://docura.lemonsqueezy.com/checkout/buy/95ac39a4-6bcc-45c2-ba87-9739781f2f15',
   },
