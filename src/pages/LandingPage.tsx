@@ -306,7 +306,7 @@ export default function LandingPage() {
             <Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link>
             <Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link>
          </div>
-         <p>© 2026 DOCURA AI. All rights reserved.</p>
+         <p>© 2026 DOCURA. All rights reserved.</p>
       </footer>
     </div>
   );
