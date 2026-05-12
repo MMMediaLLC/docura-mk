@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FileText, Mail, Lock, ArrowRight } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { motion } from 'motion/react';
 import { auth } from '../firebase';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -24,12 +23,6 @@ export default function AuthPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Placeholder for email/password if needed, but we prefer Google
-    setError("Најавата со е-пошта/лозинка сè уште не е имплементирана. Ве молиме користете Google.");
   };
 
   return (
@@ -52,10 +45,10 @@ export default function AuthPage() {
             <span className="font-display font-black text-3xl tracking-tighter text-slate-900">DOCURA</span>
           </Link>
           <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
-            {isLogin ? 'Добредојде назад' : 'Креирајте сметка'}
+            Добредојде назад
           </h1>
           <p className="text-slate-500 mt-3 font-medium text-sm leading-relaxed max-w-[280px]">
-            {isLogin ? 'Внесете ги вашите детали за пристап до вашите безбедни документи.' : 'Започнете со анализа на документи со DOCURA денес.'}
+            Најавете се со вашата Google сметка за да пристапите до вашите документи.
           </p>
         </div>
 
@@ -65,7 +58,7 @@ export default function AuthPage() {
               {error}
             </div>
           )}
-          <button 
+          <button
             onClick={handleGoogleLogin}
             disabled={isLoading}
             className="w-full flex items-center justify-center gap-3 py-3.5 bg-white border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all disabled:opacity-50 group hover:-translate-y-0.5"
@@ -84,61 +77,7 @@ export default function AuthPage() {
           </button>
         </div>
 
-        <div className="relative mb-8 z-10">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-200/60"></div>
-          </div>
-          <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-bold text-slate-400">
-            <span className="bg-[#fbfeff] px-4 rounded-full">Или продолжи со е-пошта</span>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4 relative z-10 flex flex-col items-center w-full">
-          <div className="space-y-2 w-full">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Е-пошта</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input 
-                type="email" 
-                required
-                placeholder="ime@kompanija.mk"
-                className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200/50 rounded-2xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all shadow-inner"
-              />
-            </div>
-          </div>
-          <div className="space-y-2 w-full">
-            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Лозинка</label>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input 
-                type="password" 
-                required
-                placeholder="••••••••"
-                className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200/50 rounded-2xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 transition-all shadow-inner"
-              />
-            </div>
-          </div>
-          
-          <button 
-            type="submit"
-            className="w-full btn-primary py-4 flex items-center justify-center gap-2 group mt-6"
-          >
-            {isLogin ? 'Најави се' : 'Креирај сметка'}
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-slate-500 mt-8 relative z-10 font-medium">
-          {isLogin ? "Немате сметка?" : "Веќе имате сметка?"}{' '}
-          <button 
-            onClick={() => setIsLogin(!isLogin)}
-            className="font-bold text-brand-600 hover:text-brand-700 transition-colors"
-          >
-            {isLogin ? 'Регистрирај се' : 'Најави се'}
-          </button>
-        </p>
-
-        <div className="mt-12 flex flex-wrap justify-center gap-6 text-[10px] font-bold uppercase tracking-widest text-slate-400 relative z-10">
+        <div className="mt-4 flex flex-wrap justify-center gap-6 text-[10px] font-bold uppercase tracking-widest text-slate-400 relative z-10">
           <Link to="/terms" className="hover:text-slate-900 transition-colors">Услови</Link>
           <Link to="/privacy" className="hover:text-slate-900 transition-colors">Приватност</Link>
           <Link to="/disclaimer" className="hover:text-slate-900 transition-colors">Одрекување</Link>

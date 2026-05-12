@@ -35,7 +35,7 @@ export default function SettingsPage() {
     if (!auth.currentUser) return;
     setIsCanceling(true);
     try {
-      await firebaseService.updatePlan(auth.currentUser.uid, 'true_docura');
+      await firebaseService.updatePlan(auth.currentUser.uid, 'free');
       const updatedStatus = await firebaseService.getUserStatus(auth.currentUser.uid);
       setUserStatus(updatedStatus);
       setCancelSuccess(true);
@@ -88,21 +88,23 @@ export default function SettingsPage() {
     }
   };
 
-  const planLabel = userStatus?.plan === 'true_docura' 
+  const planLabel = userStatus?.plan === 'free' || userStatus?.plan === 'true_docura'
     ? 'Бесплатен'
-    : userStatus?.plan === 'pro' 
-      ? 'Про — $6/мес' 
-      : userStatus?.plan === 'business' 
-        ? 'Бизнис — $19/мес' 
+    : userStatus?.plan === 'pro'
+      ? 'Про — 370 ден./мес'
+      : userStatus?.plan === 'business'
+        ? 'Бизнис — 1.170 ден./мес'
         : 'Се вчитува...';
 
   const usageValue = !userStatus
     ? 'Се вчитува...'
     : userStatus.plan === 'business'
       ? 'Неограничено'
-      : `${userStatus.usageCount} / ${userStatus.usageLimit} документи`;
+      : userStatus.plan === 'free' || (userStatus.plan as string) === 'true_docura'
+        ? `${userStatus.lifetimeFreeAnalysesUsed} / ${userStatus.usageLimit} документи`
+        : `${userStatus.usedAnalysesInPeriod} / ${userStatus.usageLimit} документи`;
 
-  const isPaidPlan = userStatus && userStatus.plan !== 'true_docura';
+  const isPaidPlan = userStatus && userStatus.plan !== 'free' && (userStatus.plan as string) !== 'true_docura';
 
   return (
     <div className="space-y-10 max-w-4xl font-sans selection:bg-brand-100 selection:text-brand-900 relative z-10">
@@ -121,7 +123,7 @@ export default function SettingsPage() {
             className="flex items-center gap-3 px-6 py-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-700 font-medium text-sm shadow-sm"
           >
             <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-            Вашиот план е вратен на True Docura.
+            Вашиот план е вратен на Бесплатен план.
           </motion.div>
         )}
       </AnimatePresence>

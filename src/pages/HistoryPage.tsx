@@ -1,12 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  Search, 
-  Filter, 
-  FileText, 
-  Trash2, 
-  ExternalLink,
-  ChevronLeft,
-  ChevronRight,
+import {
+  Search,
+  FileText,
+  Trash2,
   Loader2,
   AlertCircle
 } from 'lucide-react';
@@ -30,7 +26,7 @@ export default function HistoryPage() {
       setDocuments(analyses);
     } catch (err) {
       console.error("Failed to fetch history", err);
-      setError("Failed to load history. Please try again.");
+      setError("Неуспешно вчитување на историјата. Ве молиме обидете се повторно.");
     } finally {
       setIsLoading(false);
     }
@@ -63,21 +59,15 @@ export default function HistoryPage() {
           <h1 className="font-display text-4xl font-bold text-slate-900 tracking-tight">Историја на документи</h1>
           <p className="text-slate-500 font-medium mt-2 leading-relaxed">Управувајте и прегледувајте ги вашите претходно анализирани извештаи.</p>
         </div>
-        <div className="flex gap-3">
-          <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-600 transition-colors" />
-            <input 
-              type="text"
-              placeholder="Пребарај документи..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-white/80 backdrop-blur-md border border-white/60 pl-11 pr-5 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all shadow-sm w-64 text-slate-800"
-            />
-          </div>
-          <button className="flex items-center gap-2 px-5 py-3 bg-white/80 backdrop-blur-md border border-white/60 rounded-2xl text-sm font-bold text-slate-700 hover:bg-white transition-all shadow-sm active:scale-95">
-            <Filter className="w-4 h-4" />
-            Филтер
-          </button>
+        <div className="relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-brand-600 transition-colors" />
+          <input
+            type="text"
+            placeholder="Пребарај документи..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-white/80 backdrop-blur-md border border-white/60 pl-11 pr-5 py-3 rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 transition-all shadow-sm w-64 text-slate-800"
+          />
         </div>
       </div>
 
@@ -169,19 +159,10 @@ export default function HistoryPage() {
           </div>
         )}
 
-        {/* Pagination */}
-        <div className="px-8 py-6 border-t border-slate-200/40 flex items-center justify-between bg-white/20 rounded-b-[2.5rem]">
+        <div className="px-8 py-6 border-t border-slate-200/40 bg-white/20 rounded-b-[2.5rem]">
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
             Прикажани {filteredDocs.length} од {documents.length} документи
           </p>
-          <div className="flex items-center gap-3">
-            <button disabled className="p-2 border border-slate-200 rounded-xl bg-white/50 backdrop-blur-sm disabled:opacity-30 shadow-sm hover:bg-white transition-all">
-              <ChevronLeft className="w-4 h-4 text-slate-600" />
-            </button>
-            <button disabled className="p-2 border border-slate-200 rounded-xl bg-white/50 backdrop-blur-sm disabled:opacity-30 shadow-sm hover:bg-white transition-all">
-              <ChevronRight className="w-4 h-4 text-slate-600" />
-            </button>
-          </div>
         </div>
       </div>
       
