@@ -316,30 +316,20 @@ export const firebaseService = {
   },
 
   async getAnalysis(id: string): Promise<{ analysis: AnalysisResult, chunks: any[] } | null> {
-    // MOCK FOR PRODUCT HUNT
-    return {
-      analysis: {
-        id,
-        title: 'Договор за деловни услуги',
-        documentType: 'document',
-        fileName: 'Enterprise_Agreement_2026.pdf',
-        uploadDate: new Date().toISOString(),
-        risks: [
-          { title: 'Клаузула за автоматско обновување', severity: 'high', explanation: 'Автоматски се обновува за 12 месеци без претходна најава.' },
-          { title: 'Неограничена одговорност', severity: 'high', explanation: 'Одговорноста е целосно неограничена за небрежност.' },
-        ],
-        obligations: [
-          { party: 'Клиент', obligation: 'Да се обезбеди известување од 90 дена пред прекин.', timing: '90 дена пред истекот.' }
-        ],
-        deadlines: [
-          { dateOrPeriod: '31 декември, 2026', description: 'Датум на истекување на почетниот рок', severity: 'warning' }
-        ],
-        keyClauses: [],
-        confidenceNotes: [],
-        suggestedQuestions: ['Кои се условите за прекин?']
-      } as any,
-      chunks: []
-    };
+    const path = `analyses/${id}`;
+    try {
+      const snap = await getDoc(doc(db, path));
+      if (!snap.exists()) return null;
+
+      const data = snap.data();
+      return {
+        analysis: data as AnalysisResult,
+        chunks: []
+      };
+    } catch (error) {
+      handleFirestoreError(error, OperationType.GET, path);
+      return null;
+    }
   },
 
   async deleteAnalysis(id: string): Promise<void> {
@@ -353,27 +343,15 @@ export const firebaseService = {
   },
 
   async listAnalyses(userId: string) {
-    // MOCK FOR PRODUCT HUNT
-    return [
-      {
-        id: 'mock-1',
-        title: 'Договор за деловни услуги',
-        documentName: 'Enterprise_Agreement_2026.pdf',
-        documentType: 'document',
-        createdAt: new Date().toISOString(),
-        status: 'completed',
-        summary: 'Анализата е завршена. Пронајдени се 3 критични ризици.',
-      },
-      {
-        id: 'mock-2',
-        title: 'Договор за доверливост (NDA)',
-        documentName: 'NDA_TechNova_v2.docx',
-        documentType: 'document',
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-        status: 'completed',
-        summary: 'Стандарден NDA. Не се пронајдени необични клаузули.',
-      }
-    ];
+    const path = 'analyses';
+    try {
+      const q = query(collection(db, path), where('userId', '==', userId));
+      const snap = await getDocs(q);
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.LIST, path);
+      return [];
+    }
   },
 
   // ── Connection Test ───────────────────────────────────────
