@@ -1,4 +1,4 @@
-export type DocumentType = 'contract' | 'business_document' | 'tender' | 'general_pdf';
+export type DocumentType = 'contract' | 'business_document' | 'tender' | 'offer' | 'general_pdf';
 
 export interface Risk {
   title: string;
