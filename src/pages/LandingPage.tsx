@@ -11,7 +11,7 @@ import { cn } from '../lib/utils';
 const DOC_TYPES = [
   { icon: Scale,      label: 'Договори',           desc: 'Закуп, вработување, услуги, купопродажба, NDA',          color: 'text-brand-600', bg: 'bg-brand-50',   border: 'border-brand-100' },
   { icon: Receipt,    label: 'Понуди',              desc: 'Комерцијални понуди, проформа фактури, котации',         color: 'text-amber-600', bg: 'bg-amber-50',   border: 'border-amber-100' },
-  { icon: Building2,  label: 'Тендери / ЕСЈН',     desc: 'Јавни набавки, услови, рокови, дисквалификација',        color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+  { icon: Building2,  label: 'Тендери',             desc: 'Јавни набавки, услови, рокови, дисквалификација',        color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
   { icon: Briefcase,  label: 'Деловни документи',  desc: 'МОУ, општи услови, анекси, Terms & Conditions',         color: 'text-indigo-600', bg: 'bg-indigo-50',  border: 'border-indigo-100' },
   { icon: FolderOpen, label: 'Грантови и проекти', desc: 'Апликации, услови за финансирање, проектни договори',    color: 'text-rose-600',  bg: 'bg-rose-50',    border: 'border-rose-100' },
   { icon: FileText,   label: 'Секој PDF документ', desc: 'Непознат документ? Прикачи го — DOCURA го идентификува', color: 'text-slate-500', bg: 'bg-slate-100',  border: 'border-slate-200' },
@@ -26,16 +26,15 @@ const STEPS = [
 const USE_CASES = [
   { icon: Users,     title: 'За секој граѓанин',      tag: 'Секојдневна употреба',   tagBg: 'bg-brand-50 text-brand-700 border-brand-200',   desc: 'Договор за закуп, купување, телекомуникации, осигурување — без правни познавања, разбери на што се обврзуваш пред да потпишеш.' },
   { icon: Briefcase, title: 'За МСП и претприемачи',  tag: 'Деловни документи',      tagBg: 'bg-amber-50 text-amber-700 border-amber-200',    desc: 'Договори со клиенти, понуди, деловни услови — побрзо разбирање без потреба од надворешен правник за секој документ.' },
-  { icon: Building2, title: 'За тендерски учесници',  tag: 'Јавни набавки / ЕСЈН',   tagBg: 'bg-emerald-50 text-emerald-700 border-emerald-200', desc: 'Задолжителни документи, рокови, критериуми — провери сè пред поднесување и избегни дисквалификација поради превид.' },
+  { icon: Building2, title: 'За тендерски учесници',  tag: 'Јавни набавки',          tagBg: 'bg-emerald-50 text-emerald-700 border-emerald-200', desc: 'Задолжителни документи, рокови, критериуми — провери сè пред поднесување и избегни дисквалификација поради превид.' },
 ];
 
 const FAQS = [
   { q: 'Дали ова е правен совет?',                          a: 'Не. DOCURA обезбедува информативна анализа за полесно разбирање. Не претставува правен совет и не е замена за адвокат или квалификуван правник.' },
-  { q: 'Дали DOCURA разбира македонски правен контекст?',   a: 'Да. Системот познава македонски правен и деловен контекст: ЗОО, ЗРО, Закон за јавни набавки и ЕСЈН постапки.' },
-  { q: 'Може ли да анализирам тендерска документација?',    a: 'Да. DOCURA е специјално приспособен за македонски јавни набавки — задолжителни услови, рокови, критериуми и потенцијални причини за дисквалификација.' },
+  { q: 'Дали DOCURA разбира македонски правен контекст?',   a: 'Да. Системот познава македонски правен и деловен контекст: ЗОО, ЗРО и Закон за јавни набавки.' },
+  { q: 'Може ли да анализирам тендерска документација?',    a: 'Да. DOCURA е приспособен за македонски јавни набавки — задолжителни услови, рокови, критериуми и потенцијални причини за дисквалификација.' },
   { q: 'Кои формати на документи се поддржани?',            a: 'PDF и Word (.docx). Најдобри резултати со јасни, текстуално достапни документи.' },
   { q: 'Дали моите документи се користат за обучување?',    a: 'Не. Документите се обработуваат исклучиво за вашата анализа и не се зачувуваат за обучување на модели.' },
-  { q: 'Може ли да постављам прашања за документот?',       a: 'Да. По анализата можете да поставувате дополнителни прашања за конкретни клаузули, рокови или обврски.' },
 ];
 
 export default function LandingPage() {
@@ -44,7 +43,7 @@ export default function LandingPage() {
 
       {/* ── Navigation ─────────────────────────────────────────── */}
       <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-white/60 shadow-sm shadow-slate-100/60">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 h-18 flex items-center justify-between">
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
@@ -82,7 +81,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────────── */}
-      <section className="relative pt-40 pb-24 px-6 overflow-hidden">
+      <section className="relative pt-32 pb-16 px-6 overflow-hidden">
         {/* Subtle dot grid */}
         <div className="absolute inset-0 pointer-events-none opacity-[0.018]"
           style={{ backgroundImage: 'radial-gradient(circle, #4f46e5 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
@@ -215,9 +214,9 @@ export default function LandingPage() {
 
       {/* ── Stats bar ──────────────────────────────────────────── */}
       <section className="bg-slate-900 border-y border-slate-800">
-        <div className="max-w-5xl mx-auto px-6 py-7">
+        <div className="max-w-5xl mx-auto px-6 py-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-x divide-slate-700/50">
-            {[['6+', 'Типа документи'], ['<30с', 'Времетраење'], ['100%', 'Македонски јазик'], ['ЕСЈН', 'Тендери поддржани']].map(([v, l]) => (
+            {[['6+', 'Типа документи'], ['<30с', 'Времетраење'], ['100%', 'Македонски јазик'], ['PDF', 'Word поддржани']].map(([v, l]) => (
               <div key={l} className="first:divide-x-0">
                 <p className="text-2xl font-black text-white mb-0.5">{v}</p>
                 <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">{l}</p>
@@ -228,7 +227,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Document Types ─────────────────────────────────────── */}
-      <section id="dokumenti" className="py-28 px-6">
+      <section id="dokumenti" className="py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-16">
             <p className="text-xs font-black text-brand-600 uppercase tracking-[0.25em] mb-3">Поддржани документи</p>
@@ -265,7 +264,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── How it works ───────────────────────────────────────── */}
-      <section id="kako-funkcionira" className="py-28 px-6 bg-white border-y border-slate-100/60">
+      <section id="kako-funkcionira" className="py-16 px-6 bg-white border-y border-slate-100/60">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-16">
             <p className="text-xs font-black text-brand-600 uppercase tracking-[0.25em] mb-3">Процес</p>
@@ -298,12 +297,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── Use Cases ──────────────────────────────────────────── */}
-      <section className="py-28 px-6">
+      <section className="py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-16">
             <p className="text-xs font-black text-brand-600 uppercase tracking-[0.25em] mb-3">За кого е DOCURA</p>
             <h2 className="font-display text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-5 leading-tight">
-              Достапен за секого —<br className="hidden md:block" /> не само за правници
+              Достапен за секого
             </h2>
             <p className="text-lg text-slate-500 font-medium max-w-xl mx-auto">Секој кој прима, потпишува или поднесува документ заслужува да го разбере — пред да постапи.</p>
           </motion.div>
@@ -334,7 +333,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Analysis Preview (dark) ────────────────────────────── */}
-      <section className="py-28 px-6 bg-slate-950 border-y border-slate-800/60">
+      <section className="py-16 px-6 bg-slate-950 border-y border-slate-800/60">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-16">
             <p className="text-xs font-black text-brand-400 uppercase tracking-[0.25em] mb-3">Пример на резултат</p>
@@ -385,7 +384,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Pricing ────────────────────────────────────────────── */}
-      <section className="py-28 px-6 bg-white border-b border-slate-100/60">
+      <section className="py-16 px-6 bg-white border-b border-slate-100/60">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-16">
             <p className="text-xs font-black text-brand-600 uppercase tracking-[0.25em] mb-3">Цени</p>
@@ -430,7 +429,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ ────────────────────────────────────────────────── */}
-      <section className="py-28 px-6">
+      <section className="py-16 px-6">
         <div className="max-w-3xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
             <p className="text-xs font-black text-brand-600 uppercase tracking-[0.25em] mb-3">FAQ</p>
@@ -448,7 +447,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Final CTA ──────────────────────────────────────────── */}
-      <section className="py-28 px-6 bg-linear-to-br from-brand-600 to-brand-800 relative overflow-hidden">
+      <section className="py-16 px-6 bg-linear-to-br from-brand-600 to-brand-800 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-[0.07]"
           style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/5 rounded-full blur-[120px] pointer-events-none" />
