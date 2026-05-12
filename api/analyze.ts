@@ -67,6 +67,8 @@ This system is primarily used for:
 1. General PDFs (highest volume — prioritize robust handling of varied formats)
 2. Contracts (legal agreements, service contracts, commercial deals)
 3. Tenders (public procurement, MK/regional tender documents — often in Macedonian)
+4. Offers (commercial offers, quotations, proforma invoices)
+5. Business documents (MOU, general terms, T&C, invoices with conditions)
 
 Adapt emphasis and field prioritization based on detected document type.
 
@@ -124,7 +126,7 @@ Return full schema — no field omissions.
 OUTPUT SCHEMA
 
 {
-  "documentType": "contract | business_document | tender | general_pdf | unknown",
+  "documentType": "contract | business_document | tender | offer | general_pdf | unknown",
   "title": "string",
   "summary": "string (3–8 sentences. State clearly: (1) what type of document this is, (2) who the identifiable parties are if present, (3) the core purpose or effect of the document, (4) key scope, value, or context. Plain English. No padding.)",
   "keyPoints": ["string (concise, scannable, grounded in document text — label inferences explicitly)"],
@@ -176,6 +178,10 @@ Note: Macedonian/regional public tenders often use formal bureaucratic language 
 
 IF general_pdf:
 Prioritize: summary, major findings, key facts, important actions, dates, most relevant sections, visible document limitations
+
+IF offer:
+Prioritize: subject and scope of the offer, total value and pricing structure, validity period of the offer, payment terms, delivery or execution timeline, conditions set by the offeror, what is explicitly included or excluded, and any obligations that activate upon acceptance.
+Note: Flag if the validity period is short, if pricing conditions are unclear, or if acceptance terms are ambiguous.
 
 IF business_document:
 Prioritize: purpose, commitments, deliverables, responsibilities, timelines, dependencies, approvals, risks, missing clarity, financial or operational implications
