@@ -299,6 +299,17 @@ export default function AnalysisResult() {
         ${(r as any).sourceHint ? `<div style="margin-top:5px;font-size:11px;color:#64748b;font-style:italic">Извор: ${(r as any).sourceHint}</div>` : ''}
       </div>`).join('');
 
+    const penKindLabel = (k: string) => k === 'guarantee' ? 'Гаранција' : 'Казна';
+    const penaltiesHtml = (analysis.penalties || []).map(p => `
+      <div style="margin-bottom:12px;padding:14px 18px;border-left:3px solid ${sevBorder(p.severity)};background:${sevBg(p.severity)};page-break-inside:avoid">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:5px">
+          <span style="font-size:13px;font-weight:700;color:#0f172a;line-height:1.4"><span style="font-size:9px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:#475569;border:1px solid #cbd5e1;border-radius:3px;padding:1px 6px;margin-right:7px">${penKindLabel(p.kind)}</span>${p.title || ''}</span>
+          <span style="font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:${sevColor(p.severity)};white-space:nowrap;padding:2px 7px;border:1px solid ${sevBorder(p.severity)};flex-shrink:0">${sevLabel(p.severity)}</span>
+        </div>
+        <p style="margin:0;font-size:12.5px;color:#334155;line-height:1.65">${p.explanation || ''}</p>
+        ${p.sourceHint ? `<div style="margin-top:5px;font-size:11px;color:#64748b;font-style:italic">Извор: ${p.sourceHint}</div>` : ''}
+      </div>`).join('');
+
     const obligationsHtml = (analysis.obligations || []).map((o, i) => `
       <tr style="background:${i % 2 === 0 ? '#fff' : '#f8fafc'}">
         <td style="padding:9px 13px;font-size:12px;font-weight:700;color:#475569;border-bottom:1px solid #e2e8f0;vertical-align:top;white-space:nowrap">${o.party || ''}</td>
@@ -374,6 +385,7 @@ export default function AnalysisResult() {
     <div class="summary-block">${analysis.summary || 'Нема достапно резиме.'}</div>
     ${analysis.keyPoints?.length ? `<h2>Клучни точки</h2><ul class="kp">${keyPointsHtml}</ul>` : ''}
     ${analysis.risks?.length ? `<h2>Идентификувани ризици (${analysis.risks.length})</h2>${risksHtml}` : ''}
+    ${analysis.penalties?.length ? `<h2>Казни и гаранции (${analysis.penalties.length})</h2>${penaltiesHtml}` : ''}
     ${analysis.obligations?.length ? `
       <h2>Обврски</h2>
       <table class="obligations-table">
@@ -417,9 +429,37 @@ export default function AnalysisResult() {
     );
   }
 
+  // Most severe items first, so the riskiest points are visible at the top.
+  const severityRank: Record<string, number> = { high: 0, medium: 1, low: 2 };
+  const sortedRisks = [...(analysis.risks || [])].sort(
+    (a, b) => (severityRank[a.severity] ?? 3) - (severityRank[b.severity] ?? 3)
+  );
+  const sortedPenalties = [...(analysis.penalties || [])].sort(
+    (a, b) => (severityRank[a.severity] ?? 3) - (severityRank[b.severity] ?? 3)
+  );
+
+  const sevBadgeClass = (s: string) =>
+    s === 'high'
+      ? 'bg-rose-50 text-rose-700 border-rose-200'
+      : s === 'medium'
+        ? 'bg-amber-50 text-amber-700 border-amber-200'
+        : 'bg-blue-50 text-blue-700 border-blue-200';
+  const sevLabelMk = (s: string) => (s === 'high' ? 'висок' : s === 'medium' ? 'среден' : 'низок');
+
+  // Existing-token empty state, so a section with no findings reads explicitly
+  // instead of rendering blank.
+  const EmptyState = ({ text }: { text: string }) => (
+    <div className="soft-card p-6 flex items-center gap-3">
+      <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0">
+        <CheckCircle2 className="w-5 h-5" />
+      </div>
+      <span className="text-slate-500 font-medium">{text}</span>
+    </div>
+  );
+
   const tabs = [
     { id: 'summary', label: 'Резиме', icon: FileText },
-    { id: 'risks', label: 'Ризици', icon: Shield, count: analysis.risks?.length || 0 },
+    { id: 'risks', label: 'Ризици и казни', icon: Shield, count: (analysis.risks?.length || 0) + (analysis.penalties?.length || 0) },
     { id: 'obligations', label: 'Обврски', icon: CheckCircle2 },
     { id: 'deadlines', label: 'Рокови', icon: Clock, count: analysis.deadlines?.length || 0 },
     { id: 'clauses', label: 'Клучни клаузули', icon: Zap },
@@ -578,8 +618,13 @@ export default function AnalysisResult() {
                   transition={{ duration: 0.3 }}
                   className="space-y-5"
                 >
-                  {analysis.risks?.map((risk, i) => (
-                    <div key={i} className="soft-card p-6 flex gap-5">
+                  {sortedRisks.length === 0 && sortedPenalties.length === 0 && (
+                    <EmptyState text="Не се пронајдени ризични клаузули ниту казни во документот." />
+                  )}
+
+                  {/* Ризични клаузули — најризичните најгоре */}
+                  {sortedRisks.map((risk, i) => (
+                    <div key={`risk-${i}`} className="soft-card p-6 flex gap-5">
                       <div className={cn(
                         "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm",
                         risk.severity === 'high' ? "bg-rose-50 text-rose-600 shadow-rose-100" :
@@ -592,10 +637,9 @@ export default function AnalysisResult() {
                           <h4 className="font-bold text-slate-800 text-lg">{risk.title}</h4>
                           <span className={cn(
                             "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border",
-                            risk.severity === 'high' ? "bg-rose-50 text-rose-700 border-rose-200" :
-                            risk.severity === 'medium' ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-blue-50 text-blue-700 border-blue-200"
+                            sevBadgeClass(risk.severity)
                           )}>
-                            {risk.severity === 'high' ? 'висок' : risk.severity === 'medium' ? 'среден' : 'низок'} ризик
+                            {sevLabelMk(risk.severity)} ризик
                           </span>
                         </div>
                         <p className="text-slate-600 leading-relaxed font-medium bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">{risk.explanation}</p>
@@ -608,6 +652,51 @@ export default function AnalysisResult() {
                       </div>
                     </div>
                   ))}
+
+                  {/* Казни и гаранции — подгрупа во рамки на Ризици */}
+                  {sortedPenalties.length > 0 && (
+                    <div className="pt-4 space-y-5">
+                      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <Shield className="w-3.5 h-3.5 text-brand-500" />
+                        Казни и гаранции
+                      </h4>
+                      {sortedPenalties.map((pen, i) => (
+                        <div key={`pen-${i}`} className="soft-card p-6 flex gap-5">
+                          <div className={cn(
+                            "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm",
+                            pen.kind === 'guarantee' ? "bg-emerald-50 text-emerald-600 shadow-emerald-100" :
+                            pen.severity === 'high' ? "bg-rose-50 text-rose-600 shadow-rose-100" :
+                            pen.severity === 'medium' ? "bg-amber-50 text-amber-600 shadow-amber-100" : "bg-blue-50 text-blue-600 shadow-blue-100"
+                          )}>
+                            {pen.kind === 'guarantee' ? <Shield className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+                          </div>
+                          <div className="space-y-3 flex-1">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                              <div className="flex items-center gap-2.5">
+                                <span className="px-2.5 py-1 bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-widest rounded-full border border-slate-200/50">
+                                  {pen.kind === 'guarantee' ? 'Гаранција' : 'Казна'}
+                                </span>
+                                <h4 className="font-bold text-slate-800 text-lg">{pen.title}</h4>
+                              </div>
+                              <span className={cn(
+                                "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border",
+                                sevBadgeClass(pen.severity)
+                              )}>
+                                {sevLabelMk(pen.severity)}
+                              </span>
+                            </div>
+                            <p className="text-slate-600 leading-relaxed font-medium bg-slate-50/50 p-4 rounded-2xl border border-slate-100/50">{pen.explanation}</p>
+                            {pen.sourceHint && (
+                              <div className="flex items-center gap-2 text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-2">
+                                <Info className="w-3.5 h-3.5" />
+                                Извор: <span className="text-brand-600">{pen.sourceHint}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               )}
 
@@ -619,6 +708,9 @@ export default function AnalysisResult() {
                   transition={{ duration: 0.3 }}
                   className="space-y-4"
                 >
+                  {(!analysis.obligations || analysis.obligations.length === 0) ? (
+                    <EmptyState text="Не се пронајдени обврски во документот." />
+                  ) : (
                   <div className="soft-card overflow-hidden">
                     <table className="w-full text-left text-sm">
                       <thead className="bg-slate-50/80 border-b border-slate-200/60 backdrop-blur-sm">
@@ -636,8 +728,16 @@ export default function AnalysisResult() {
                                 {ob.party}
                               </span>
                             </td>
-                            <td className="px-6 py-5 text-slate-700 font-medium leading-relaxed">{ob.obligation}</td>
-                            <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap">
+                            <td className="px-6 py-5 text-slate-700 font-medium leading-relaxed">
+                              {ob.obligation}
+                              {ob.sourceHint && (
+                                <div className="flex items-center gap-2 text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-2">
+                                  <Info className="w-3.5 h-3.5" />
+                                  Извор: <span className="text-brand-600">{ob.sourceHint}</span>
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-6 py-5 text-slate-500 font-medium whitespace-nowrap align-top">
                               <div className="flex items-center gap-2">
                                 <Clock className="w-3.5 h-3.5 text-slate-400" />
                                 {ob.timing}
@@ -648,6 +748,7 @@ export default function AnalysisResult() {
                       </tbody>
                     </table>
                   </div>
+                  )}
                 </motion.div>
               )}
 
@@ -659,15 +760,24 @@ export default function AnalysisResult() {
                   transition={{ duration: 0.3 }}
                   className="space-y-5"
                 >
+                  {(!analysis.deadlines || analysis.deadlines.length === 0) && (
+                    <EmptyState text="Не се пронајдени рокови ниту клучни датуми во документот." />
+                  )}
                   {analysis.deadlines?.map((dl, i) => (
                     <div key={i} className="soft-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5 group">
                       <div className="flex items-center gap-5">
-                        <div className="w-14 h-14 bg-slate-50 rounded-2xl flex flex-col items-center justify-center border border-slate-100 group-hover:bg-brand-50 group-hover:border-brand-200 transition-all">
+                        <div className="w-14 h-14 bg-slate-50 rounded-2xl flex flex-col items-center justify-center border border-slate-100 group-hover:bg-brand-50 group-hover:border-brand-200 transition-all shrink-0">
                           <Calendar className="w-6 h-6 text-slate-400 group-hover:text-brand-500" />
                         </div>
                         <div>
                           <h4 className="font-bold text-slate-800 text-lg mb-1">{dl.description}</h4>
                           <p className="text-sm font-semibold text-brand-600">{dl.dateOrPeriod}</p>
+                          {dl.sourceHint && (
+                            <div className="flex items-center gap-2 text-[11px] text-slate-400 font-bold uppercase tracking-wider mt-2">
+                              <Info className="w-3.5 h-3.5" />
+                              Извор: <span className="text-brand-600">{dl.sourceHint}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                       <span className={cn(
@@ -690,6 +800,11 @@ export default function AnalysisResult() {
                   transition={{ duration: 0.3 }}
                   className="grid sm:grid-cols-2 gap-6"
                 >
+                  {(!analysis.keyClauses || analysis.keyClauses.length === 0) && (
+                    <div className="sm:col-span-2">
+                      <EmptyState text="Не се пронајдени посебни клаузули во документот." />
+                    </div>
+                  )}
                   {analysis.keyClauses?.map((clause, i) => (
                     <div key={i} className="soft-card p-6 flex flex-col h-full hover:border-brand-200">
                       <div className="flex items-center justify-between mb-4">
