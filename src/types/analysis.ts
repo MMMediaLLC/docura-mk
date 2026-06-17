@@ -7,16 +7,26 @@ export interface Risk {
   sourceHint?: string;
 }
 
+export interface Penalty {
+  kind: 'penalty' | 'guarantee';
+  title: string;
+  severity: 'low' | 'medium' | 'high';
+  explanation: string;
+  sourceHint?: string;
+}
+
 export interface Obligation {
-  party: 'user' | 'provider' | 'client' | 'bidder' | 'unspecified';
+  party: string;
   obligation: string;
   timing: string;
+  sourceHint?: string;
 }
 
 export interface Deadline {
   dateOrPeriod: string;
   description: string;
   severity: 'info' | 'important' | 'urgent';
+  sourceHint?: string;
 }
 
 export interface KeyClause {
@@ -33,6 +43,7 @@ export interface AnalysisResult {
   summary: string;
   keyPoints: string[];
   risks: Risk[];
+  penalties: Penalty[];
   obligations: Obligation[];
   deadlines: Deadline[];
   keyClauses: KeyClause[];

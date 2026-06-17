@@ -49,6 +49,7 @@ export class AnalysisService {
         summary: payload.summary || "No summary available.",
         keyPoints: payload.keyPoints || [],
         risks: payload.risks || [],
+        penalties: payload.penalties || [],
         obligations: payload.obligations || [],
         deadlines: payload.deadlines || [],
         keyClauses: payload.keyClauses || [],
