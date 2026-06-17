@@ -1,6 +1,10 @@
 import { GoogleGenAI } from '@google/genai';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+// Gemini 3 Flash has a large context window; 200k chars (~50k tokens) covers
+// long tender/contract PDFs in a single pass so no findings are lost to chunking.
+const MAX_DOC_CHARS = 200000;
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 1. Validate Method
   if (req.method !== 'POST') {
@@ -11,19 +15,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // 2. Validate Payload
   if (!text || typeof text !== 'string') {
-    return res.status(400).json({ error: 'Missing or invalid "text" field in request body.' });
+    return res.status(400).json({ error: 'Документот не може да се прочита. Ве молиме обидете се повторно со валидна датотека.' });
   }
   if (text.length < 50) {
-    return res.status(400).json({ error: 'Document text is too short to analyze (minimum 50 characters required).' });
+    return res.status(400).json({ error: 'Текстот на документот е премногу краток за анализа (потребни се најмалку 50 знаци). Можеби е скениран PDF без избирлив текст.' });
   }
-  if (text.length > 50000) {
-    return res.status(400).json({ error: 'Document is too large (maximum allowed 50,000 characters exceeded).' });
+  if (text.length > MAX_DOC_CHARS) {
+    return res.status(400).json({ error: 'Документот е преголем (надминати се дозволените 200.000 знаци). Поделете го на помали делови и анализирајте ги поединечно.' });
   }
 
   // 3. Initialize Secure Backend Client
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'Internal Server Error: Missing GEMINI_API_KEY environment variable.' });
+    console.error('[Backend] Missing GEMINI_API_KEY environment variable.');
+    return res.status(500).json({ error: 'Услугата за анализа моментално не е достапна. Ве молиме обидете се подоцна.' });
   }
 
   const ai = new GoogleGenAI({ apiKey });
@@ -386,10 +391,29 @@ ${text}
     }
 
     const data = JSON.parse(jsonString);
+
+    // 6. Internal completeness logging — track analysis quality over time.
+    // Not returned to the client; visible only in server logs.
+    const count = (v: any) => Array.isArray(v) ? v.length : 0;
+    const coreSections = {
+      deadlines: count(data.deadlines),
+      obligations: count(data.obligations),
+      risks: count(data.risks),
+      penalties: count(data.penalties),
+      summary: typeof data.summary === 'string' && data.summary.trim().length > 0 ? 1 : 0,
+    };
+    const filledCore = Object.values(coreSections).filter(n => n > 0).length;
+    const completeness = Math.round((filledCore / 5) * 100);
+    console.log(
+      `[Analysis] type=${data.documentType || 'unknown'} chars=${text.length} ` +
+      `completeness=${completeness}% sections=${JSON.stringify(coreSections)} ` +
+      `keyClauses=${count(data.keyClauses)} confidenceNotes=${count(data.confidenceNotes)}`
+    );
+
     return res.status(200).json({ analysis: data });
 
   } catch (error: any) {
     console.error("[Backend] AI Generation Error:", error.message);
-    return res.status(500).json({ error: "Failed to generate analysis from AI provider safely." });
+    return res.status(500).json({ error: "Анализата не успеа да се генерира безбедно. Ве молиме обидете се повторно." });
   }
 }

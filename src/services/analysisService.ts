@@ -5,6 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.5.207/build/pdf.worker.min.mjs`;
 
+// Keep in sync with MAX_DOC_CHARS in api/analyze.ts.
+const MAX_DOC_CHARS = 200000;
+
 export class AnalysisService {
   // Retaining the constructor signature prevents Dashboard.tsx compilation errors
   constructor(apiKey?: string) {
@@ -32,7 +35,13 @@ export class AnalysisService {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("[Backend Error]", response.status, errorText);
-        throw new Error(`Secure Analysis Failed: ${response.statusText}`);
+        // Surface the specific server-side reason to the user when available,
+        // instead of a generic failure message.
+        let serverMessage = '';
+        try {
+          serverMessage = JSON.parse(errorText)?.error || '';
+        } catch { /* response was not JSON */ }
+        throw new Error(serverMessage || "Анализата не успеа. Ве молиме обидете се повторно.");
       }
 
       console.log("[Pipeline] Processing backend JSON response...");
@@ -62,7 +71,10 @@ export class AnalysisService {
       return { analysis: finalAnalysis, chunks };
     } catch (error: any) {
       console.error("[Pipeline] Secure Fetch failed:", error);
-      throw new Error("Analysis failed to communicate with secure backend. " + error.message);
+      // Preserve the specific (already localized) message; only fall back to a
+      // generic Macedonian message for genuine network/transport failures.
+      if (error instanceof Error && error.message) throw error;
+      throw new Error("Не може да се воспостави врска со серверот за анализа. Проверете ја интернет-врската и обидете се повторно.");
     }
   }
 
@@ -90,12 +102,12 @@ export class AnalysisService {
     text = this.cleanText(text);
     
     if (text.length < 50) {
-      throw new Error("This file could not be read clearly. It may be an image-only PDF, password protected, or completely empty.");
+      throw new Error("Датотеката не може да се прочита јасно. Можеби е PDF само со слики (скениран без текст), заштитена со лозинка или празна. Обидете се со датотека што содржи избирлив текст.");
     }
 
-    if (text.length > 50000) {
+    if (text.length > MAX_DOC_CHARS) {
       console.warn(`[Pipeline] Text exceeds threshold: ${text.length} chars. Rejecting to prevent abuse and high costs.`);
-      throw new Error(`Document is too large (${text.length} characters). Maximum allowed is 50,000 characters to ensure safe processing constraints.`);
+      throw new Error(`Документот е преголем (${text.length.toLocaleString('mk-MK')} знаци). Дозволени се најмногу 200.000 знаци. Поделете го документот на помали делови и анализирајте ги поединечно.`);
     }
     
     console.log(`[Pipeline] Extracted text length: ${text.length} characters`);
